@@ -11,6 +11,7 @@ onMounted(() => {
     columnMinSizes: 0,
   })
 })
+
 </script>
 
 <template>
