@@ -22,7 +22,7 @@ onMounted(() => {
       </Nav>
     </div>
     <div class="overflow-x-auto">
-      <Nav><Tab>👁 Preview</Tab></Nav>
+      <Nav><Tab :selected="true">👁 Preview</Tab></Nav>
     </div>
     <main class="view-a overflow-auto px-4 py-10 text-center">
       <router-view />
@@ -32,7 +32,7 @@ onMounted(() => {
     </div>
     <div class="view-split">
       <div class="view-split-bar h-full" />
-      <div class="view-split-handle">↔</div>
+      <div class="view-split-handle p-1">↔</div>
     </div>
   </div>
 </template>
@@ -66,17 +66,14 @@ onMounted(() => {
   left: -30px;
   width: 25px;
   top: 4px;
-  height: 1.3em;
-  line-height: 1.3em;
   text-align: center;
-  @apply bg-gray-100 text-gray-300 dark:bg-gray-900 dark:text-gray-600 rounded-md
-    border-gray-200 dark:border-gray-800 border-1;
+  @apply bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500 rounded-md;
 }
 .view-split:hover .view-split-handle, .view-split:active .view-split-handle {
   left: -30px;
   width: 60px;
-  @apply bg-indigo-200 text-indigo-400 border-indigo-300 shadow-md
-    dark:bg-indigo-700 dark:text-indigo-400 dark:border-indigo-600;
+  @apply bg-gray-200 text-gray-500 border-2 border-gray-300 shadow-md
+    dark:bg-gray-700 dark:text-gray-300 dark:border-gray-400;
 }
 .view-split-handle svg {
   width: 10px;
