@@ -3,13 +3,10 @@ import { onMounted } from 'vue';
 import Split from 'split-grid';
 
 onMounted(() => {
-  const splitter = document.querySelector('.view-split');
-  console.log('going to split')
-  console.log(Split, splitter)
   Split({
     columnGutters: [{
       track: 1,
-      element: splitter,
+      element: document.querySelector('.view-split'),
     }],
   })
 })
@@ -26,6 +23,9 @@ onMounted(() => {
 }
 .view-split-bar {
   width: 2px;
+}
+.view-split:hover .view-split-bar, .view-split:active .view-split-bar {
+  width: 4px;
 }
 </style>
 
