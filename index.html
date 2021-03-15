@@ -8,10 +8,19 @@
   <div id="app"></div>
   <script>
     (function() {
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-      const setting = localStorage.getItem('color-schema') || 'auto'
-      if (setting === 'dark' || (prefersDark && setting !== 'light'))
-        document.documentElement.classList.toggle('dark', true)
+      const updateDarkMode = (storageEvent = false) => {
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        const setting = localStorage.getItem('color-schema') || 'auto'
+        if (setting === 'dark' || (prefersDark && setting !== 'light'))
+          document.documentElement.classList.toggle('dark', true)
+        if (storageEvent) {
+          document.documentElement.classList.toggle('dark', 
+            setting === 'dark' ? true : (setting === 'light' ? false : prefersDark)
+          )
+        }
+      }
+      updateDarkMode()
+      window.addEventListener('storage', () => updateDarkMode(true))
     })()
   </script>
   <script type="module" src="/src/main.ts"></script>

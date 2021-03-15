@@ -1,6 +1,13 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+import { isDark, toggleDark } from '~/logics'
+
+const { t } = useI18n()
 </script>
 
 <template>
-  <button class="p-1"></button>
+  <a class="icon-btn mx-2" :title="t('button.toggle_dark')" @click="toggleDark">
+    <carbon-moon v-if="isDark" />
+    <carbon-sun v-else />
+  </a>
 </template>

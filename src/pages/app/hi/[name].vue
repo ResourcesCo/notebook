@@ -15,7 +15,13 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <div>
+  <Nav class="nav">
+    <TabArea>
+      <Tab :selected="true">🏡 Home</Tab>
+      <Tab>🌎 Request</Tab>
+    </TabArea>
+  </Nav>
+  <div class="m-2 text-center">
     <p class="text-4xl">
       <carbon-pedestrian class="inline-block" />
     </p>

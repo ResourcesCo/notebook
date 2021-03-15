@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <div class="flex">
+  <div class="flex flex-grow">
     <slot />
   </div>
 </template>
