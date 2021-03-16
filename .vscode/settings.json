@@ -15,4 +15,7 @@
     "*.css": "postcss",
   },
   "editor.tabSize": 2,
+  "files.autoSave": "onWindowChange",
+  "editor.renderWhitespace": "none",
+  "editor.wordWrap": "on",
 }
