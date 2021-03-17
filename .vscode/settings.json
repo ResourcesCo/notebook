@@ -18,4 +18,5 @@
   "files.autoSave": "onWindowChange",
   "editor.renderWhitespace": "none",
   "editor.wordWrap": "on",
+  "editor.formatOnSave": true,
 }

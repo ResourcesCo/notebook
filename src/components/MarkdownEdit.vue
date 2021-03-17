@@ -1,5 +1,6 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, onBeforeUnmount } from 'vue'
+import { NOOP } from '@vue/shared'
 import {
   EditorView,
   highlightSpecialChars,
@@ -14,7 +15,7 @@ import { foldGutter, foldKeymap } from '@codemirror/fold'
 import {
   indentOnInput,
   LanguageSupport,
-  LanguageDescription,
+  LanguageDescription
 } from '@codemirror/language'
 import { defaultKeymap } from '@codemirror/commands'
 import { bracketMatching } from '@codemirror/matchbrackets'
@@ -24,13 +25,7 @@ import { autocompletion, completionKeymap } from '@codemirror/autocomplete'
 import { commentKeymap } from '@codemirror/comment'
 import { rectangularSelection } from '@codemirror/rectangular-selection'
 import { lintKeymap } from '@codemirror/lint'
-import { jsxLanguage } from '@codemirror/lang-javascript'
-import { htmlLanguage } from '@codemirror/lang-html'
-import { cssLanguage } from '@codemirror/lang-css'
-import { pythonLanguage } from '@codemirror/lang-python'
 import { markdown } from '@codemirror/lang-markdown'
-import { jsonLanguage } from '@codemirror/lang-json'
-import { sql, PostgreSQL } from '@codemirror/lang-sql'
 import {
   lightHighlightStyle,
   darkHighlightStyle,
@@ -39,34 +34,53 @@ import {
 } from '../styles/editor'
 
 export default defineComponent({
-  setup(props, _ctx) {
-    const codeLanguages: { [key: string]: LanguageSupport } = {
-      javascript: new LanguageSupport(jsxLanguage),
-      css: new LanguageSupport(cssLanguage),
-      python: new LanguageSupport(pythonLanguage),
-      json: new LanguageSupport(jsonLanguage),
-      sql: sql({ dialect: PostgreSQL }),
-    }
-    codeLanguages.html = new LanguageSupport(htmlLanguage, [
-      codeLanguages.css, codeLanguages.javascript
-    ]);
-    const lang = (name: string, extraProps = {}) => (
-      LanguageDescription.of({
-        name,
-        async load() {
-          return codeLanguages[name]
-        },
-        ...extraProps
-      })
-    )
+  emits: ['change'],
+  setup(props, ctx) {
     const markdownLanguage = markdown({
       codeLanguages: [
-        lang('javascript', { alias: ['js', 'jsx'] }),
-        lang('css'),
-        lang('python', { alias: ['py'] }),
-        lang('json'),
-        lang('sql'),
-        lang('html', { alias: ['htm'] }),
+        LanguageDescription.of({
+          name: 'javascript', alias: ['js', 'jsx'], async load() {
+            const { jsxLanguage } = await import('@codemirror/lang-javascript')
+            return new LanguageSupport(jsxLanguage)
+          }
+        }),
+        LanguageDescription.of({
+          name: 'css', async load() {
+            const { cssLanguage } = await import('@codemirror/lang-css')
+            return new LanguageSupport(cssLanguage)
+          }
+        }),
+        LanguageDescription.of({
+          name: 'python', alias: ['py'], async load() {
+            const { pythonLanguage } = await import('@codemirror/lang-python')
+            return new LanguageSupport(pythonLanguage)
+          }
+        }),
+        LanguageDescription.of({
+          name: 'json', async load() {
+            const { jsonLanguage } = await import('@codemirror/lang-json')
+            return new LanguageSupport(jsonLanguage)
+          }
+        }),
+        LanguageDescription.of({
+          name: 'sql', async load() {
+            const { sql, PostgreSQL } = await import('@codemirror/lang-sql')
+            return sql({ dialect: PostgreSQL })
+          }
+        }),
+        LanguageDescription.of({
+          name: 'html', alias: ['htm'], async load() {
+            const { jsxLanguage } = await import('@codemirror/lang-javascript')
+            const javascript = new LanguageSupport(jsxLanguage)
+            const { cssLanguage } = await import('@codemirror/lang-css')
+            const css = new LanguageSupport(cssLanguage)
+            const { htmlLanguage } = await import('@codemirror/lang-html')
+
+            return new LanguageSupport(htmlLanguage, [
+              css, javascript
+            ])
+          }
+        }),
       ]
     })
 
@@ -114,6 +128,11 @@ export default defineComponent({
       styleCompartment.of(styleExtension),
       EditorView.lineWrapping,
       placeholder('# Enter some markdown here...'),
+      EditorView.updateListener.of((v) => {
+        if (v.docChanged) {
+          ctx.emit('change', editor.state.doc)
+        }
+      })
     ]
 
     const updateStyle = () => {

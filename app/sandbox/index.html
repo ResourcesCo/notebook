@@ -12,25 +12,15 @@
           const prefersDark =
             window.matchMedia &&
             window.matchMedia("(prefers-color-scheme: dark)").matches;
-          const setting = localStorage.getItem("color-schema") || "auto";
+          const params = new URLSearchParams(window.location.search);
+          const setting = params.get("color-schema") || "auto";
           if (setting === "dark" || (prefersDark && setting !== "light")) {
             document.documentElement.classList.toggle("dark", true);
           }
-          if (storageEvent) {
-            document.documentElement.classList.toggle(
-              "dark",
-              setting === "dark"
-                ? true
-                : setting === "light"
-                ? false
-                : prefersDark
-            );
-          }
         };
         updateDarkMode();
-        window.addEventListener("storage", () => updateDarkMode(true));
       })();
     </script>
-    <script type="module" src="/src/main.ts"></script>
+    <script type="module" src="/src/app/sandbox/main.ts"></script>
   </body>
 </html>
