@@ -1,8 +1,19 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue'
 import Split from 'split-grid'
+import Nav from '../components/Nav.vue'
+import TabArea from '../components/TabArea.vue'
+import Tab from '../components/Tab.vue'
+import DisplayMenu from '../components/DisplayMenu.vue'
+import { subscribers, colorSchema } from '../modules/store'
 
 export default defineComponent({
+  components: {
+    Nav,
+    TabArea,
+    Tab,
+    DisplayMenu,
+  },
   setup(props, _ctx) {
     const codeFrame = ref()
     const viewFrame = ref()
@@ -17,16 +28,22 @@ export default defineComponent({
         columnMinSizes: 0,
       })
       window.addEventListener('message', e => {
-        if (e.isTrusted && e.source === codeFrame?.value.contentWindow && viewFrame.value) {
-          viewFrame.value.contentWindow.postMessage(e.data, window.location.href)
+        if (codeFrame.value?.contentWindow && viewFrame.value?.contentWindow) {
+          if (e.isTrusted && e.source === codeFrame.value?.contentWindow && viewFrame.value?.contentWindow && Array.isArray(e.data) && e.data.length === 2 && e.data[0] === 'md') {
+            viewFrame.value.contentWindow.postMessage(e.data, '*')
+          }
         }
       })
+      if (codeFrame.value && viewFrame.value) {
+        subscribers.value = [codeFrame.value, viewFrame.value]
+      }
     })
 
     return {
       codeFrame,
       viewFrame,
-      split
+      split,
+      colorSchema: colorSchema.value,
     }
   }
 })
@@ -35,20 +52,36 @@ export default defineComponent({
 
 <template>
   <div class="view-container text-gray-700 dark:text-gray-200">
+    <div>
+      <Nav class="nav">
+        <TabArea>
+          <Tab :selected="true">🏡 Home</Tab>
+          <Tab>🌎 Request</Tab>
+        </TabArea>
+      </Nav>
+    </div>
+    <div>
+      <Nav>
+        <TabArea>
+          <Tab :selected="true">👁 Preview</Tab>
+        </TabArea>
+        <DisplayMenu />
+      </Nav>
+    </div>
     <div class="overflow-auto">
       <iframe
         ref="codeFrame"
         class="h-full w-full"
-        src="/app/edit/"
-        sandbox="allow-same-origin allow-scripts allow-popups allow-downloads"
+        :src="'/app/edit/?color-schema=' + colorSchema"
+        sandbox="allow-scripts allow-popups allow-downloads"
       ></iframe>
     </div>
     <div class="overflow-auto">
       <iframe
         ref="viewFrame"
         class="h-full w-full"
-        src="/app/view/"
-        sandbox="allow-same-origin allow-scripts allow-popups allow-downloads"
+        :src="'/app/view/?color-schema=' + colorSchema"
+        sandbox="allow-scripts allow-popups allow-downloads"
       ></iframe>
     </div>
     <div ref="split" class="view-split">
@@ -62,7 +95,7 @@ export default defineComponent({
 .view-container {
   display: grid;
   grid-template-columns: 1fr 0px 1fr;
-  grid-template-rows: 1fr;
+  grid-template-rows: auto 1fr;
   height: 100vh;
 }
 .view-split {

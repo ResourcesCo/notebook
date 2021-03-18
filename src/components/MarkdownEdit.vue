@@ -1,6 +1,5 @@
 <script lang="ts">
-import { defineComponent, ref, onMounted, onBeforeUnmount } from 'vue'
-import { NOOP } from '@vue/shared'
+import { defineComponent, ref, onMounted, watch } from 'vue'
 import {
   EditorView,
   highlightSpecialChars,
@@ -32,6 +31,7 @@ import {
   lightTheme,
   darkTheme,
 } from '../styles/editor'
+import { isDark } from '../modules/store'
 
 export default defineComponent({
   emits: ['change'],
@@ -92,12 +92,8 @@ export default defineComponent({
     // TODO: use reactive
     const darkStyleExtension = [darkHighlightStyle, darkTheme]
     const lightStyleExtension = [lightHighlightStyle, lightTheme]
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
     const getStyleExtension = () => {
-      const setting = localStorage.getItem('color-schema') || 'auto'
-      const isDark = (setting === 'dark' ? true :
-        (setting === 'light' ? false : prefersDark))
-      return isDark ? darkStyleExtension : lightStyleExtension
+      return isDark.value ? darkStyleExtension : lightStyleExtension
     }
     let styleExtension = getStyleExtension()
 
@@ -135,7 +131,7 @@ export default defineComponent({
       })
     ]
 
-    const updateStyle = () => {
+    watch(isDark, () => {
       const newStyleExtension = getStyleExtension()
       if (newStyleExtension !== styleExtension) {
         styleExtension = newStyleExtension
@@ -143,7 +139,7 @@ export default defineComponent({
           effects: styleCompartment.reconfigure(styleExtension)
         })
       }
-    }
+    })
 
     onMounted(() => {
       editor = new EditorView({
@@ -153,11 +149,6 @@ export default defineComponent({
         }),
         parent: root.value,
       })
-      window.addEventListener('storage', updateStyle)
-    })
-
-    onBeforeUnmount(() => {
-      window.removeEventListener('storage', updateStyle)
     })
 
     const handleFocus = () => {

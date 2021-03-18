@@ -1,3 +1,3 @@
-import { ViteSSGContext } from 'vite-ssg'
+import type { App } from 'vue'
 
-export type UserModule = (ctx: ViteSSGContext) => void
+export type UserModule = (ctx: { app: App, sandbox?: true }) => void

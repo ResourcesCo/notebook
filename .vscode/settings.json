@@ -19,4 +19,5 @@
   "editor.renderWhitespace": "none",
   "editor.wordWrap": "on",
   "editor.formatOnSave": true,
+  "autoHide.autoHideSideBar": false,
 }
