@@ -4,10 +4,12 @@ import Vue from "@vitejs/plugin-vue";
 import WindiCSS from "vite-plugin-windicss";
 import VueI18n from "@intlify/vite-plugin-vue-i18n";
 
+const packageDir = './';
+
 export default defineConfig({
   resolve: {
     alias: {
-      "~/": `${resolve(__dirname, "src")}/`,
+      "~/": `${resolve(packageDir, "src")}/`,
     },
   },
   plugins: [
@@ -22,18 +24,18 @@ export default defineConfig({
 
     // https://github.com/intlify/vite-plugin-vue-i18n
     VueI18n({
-      include: [resolve(__dirname, "locales/**")],
+      include: [resolve(packageDir, "locales/**")],
     }),
   ],
 
   build: {
     rollupOptions: {
       input: {
-        main: resolve(__dirname, "index.html"),
-        app: resolve(__dirname, "app/index.html"),
-        "app/edit": resolve(__dirname, "app/edit/index.html"),
-        "app/view": resolve(__dirname, "app/view/index.html"),
-        "app/sandbox": resolve(__dirname, "app/sandbox/index.html"),
+        main: resolve(packageDir, "index.html"),
+        app: resolve(packageDir, "app/index.html"),
+        "app/edit": resolve(packageDir, "app/edit/index.html"),
+        "app/view": resolve(packageDir, "app/view/index.html"),
+        "app/sandbox": resolve(packageDir, "app/sandbox/index.html"),
       },
       output: {
         manualChunks: {
@@ -41,7 +43,7 @@ export default defineConfig({
           'codemirror-py': ['@codemirror/lang-python'],
           'codemirror-sql': ['@codemirror/lang-sql'],
         }
-      },
+      }
     },
   },
 

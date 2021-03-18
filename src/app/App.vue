@@ -6,6 +6,7 @@ import TabArea from '../components/TabArea.vue'
 import Tab from '../components/Tab.vue'
 import DisplayMenu from '../components/DisplayMenu.vue'
 import { subscribers, colorSchema } from '../modules/store'
+import { join } from '../utils/path-string'
 
 export default defineComponent({
   components: {
@@ -30,7 +31,7 @@ export default defineComponent({
       window.addEventListener('message', e => {
         if (codeFrame.value?.contentWindow && viewFrame.value?.contentWindow) {
           if (e.isTrusted && e.source === codeFrame.value?.contentWindow && viewFrame.value?.contentWindow && Array.isArray(e.data) && e.data.length === 2 && e.data[0] === 'md') {
-            viewFrame.value.contentWindow.postMessage(e.data, '*')
+            viewFrame.value.contentWindow.postMessage(['md', e.data[1] + `\n\n# ${join(["Hello", "World"])}`], '*')
           }
         }
       })
