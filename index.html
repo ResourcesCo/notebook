@@ -11,10 +11,9 @@
         const prefersDark =
           window.matchMedia &&
           window.matchMedia("(prefers-color-scheme: dark)").matches;
-        const setting = localStorage.getItem("rco/settings/color-schema") || "auto";
-        if (setting === "dark" || (prefersDark && setting !== "light")) {
-          document.documentElement.classList.toggle("dark", true);
-        }
+        const setting = localStorage.getItem("rco/settings/color-scheme") || "auto";
+        const dark = setting === 'auto' ? prefersDark : (setting === 'dark')
+        document.documentElement.classList[dark ? 'add' : 'remove']("dark");
       })();
     </script>
     <script type="module" src="/src/main.ts"></script>

@@ -1,12 +1,12 @@
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue'
+import { defineComponent, ref, onMounted, watch, reactive } from 'vue'
 import Split from 'split-grid'
 import Nav from '../Nav.vue'
 import TabArea from '../TabArea.vue'
 import Tab from '../Tab.vue'
 import DisplayMenu from '../DisplayMenu.vue'
 import TabView from './TabView.vue'
-import { subscribers, colorSchema } from '../../modules/store'
+import { colorScheme } from '../../modules/store'
 import { join } from '../../utils/path-string'
 
 export default defineComponent({
@@ -18,9 +18,24 @@ export default defineComponent({
     TabView,
   },
   setup(props, _ctx) {
-    const codeFrame = ref()
     const viewFrame = ref()
     const split = ref()
+
+    const frames = reactive<{ code: HTMLIFrameElement | undefined, view: HTMLIFrameElement | undefined }>({
+      code: undefined,
+      view: undefined,
+    })
+
+    const handleMessage = (e: MessageEvent) => {
+      if (frames.code && frames.view) {
+        if (
+          e.isTrusted && e.source === frames.code.contentWindow && frames.view.contentWindow &&
+          Array.isArray(e.data) && e.data.length === 2 && e.data[0] === 'md'
+        ) {
+          viewFrame.value.contentWindow.postMessage(['md', e.data[1]], '*')
+        }
+      }
+    }
 
     onMounted(() => {
       Split({
@@ -30,23 +45,23 @@ export default defineComponent({
         }],
         columnMinSizes: 0,
       })
-      window.addEventListener('message', e => {
-        if (codeFrame.value?.contentWindow && viewFrame.value?.contentWindow) {
-          if (e.isTrusted && e.source === codeFrame.value?.contentWindow && viewFrame.value?.contentWindow && Array.isArray(e.data) && e.data.length === 2 && e.data[0] === 'md') {
-            viewFrame.value.contentWindow.postMessage(['md', e.data[1]], '*')
-          }
+      frames.view = viewFrame.value
+      window.addEventListener('message', handleMessage)
+    })
+
+    watch(colorScheme, () => {
+      for (const frame of Object.values(frames)) {
+        if (frame) {
+          frame.contentWindow?.postMessage!(['color-scheme', colorScheme.value], '*')
         }
-      })
-      if (codeFrame.value && viewFrame.value) {
-        subscribers.value = [codeFrame.value, viewFrame.value]
       }
     })
 
     return {
-      codeFrame: { codeFrame },
+      frames,
       viewFrame,
       split,
-      colorSchema: colorSchema.value,
+      colorScheme,
     }
   }
 })
@@ -63,12 +78,12 @@ export default defineComponent({
         <DisplayMenu />
       </Nav>
     </div>
-    <TabView :codeFrame="codeFrame"></TabView>
+    <TabView :frames="frames"></TabView>
     <div class="overflow-auto">
       <iframe
         ref="viewFrame"
         class="h-full w-full"
-        :src="'/app/view/?color-schema=' + colorSchema"
+        :src="'/app/view/?color-scheme=' + colorScheme"
         sandbox="allow-scripts allow-popups allow-downloads"
       ></iframe>
     </div>

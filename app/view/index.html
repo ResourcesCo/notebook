@@ -12,10 +12,9 @@
           window.matchMedia &&
           window.matchMedia("(prefers-color-scheme: dark)").matches;
         const params = new URLSearchParams(window.location.search);
-        const setting = params.get("color-schema") || "auto";
-        if (setting === "dark" || (prefersDark && setting !== "light")) {
-          document.documentElement.classList.toggle("dark", true);
-        }
+        const setting = params.get("color-scheme") || "auto";
+        const dark = setting === 'auto' ? prefersDark : (setting === 'dark')
+        document.documentElement.classList[dark ? 'add' : 'remove']("dark");
       })();
     </script>
     <script type="module" src="/src/app/view/main.ts"></script>

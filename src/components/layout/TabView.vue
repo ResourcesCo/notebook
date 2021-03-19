@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue'
-import { colorSchema } from '../../modules/store'
+import { colorScheme } from '../../modules/store'
 import Nav from '../Nav.vue'
 import TabArea from '../TabArea.vue'
 import Tab from '../Tab.vue'
@@ -11,12 +11,13 @@ export default defineComponent({
     TabArea,
     Tab,
   },
-  props: {
-    codeFrame: Object
-  },
+  props: ['frames'],
   setup(props, ctx) {
-    console.log(props.codeFrame)
-    return { codeFrame: props.codeFrame.codeFrame, colorSchema }
+    const codeFrame = ref()
+    onMounted(() => {
+      props.frames.code = codeFrame.value
+    })
+    return { codeFrame, colorScheme: colorScheme.value }
   }
 })
 </script>
@@ -34,7 +35,7 @@ export default defineComponent({
     <iframe
       ref="codeFrame"
       class="h-full w-full"
-      :src="'/app/edit/?color-schema=' + colorSchema"
+      :src="'/app/edit/?color-scheme=' + colorScheme"
       sandbox="allow-scripts allow-popups allow-downloads"
     ></iframe>
   </div>
