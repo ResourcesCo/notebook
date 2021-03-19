@@ -1,12 +1,8 @@
 <script lang="ts">
 import { defineComponent, ref, watch } from 'vue'
+import MarkdownIt from 'markdown-it'
 
-let md
-
-const getMarkdownIt = async () => {
-  const { default: MarkdownIt } = await import('markdown-it')
-  md = new MarkdownIt()
-}
+const md = new MarkdownIt()
 
 export default defineComponent({
   props: {
@@ -19,9 +15,6 @@ export default defineComponent({
     const root = ref()
 
     watch(() => props.value, async () => {
-      if (!md) {
-        await getMarkdownIt();
-      }
       root.value.innerHTML = md.render(props.value)
     })
 
