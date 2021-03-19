@@ -5,6 +5,7 @@ import Nav from '../Nav.vue'
 import TabArea from '../TabArea.vue'
 import Tab from '../Tab.vue'
 import DisplayMenu from '../DisplayMenu.vue'
+import TabView from './TabView.vue'
 import { subscribers, colorSchema } from '../../modules/store'
 import { join } from '../../utils/path-string'
 
@@ -14,6 +15,7 @@ export default defineComponent({
     TabArea,
     Tab,
     DisplayMenu,
+    TabView,
   },
   setup(props, _ctx) {
     const codeFrame = ref()
@@ -41,7 +43,7 @@ export default defineComponent({
     })
 
     return {
-      codeFrame,
+      codeFrame: { codeFrame },
       viewFrame,
       split,
       colorSchema: colorSchema.value,
@@ -54,14 +56,6 @@ export default defineComponent({
 <template>
   <div class="view-container text-gray-700 dark:text-gray-200">
     <div>
-      <Nav class="nav">
-        <TabArea>
-          <Tab :selected="true">🏡 Home</Tab>
-          <Tab>🌎 Request</Tab>
-        </TabArea>
-      </Nav>
-    </div>
-    <div>
       <Nav>
         <TabArea>
           <Tab :selected="true">👁 Preview</Tab>
@@ -69,14 +63,7 @@ export default defineComponent({
         <DisplayMenu />
       </Nav>
     </div>
-    <div class="overflow-auto">
-      <iframe
-        ref="codeFrame"
-        class="h-full w-full"
-        :src="'/app/edit/?color-schema=' + colorSchema"
-        sandbox="allow-scripts allow-popups allow-downloads"
-      ></iframe>
-    </div>
+    <TabView :codeFrame="codeFrame"></TabView>
     <div class="overflow-auto">
       <iframe
         ref="viewFrame"
