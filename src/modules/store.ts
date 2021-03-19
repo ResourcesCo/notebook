@@ -1,21 +1,19 @@
 import { ref, Ref, watch, computed } from 'vue'
 import { createStore } from "vuex";
 import { UserModule } from "~/types";
-import { useStorage, StorageLike, usePreferredDark, useToggle } from '@vueuse/core'
-
-let localStorageIfPresent: StorageLike | undefined = undefined
-
-try {
-  localStorageIfPresent = window.localStorage
-} catch (err) {
-}
+import { usePreferredDark, useToggle } from '@vueuse/core'
+import hasLocalStorage from '../store/hasLocalStorage'
+import useStorage from '../store/useStorage'
 
 const getUrlParamSchema = () => {
   const params = new URLSearchParams(window.location.search);
   return params.get("color-schema") || "auto"
 }
 
-export const colorSchema = localStorageIfPresent ? useStorage('color-schema', 'auto') : ref(getUrlParamSchema()) as Ref<'auto' | 'dark' | 'light'>
+export const colorSchema = useStorage(
+  ['settings', 'color-scheme'], 
+  ({hasLocalStorage}: {hasLocalStorage: boolean}) => hasLocalStorage ? getUrlParamSchema() : 'auto'
+) as Ref<'auto' | 'dark' | 'light'>
 
 export const subscribers = ref() as Ref<HTMLIFrameElement[] | undefined>
 
@@ -46,7 +44,7 @@ watch(
   { immediate: true },
 )
 
-if (!localStorageIfPresent) {
+if (!hasLocalStorage) {
   window.addEventListener('message', e => {
     if (e.isTrusted && Array.isArray(e.data) && e.data.length === 2 && e.data[0] === 'color-schema') {
       colorSchema.value = e.data[1]
