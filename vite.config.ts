@@ -2,7 +2,6 @@ import { resolve } from "path";
 import { defineConfig } from "vite";
 import Vue from "@vitejs/plugin-vue";
 import WindiCSS from "vite-plugin-windicss";
-import VueI18n from "@intlify/vite-plugin-vue-i18n";
 
 const packageDir = './';
 
@@ -20,11 +19,6 @@ export default defineConfig({
     // https://github.com/antfu/vite-plugin-windicss
     WindiCSS({
       safelist: "prose prose-sm m-auto text-left",
-    }),
-
-    // https://github.com/intlify/vite-plugin-vue-i18n
-    VueI18n({
-      include: [resolve(packageDir, "locales/**")],
     }),
   ],
 
