@@ -7,7 +7,11 @@ import Tab from '../Tab.vue'
 import DisplayMenu from '../DisplayMenu.vue'
 import TabView from './TabView.vue'
 import { colorScheme } from '../../modules/store'
-import { join } from '../../utils/path-string'
+import { nanoid } from 'nanoid'
+
+interface TabViewModel {
+  frame: HTMLIFrameElement | undefined,
+}
 
 export default defineComponent({
   components: {
@@ -21,10 +25,23 @@ export default defineComponent({
     const viewFrame = ref()
     const split = ref()
 
+    const pages = reactive({
+      [nanoid(7)]: { key: 'home', title: 'Home', emoji: '🏠', body: '' },
+      [nanoid(7)]: { key: 'request', title: 'Request', emoji: '🌎', body: '' },
+      [nanoid(7)]: { key: 'query', title: 'Query', emoji: '🗄', body: '' },
+    })
+
+    const tabs = Object.keys(pages)
+    const selected = tabs[0]
+    const tabState = reactive({
+      tabs, selected
+    })
+
     const frames = reactive<{ code: HTMLIFrameElement | undefined, view: HTMLIFrameElement | undefined }>({
       code: undefined,
       view: undefined,
     })
+
 
     const handleMessage = (e: MessageEvent) => {
       if (frames.code && frames.view) {
@@ -62,6 +79,8 @@ export default defineComponent({
       viewFrame,
       split,
       colorScheme,
+      pages,
+      tabState,
     }
   }
 })
@@ -73,12 +92,19 @@ export default defineComponent({
     <div>
       <Nav>
         <TabArea>
-          <Tab :selected="true">👁 Preview</Tab>
+          <Tab :selected="true">👁 View</Tab>
+          <Tab>⚙️ Meta</Tab>
         </TabArea>
         <DisplayMenu />
       </Nav>
     </div>
-    <TabView :frames="frames"></TabView>
+    <TabView
+      :frames="frames"
+      :pages="pages"
+      :tabState="tabState"
+      mode="page"
+      :showSymmetric="false"
+    />
     <div class="overflow-auto">
       <iframe
         ref="viewFrame"
@@ -99,7 +125,7 @@ export default defineComponent({
   display: grid;
   grid-template-columns: 1fr 0px 1fr;
   grid-template-rows: auto 1fr;
-  height: 100vh;
+  height: 100%;
 }
 .view-split {
   position: relative;

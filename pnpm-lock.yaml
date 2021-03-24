@@ -24,6 +24,7 @@ dependencies:
   '@vueuse/head': 0.5.1_vue@3.0.7
   lodash: 4.17.21
   markdown-it: 12.0.4
+  nanoid: 3.1.22
   nprogress: 0.2.0
   prism-theme-vars: 0.2.2
   split-grid: 1.0.9
@@ -861,7 +862,7 @@ packages:
   /@vueuse/core/4.4.1_vue@3.0.7:
     dependencies:
       '@vueuse/shared': 4.4.1_vue@3.0.7
-      vue-demi: 0.7.3_vue@3.0.7
+      vue-demi: 0.7.4_vue@3.0.7
     dev: false
     peerDependencies:
       vue: '*'
@@ -877,7 +878,7 @@ packages:
       integrity: sha512-xt6qgtItb4z/7vp664opQc0c2+ZoU9itMfvpmg4+h0uJcEnhl7LYxO4V+G8H7EVki7SyXDIFMfoCiCFaJrArmg==
   /@vueuse/shared/4.4.1_vue@3.0.7:
     dependencies:
-      vue-demi: 0.7.3_vue@3.0.7
+      vue-demi: 0.7.4_vue@3.0.7
     dev: false
     peerDependencies:
       vue: '*'
@@ -3255,7 +3256,6 @@ packages:
     resolution:
       integrity: sha512-z81GNO7nnYMEhrGh9LeymoE4+Yr0Wn5McHIZMK5cfQCl+NDX08sCZgUc9/6MHni9IWuFLm1Z3HTCXu2z9fN62Q==
   /nanoid/3.1.22:
-    dev: true
     engines:
       node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1
     hasBin: true
@@ -4633,7 +4633,7 @@ packages:
       fsevents: 2.3.2
     resolution:
       integrity: sha512-K96k5Nb1kywggFwZNGf/NQVZIrjMSvjebYWFIEQRu8AQWtzxatMF8/reExFXebmrfWAT3PTUk6l4zJBkpMtyVg==
-  /vue-demi/0.7.3_vue@3.0.7:
+  /vue-demi/0.7.4_vue@3.0.7:
     dependencies:
       vue: 3.0.7
     dev: false
@@ -4646,7 +4646,7 @@ packages:
         optional: true
     requiresBuild: true
     resolution:
-      integrity: sha512-vrzM26H4CZCXBf/eu4T8nks6o7qgziYM52myk8bg+atw4qYqpeWJf5c82W8VdmgGfSIdh9ulOOe9+GeLc3Z/8A==
+      integrity: sha512-PT0qzI9Rp8R8eUAsTPXADC+KAZdrMufmbZqEMMqvaiesWyjCpgyuuvS5Su8cvBjK9RevLT/YfFiKWxc8YB9/8g==
   /vue-eslint-parser/7.6.0_eslint@7.22.0:
     dependencies:
       debug: 4.3.1
@@ -4855,6 +4855,7 @@ specifiers:
   eslint: ^7.22.0
   lodash: ^4.17.21
   markdown-it: ^12.0.4
+  nanoid: ^3.1.22
   nprogress: ^0.2.0
   pnpm: ^5.18.7
   prism-theme-vars: ^0.2.2

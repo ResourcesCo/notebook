@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue'
+import { defineComponent, ref, onMounted, computed } from 'vue'
 import { colorScheme } from '../../modules/store'
 import Nav from '../Nav.vue'
 import TabArea from '../TabArea.vue'
@@ -11,13 +11,37 @@ export default defineComponent({
     TabArea,
     Tab,
   },
-  props: ['frames'],
+  props: {
+    frames: Object,
+    side: String,
+    pages: Object,
+    tabState: Object,
+    mode: String,
+    showSymmetric: Boolean,
+  },
   setup(props, ctx) {
     const codeFrame = ref()
     onMounted(() => {
-      props.frames.code = codeFrame.value
+      if (props.frames) {
+        props.frames.code = codeFrame.value
+      }
     })
-    return { codeFrame, colorScheme: colorScheme.value }
+
+    const handleClick = (id) => {
+      props.tabState.selected = id
+    }
+
+    const tabs = computed(() => props.tabState.tabs)
+    const selected = computed(() => props.tabState.selected)
+
+    return {
+      codeFrame,
+      colorScheme: colorScheme.value,
+      side: props.side,
+      tabs,
+      selected,
+      handleClick,
+    }
   }
 })
 </script>
@@ -26,12 +50,15 @@ export default defineComponent({
   <div class="header">
     <Nav class="nav">
       <TabArea>
-        <Tab :selected="true">🏡 Home</Tab>
-        <Tab>🌎 Request</Tab>
+        <Tab
+          v-for="tab in tabs"
+          :selected="tab === selected"
+          @click="() => handleClick(tab)"
+        >{{ pages[tab].emoji }} {{ pages[tab].title }}</Tab>
       </TabArea>
     </Nav>
   </div>
-  <div class="overflow-auto content">
+  <div :class="['overflow-auto', 'content', side]">
     <iframe
       ref="codeFrame"
       class="h-full w-full"
@@ -43,11 +70,15 @@ export default defineComponent({
 
 <style scoped>
 .header {
-  grid-column: 1;
   grid-row: 1;
 }
 .content {
-  grid-column: 1;
   grid-row: 2;
+}
+.left {
+  grid-column: 1;
+}
+.right {
+  grid-column: 3;
 }
 </style>

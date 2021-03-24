@@ -18,7 +18,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <main class="m-1 flex flex-col flex-grow">
+  <main class="p-1 flex flex-col flex-grow">
     <MarkdownEdit @change="handleChange" />
   </main>
 </template>
