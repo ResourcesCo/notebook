@@ -150,7 +150,7 @@ export default defineComponent({
     onMounted(() => {
       editor = new EditorView({
         state: EditorState.create({
-          doc: '',
+          doc: props.page.body,
           extensions,
         }),
         parent: root.value,

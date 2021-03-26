@@ -9,7 +9,7 @@ export default defineComponent({
   },
   setup(props, ctx) {
     const page = reactive({
-      body: '',
+      body: undefined,
     })
     const handleChange = debounce((value) => {
       parent.postMessage(['md', String(value)], '*')
@@ -28,7 +28,7 @@ export default defineComponent({
 
 <template>
   <main class="p-1 flex flex-col flex-grow">
-    <MarkdownEdit :page="page" @change="handleChange" />
+    <MarkdownEdit :page="page" @change="handleChange" v-if="typeof page.body == 'string'" />
   </main>
 </template>
 
