@@ -35,6 +35,7 @@ import { isDark } from '../modules/store'
 
 export default defineComponent({
   emits: ['change'],
+  props: ['page'],
   setup(props, ctx) {
     const markdownLanguage = markdown({
       codeLanguages: [
@@ -139,6 +140,11 @@ export default defineComponent({
           effects: styleCompartment.reconfigure(styleExtension)
         })
       }
+    })
+
+    watch(props.page, () => {
+      const tr = editor.state.update({ changes: { from: 0, to: editor.state.doc.length, insert: props.page.body } })
+      editor.dispatch(tr)
     })
 
     onMounted(() => {

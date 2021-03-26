@@ -4,13 +4,29 @@ import Split from 'split-grid'
 import Nav from '../Nav.vue'
 import TabArea from '../TabArea.vue'
 import Tab from '../Tab.vue'
-import DisplayMenu from '../DisplayMenu.vue'
 import TabView from './TabView.vue'
 import { colorScheme } from '../../modules/store'
 import { nanoid } from 'nanoid'
 
-interface TabViewModel {
-  frame: HTMLIFrameElement | undefined,
+export interface FrameGroup {
+  code: HTMLIFrameElement | undefined;
+  view: HTMLIFrameElement | undefined;
+}
+
+export interface Page {
+  id: string,
+  key: string,
+  title: string,
+  emoji: string,
+  body: string,
+}
+
+export type PageCollection = { [key: string]: Page }
+
+export interface TabState {
+  tabs: string[],
+  selected: string | undefined,
+  mode: 'edit' | 'view',
 }
 
 export default defineComponent({
@@ -18,38 +34,42 @@ export default defineComponent({
     Nav,
     TabArea,
     Tab,
-    DisplayMenu,
     TabView,
   },
   setup(props, _ctx) {
-    const viewFrame = ref()
     const split = ref()
 
-    const pages = reactive({
-      [nanoid(7)]: { key: 'home', title: 'Home', emoji: '🏠', body: '' },
-      [nanoid(7)]: { key: 'request', title: 'Request', emoji: '🌎', body: '' },
-      [nanoid(7)]: { key: 'query', title: 'Query', emoji: '🗄', body: '' },
+    const ids = [nanoid(7), nanoid(7), nanoid(7)]
+    const pages = reactive<PageCollection>({
+      [ids[0]]: { id: ids[0], key: 'home', title: 'Home', emoji: '🏠', body: '' },
+      [ids[1]]: { id: ids[1], key: 'request', title: 'Request', emoji: '🌎', body: '' },
+      [ids[2]]: { id: ids[2], key: 'query', title: 'Query', emoji: '🗄', body: '' },
     })
 
     const tabs = Object.keys(pages)
     const selected = tabs[0]
-    const tabState = reactive({
-      tabs, selected
+    const tabState = reactive<TabState>({
+      tabs, selected, mode: 'edit',
     })
 
-    const frames = reactive<{ code: HTMLIFrameElement | undefined, view: HTMLIFrameElement | undefined }>({
+    const rightTabs: string[] = []
+    const rightTabState = reactive<TabState>({
+      tabs: rightTabs, selected: undefined, mode: 'view',
+    })
+
+    const frames = reactive<FrameGroup>({
       code: undefined,
       view: undefined,
     })
 
 
     const handleMessage = (e: MessageEvent) => {
-      if (frames.code && frames.view) {
+      if (frames.code) {
         if (
-          e.isTrusted && e.source === frames.code.contentWindow && frames.view.contentWindow &&
+          e.isTrusted && e.source === frames.code.contentWindow &&
           Array.isArray(e.data) && e.data.length === 2 && e.data[0] === 'md'
         ) {
-          viewFrame.value.contentWindow.postMessage(['md', e.data[1]], '*')
+          pages[tabState.selected].body = e.data[1]
         }
       }
     }
@@ -62,7 +82,6 @@ export default defineComponent({
         }],
         columnMinSizes: 0,
       })
-      frames.view = viewFrame.value
       window.addEventListener('message', handleMessage)
     })
 
@@ -76,11 +95,11 @@ export default defineComponent({
 
     return {
       frames,
-      viewFrame,
       split,
       colorScheme,
       pages,
       tabState,
+      rightTabState,
     }
   }
 })
@@ -89,30 +108,22 @@ export default defineComponent({
 
 <template>
   <div class="view-container text-gray-700 dark:text-gray-200">
-    <div>
-      <Nav>
-        <TabArea>
-          <Tab :selected="true">👁 View</Tab>
-          <Tab>⚙️ Meta</Tab>
-        </TabArea>
-        <DisplayMenu />
-      </Nav>
-    </div>
     <TabView
       :frames="frames"
       :pages="pages"
       :tabState="tabState"
-      mode="page"
+      :otherTabState="rightTabState"
       :showSymmetric="false"
+      side="left"
     />
-    <div class="overflow-auto">
-      <iframe
-        ref="viewFrame"
-        class="h-full w-full"
-        :src="'/app/view/?color-scheme=' + colorScheme"
-        sandbox="allow-scripts allow-popups allow-downloads"
-      ></iframe>
-    </div>
+    <TabView
+      :frames="frames"
+      :pages="pages"
+      :tabState="rightTabState"
+      :otherTabState="tabState"
+      :showSymmetric="true"
+      side="right"
+    />
     <div ref="split" class="view-split">
       <div class="view-split-bar h-full" />
       <div class="view-split-handle p-1">↔</div>

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, reactive } from 'vue'
 import debounce from 'lodash/debounce'
 import MarkdownEdit from '../../components/MarkdownEdit.vue'
 
@@ -8,18 +8,27 @@ export default defineComponent({
     MarkdownEdit,
   },
   setup(props, ctx) {
+    const page = reactive({
+      body: '',
+    })
     const handleChange = debounce((value) => {
       parent.postMessage(['md', String(value)], '*')
     }, 10, { leading: true })
 
-    return { handleChange }
+    window.addEventListener('message', e => {
+      if (e.isTrusted && e.source === parent && Array.isArray(e.data) && e.data.length === 2 && e.data[0] === 'md') {
+        page.body = e.data[1]
+      }
+    })
+
+    return { page, handleChange }
   }
 })
 </script>
 
 <template>
   <main class="p-1 flex flex-col flex-grow">
-    <MarkdownEdit @change="handleChange" />
+    <MarkdownEdit :page="page" @change="handleChange" />
   </main>
 </template>
 
