@@ -1,6 +1,7 @@
 <script lang="ts">
 import { defineComponent, ref, watch } from 'vue'
 import MarkdownIt from 'markdown-it'
+import Prism from 'prismjs'
 
 const md = new MarkdownIt()
 
@@ -16,6 +17,7 @@ export default defineComponent({
 
     watch(() => props.value, async () => {
       root.value.innerHTML = md.render(props.value)
+      Prism.highlightAll()
     })
 
     return { root }

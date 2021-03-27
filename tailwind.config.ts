@@ -18,7 +18,7 @@ export default defineConfig({
               color: 'inherit',
               opacity: 0.75,
               fontWeight: '500',
-              textDecoration: 'underline',
+              textDecoration: 'none',
               '&:hover': {
                 opacity: 1,
                 color: colors.teal[600],
