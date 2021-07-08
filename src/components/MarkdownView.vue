@@ -10,12 +10,12 @@ import typescript from "highlight.js/lib/languages/typescript";
 import json from "highlight.js/lib/languages/json";
 import highlight from "markdown-it-highlightjs/core";
 
-hljs.registerLanguage("markdown", markdown);
 hljs.registerLanguage("xml", xml);
 hljs.registerLanguage("css", css);
 hljs.registerLanguage("javascript", javascript);
 hljs.registerLanguage("typescript", typescript);
 hljs.registerLanguage("json", json);
+hljs.registerLanguage("markdown", markdown);
 
 const md = MarkdownIt().use(highlight, { hljs });
 

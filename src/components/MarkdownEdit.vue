@@ -37,56 +37,99 @@ export default defineComponent({
   emits: ["change"],
   props: ["page"],
   setup(props, ctx) {
+    const codeLanguages = [
+      LanguageDescription.of({
+        name: "javascript",
+        alias: ["js", "jsx"],
+        async load() {
+          const { jsxLanguage } = await import("@codemirror/lang-javascript");
+          return new LanguageSupport(jsxLanguage);
+        },
+      }),
+      LanguageDescription.of({
+        name: "typescript",
+        alias: ["ts", "tsx"],
+        async load() {
+          const { tsxLanguage } = await import("@codemirror/lang-javascript");
+          return new LanguageSupport(tsxLanguage);
+        },
+      }),
+      LanguageDescription.of({
+        name: "css",
+        async load() {
+          const { cssLanguage } = await import("@codemirror/lang-css");
+          return new LanguageSupport(cssLanguage);
+        },
+      }),
+      LanguageDescription.of({
+        name: "python",
+        alias: ["py"],
+        async load() {
+          const { pythonLanguage } = await import("@codemirror/lang-python");
+          return new LanguageSupport(pythonLanguage);
+        },
+      }),
+      LanguageDescription.of({
+        name: "json",
+        async load() {
+          const { jsonLanguage } = await import("@codemirror/lang-json");
+          return new LanguageSupport(jsonLanguage);
+        },
+      }),
+      LanguageDescription.of({
+        name: "sql",
+        async load() {
+          const { sql, PostgreSQL } = await import("@codemirror/lang-sql");
+          return sql({ dialect: PostgreSQL });
+        },
+      }),
+      LanguageDescription.of({
+        name: "html",
+        alias: ["htm"],
+        async load() {
+          const { jsxLanguage } = await import("@codemirror/lang-javascript");
+          const javascript = new LanguageSupport(jsxLanguage);
+          const { cssLanguage } = await import("@codemirror/lang-css");
+          const css = new LanguageSupport(cssLanguage);
+          const { htmlLanguage } = await import("@codemirror/lang-html");
+
+          return new LanguageSupport(htmlLanguage, [css, javascript]);
+        },
+      }),
+    ];
+
     const markdownLanguage = markdown({
       codeLanguages: [
+        ...codeLanguages,
         LanguageDescription.of({
-          name: "javascript",
-          alias: ["js", "jsx"],
+          name: "markdown",
+          alias: ["md", "mkd"],
           async load() {
-            const { jsxLanguage } = await import("@codemirror/lang-javascript");
-            return new LanguageSupport(jsxLanguage);
-          },
-        }),
-        LanguageDescription.of({
-          name: "css",
-          async load() {
-            const { cssLanguage } = await import("@codemirror/lang-css");
-            return new LanguageSupport(cssLanguage);
-          },
-        }),
-        LanguageDescription.of({
-          name: "python",
-          alias: ["py"],
-          async load() {
-            const { pythonLanguage } = await import("@codemirror/lang-python");
-            return new LanguageSupport(pythonLanguage);
-          },
-        }),
-        LanguageDescription.of({
-          name: "json",
-          async load() {
-            const { jsonLanguage } = await import("@codemirror/lang-json");
-            return new LanguageSupport(jsonLanguage);
-          },
-        }),
-        LanguageDescription.of({
-          name: "sql",
-          async load() {
-            const { sql, PostgreSQL } = await import("@codemirror/lang-sql");
-            return sql({ dialect: PostgreSQL });
-          },
-        }),
-        LanguageDescription.of({
-          name: "html",
-          alias: ["htm"],
-          async load() {
-            const { jsxLanguage } = await import("@codemirror/lang-javascript");
-            const javascript = new LanguageSupport(jsxLanguage);
-            const { cssLanguage } = await import("@codemirror/lang-css");
-            const css = new LanguageSupport(cssLanguage);
-            const { htmlLanguage } = await import("@codemirror/lang-html");
-
-            return new LanguageSupport(htmlLanguage, [css, javascript]);
+            return markdown({
+              codeLanguages: [
+                ...codeLanguages,
+                LanguageDescription.of({
+                  name: "markdown",
+                  alias: ["md", "mkd"],
+                  async load() {
+                    return markdown({
+                      codeLanguages: [
+                        ...codeLanguages,
+                        LanguageDescription.of({
+                          name: "markdown",
+                          alias: ["md", "mkd"],
+                          async load() {
+                            return markdown({
+                              codeLanguages,
+                            });
+                          },
+                        }),
+                      ],
+                    });
+                  },
+                }),
+              ],
+            });
           },
         }),
       ],
