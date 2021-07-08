@@ -1,12 +1,12 @@
 <script lang="ts">
-import { defineComponent, ref, onMounted, watch, reactive } from 'vue'
-import Split from 'split-grid'
-import Nav from '../Nav.vue'
-import TabArea from '../TabArea.vue'
-import Tab from '../Tab.vue'
-import TabView from './TabView.vue'
-import { colorScheme } from '../../modules/store'
-import { nanoid } from 'nanoid'
+import { defineComponent, ref, onMounted, watch, reactive } from "vue";
+import Split from "split-grid";
+import Nav from "../Nav.vue";
+import TabArea from "../TabArea.vue";
+import Tab from "../Tab.vue";
+import TabView from "./TabView.vue";
+import { colorScheme } from "../../modules/store";
+import { nanoid } from "nanoid";
 
 export interface FrameGroup {
   code: HTMLIFrameElement | undefined;
@@ -14,19 +14,19 @@ export interface FrameGroup {
 }
 
 export interface Page {
-  id: string,
-  key: string,
-  title: string,
-  emoji: string,
-  body: string,
+  id: string;
+  key: string;
+  title: string;
+  emoji: string;
+  body: string;
 }
 
-export type PageCollection = { [key: string]: Page }
+export type PageCollection = { [key: string]: Page };
 
 export interface TabState {
-  tabs: string[],
-  selected: string | undefined,
-  mode: 'edit' | 'view',
+  tabs: string[];
+  selected: string | undefined;
+  mode: "edit" | "view";
 }
 
 export default defineComponent({
@@ -37,61 +37,76 @@ export default defineComponent({
     TabView,
   },
   setup(props, _ctx) {
-    const split = ref()
+    const split = ref();
 
-    const ids = [nanoid(7), nanoid(7), nanoid(7)]
+    const ids = [nanoid(7), nanoid(7), nanoid(7)];
     const pages = reactive<PageCollection>({
-      [ids[0]]: { id: ids[0], key: 'home', title: 'Home', emoji: '🏠', body: '' },
-      [ids[1]]: { id: ids[1], key: 'request', title: 'Request', emoji: '🌎', body: '' },
-      [ids[2]]: { id: ids[2], key: 'query', title: 'Query', emoji: '🗄', body: '' },
-    })
+      [ids[0]]: {
+        id: ids[0],
+        key: "edit",
+        title: "Edit",
+        emoji: "📝",
+        body: "",
+      },
+    });
 
-    const tabs = Object.keys(pages)
-    const selected = tabs[0]
+    const tabs = Object.keys(pages);
+    const selected = tabs[0];
     const tabState = reactive<TabState>({
-      tabs, selected, mode: 'edit',
-    })
+      tabs,
+      selected,
+      mode: "edit",
+    });
 
-    const rightTabs: string[] = []
+    const rightTabs: string[] = [];
     const rightTabState = reactive<TabState>({
-      tabs: rightTabs, selected: undefined, mode: 'view',
-    })
+      tabs: rightTabs,
+      selected: undefined,
+      mode: "view",
+    });
 
     const frames = reactive<FrameGroup>({
       code: undefined,
       view: undefined,
-    })
-
+    });
 
     const handleMessage = (e: MessageEvent) => {
       if (frames.code) {
         if (
-          e.isTrusted && e.source === frames.code.contentWindow &&
-          Array.isArray(e.data) && e.data.length === 2 && e.data[0] === 'md'
+          e.isTrusted &&
+          e.source === frames.code.contentWindow &&
+          Array.isArray(e.data) &&
+          e.data.length === 2 &&
+          e.data[0] === "md"
         ) {
-          pages[tabState.selected].body = e.data[1]
+          pages[tabState.selected].body = e.data[1];
         }
       }
-    }
+    };
 
     onMounted(() => {
       Split({
-        columnGutters: [{
-          track: 1,
-          element: split.value,
-        }],
+        columnGutters: [
+          {
+            track: 1,
+            element: split.value,
+          },
+        ],
         columnMinSizes: 0,
-      })
-      window.addEventListener('message', handleMessage)
-    })
+      });
+      window.addEventListener("message", handleMessage);
+    });
 
     watch(colorScheme, () => {
       for (const frame of Object.values(frames)) {
         if (frame) {
-          frame.contentWindow?.postMessage!(['color-scheme', colorScheme.value], '*')
+          frame.contentWindow?.postMessage!(
+            ["color-scheme", colorScheme.value],
+            "*"
+          );
         }
       }
-    })
+    });
 
     return {
       frames,
@@ -100,10 +115,9 @@ export default defineComponent({
       pages,
       tabState,
       rightTabState,
-    }
-  }
-})
-
+    };
+  },
+});
 </script>
 
 <template>

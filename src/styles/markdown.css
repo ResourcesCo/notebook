@@ -1,54 +1,216 @@
-/* https://github.com/antfu/prism-theme-vars */
-@import 'prism-theme-vars/base.css';
-
-:root {
-  --prism-font-family: 'Input Mono', monospace;
+.prose pre code.hljs {
+  font-size: 14px;
 }
 
-html:not(.dark) {
-  --prism-foreground: #393a34;
-  --prism-background: #fbfbfb;
-  --prism-comment: #a0ada0;
-  --prism-string: #b56959;
-  --prism-literal: #2f8a89;
-  --prism-number: #296aa3;
-  --prism-keyword: #1c6b48;
-  --prism-function: #6c7834;
-  --prism-boolean: #1c6b48;
-  --prism-constant: #a65e2b;
-  --prism-deleted: #a14f55;
-  --prism-class: #2993a3;
-  --prism-builtin: #ab5959;
-  --prism-property: #b58451;
-  --prism-namespace: #b05a78;
-  --prism-punctuation: #8e8f8b;
-  --prism-decorator: #bd8f8f;
-  --prism-regex: #ab5e3f;
-  --prism-json-property: #698c96;
+.prose ul {
+  margin-top: 1em;
+  margin-bottom: 1em;
 }
 
-html.dark {
-  --prism-foreground: #d4cfbf;
-  --prism-background: #151515;
-  --prism-comment: #758575;
-  --prism-string: #d48372;
-  --prism-literal: #429988;
-  --prism-keyword: #4d9375;
-  --prism-boolean: #1c6b48;
-  --prism-number: #6394bf;
-  --prism-variable: #c2b36e;
-  --prism-function: #a1b567;
-  --prism-deleted: #a14f55;
-  --prism-class: #54b1bf;
-  --prism-builtin: #e0a569;
-  --prism-property: #dd8e6e;
-  --prism-namespace: #db889a;
-  --prism-punctuation: #858585;
-  --prism-decorator: #bd8f8f;
-  --prism-regex: #ab5e3f;
-  --prism-json-property: #6b8b9e;
-  --prism-line-number: #888888;
-  --prism-line-number-gutter: #eeeeee;
-  --prism-line-highlight-background: #444444;
-  --prism-selection-background: #444444;
+.prose li {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/*
+Atom One Dark With support for ReasonML by Gidi Morris, based off work by Daniel Gamage
+Original One Dark Syntax theme from https://github.com/atom/one-dark-syntax
+*/
+html.dark .hljs {
+  color: #abb2bf;
+  /*background: #282c34;*/
+}
+html.dark .hljs-keyword, html.dark .hljs-operator {
+  color: #F92672;
+}
+html.dark .hljs-pattern-match {
+  color: #F92672;
+}
+html.dark .hljs-pattern-match .hljs-constructor {
+  color: #61aeee;
+}
+html.dark .hljs-function {
+  color: #61aeee;
+}
+html.dark .hljs-function .hljs-params {
+  color: #A6E22E;
+}
+html.dark .hljs-function .hljs-params .hljs-typing {
+  color: #FD971F;
+}
+html.dark .hljs-module-access .hljs-module {
+  color: #7e57c2;
+}
+html.dark .hljs-constructor {
+  color: #e2b93d;
+}
+html.dark .hljs-constructor .hljs-string {
+  color: #9CCC65;
+}
+html.dark .hljs-comment, html.dark .hljs-quote {
+  color: #b18eb1;
+  font-style: italic;
+}
+html.dark .hljs-doctag, html.dark .hljs-formula {
+  color: #c678dd;
+}
+html.dark .hljs-section, html.dark .hljs-name, html.dark .hljs-selector-tag, html.dark .hljs-deletion, html.dark .hljs-subst {
+  color: #e06c75;
+}
+html.dark .hljs-literal {
+  color: #56b6c2;
+}
+html.dark .hljs-string, html.dark .hljs-regexp, html.dark .hljs-addition, html.dark .hljs-attribute, html.dark .hljs-meta .hljs-string {
+  color: #98c379;
+}
+html.dark .hljs-built_in,
+html.dark .hljs-title.class_,
+html.dark .hljs-class .hljs-title {
+  color: #e6c07b;
+}
+html.dark .hljs-attr, html.dark .hljs-variable, html.dark .hljs-template-variable, html.dark .hljs-type, html.dark .hljs-selector-class, html.dark .hljs-selector-attr, html.dark .hljs-selector-pseudo, html.dark .hljs-number {
+  color: #d19a66;
+}
+html.dark .hljs-symbol, html.dark .hljs-bullet, html.dark .hljs-link, html.dark .hljs-meta, html.dark .hljs-selector-id, html.dark .hljs-title {
+  color: #61aeee;
+}
+html.dark .hljs-emphasis {
+  font-style: italic;
+}
+html.dark .hljs-strong {
+  font-weight: bold;
+}
+html.dark .hljs-link {
+  text-decoration: underline;
+}
+
+/*!
+  Theme: StackOverflow Light
+  Description: Light theme as used on stackoverflow.com
+  Author: stackoverflow.com
+  Maintainer: @Hirse
+  Website: https://github.com/StackExchange/Stacks
+  License: MIT
+  Updated: 2021-05-15
+
+  Updated for @stackoverflow/stacks v0.64.0
+  Code Blocks: /blob/v0.64.0/lib/css/components/_stacks-code-blocks.less
+  Colors: /blob/v0.64.0/lib/css/exports/_stacks-constants-colors.less
+*/
+
+html:not(.dark) .hljs {
+  /* var(--highlight-color) */
+  color: #2f3337;
+  /* var(--highlight-bg) */
+  /*background: #f6f6f6;*/
+}
+
+html:not(.dark) .hljs-subst {
+  /* var(--highlight-color) */
+  color: #2f3337;
+}
+
+html:not(.dark) .hljs-comment {
+  /* var(--highlight-comment) */
+  color: #656e77;
+}
+
+html:not(.dark) .hljs-keyword,
+html:not(.dark) .hljs-selector-tag,
+html:not(.dark) .hljs-meta .hljs-keyword,
+html:not(.dark) .hljs-doctag,
+html:not(.dark) .hljs-section {
+  /* var(--highlight-keyword) */
+  color: #015692;
+}
+
+html:not(.dark) .hljs-attr {
+  /* var(--highlight-attribute); */
+  color: #015692;
+}
+
+html:not(.dark) .hljs-attribute {
+  /* var(--highlight-symbol) */
+  color: #803378;
+}
+
+html:not(.dark) .hljs-name,
+html:not(.dark) .hljs-type,
+html:not(.dark) .hljs-number,
+html:not(.dark) .hljs-selector-id,
+html:not(.dark) .hljs-quote,
+html:not(.dark) .hljs-template-tag {
+  /* var(--highlight-namespace) */
+  color: #b75501;
+}
+
+html:not(.dark) .hljs-selector-class {
+  /* var(--highlight-keyword) */
+  color: #015692;
+}
+
+html:not(.dark) .hljs-string,
+html:not(.dark) .hljs-regexp,
+html:not(.dark) .hljs-symbol,
+html:not(.dark) .hljs-variable,
+html:not(.dark) .hljs-template-variable,
+html:not(.dark) .hljs-link,
+html:not(.dark) .hljs-selector-attr {
+  /* var(--highlight-variable) */
+  color: #54790d;
+}
+
+html:not(.dark) .hljs-meta,
+html:not(.dark) .hljs-selector-pseudo {
+  /* var(--highlight-keyword) */
+  color: #015692;
+}
+
+html:not(.dark) .hljs-built_in,
+html:not(.dark) .hljs-title,
+html:not(.dark) .hljs-literal {
+  /* var(--highlight-literal) */
+  color: #b75501;
+}
+
+html:not(.dark) .hljs-bullet,
+html:not(.dark) .hljs-code {
+  /* var(--highlight-punctuation) */
+  color: #535a60;
+}
+
+html:not(.dark) .hljs-meta .hljs-string {
+  /* var(--highlight-variable) */
+  color: #54790d;
+}
+
+html:not(.dark) .hljs-deletion {
+  /* var(--highlight-deletion) */
+  color: #c02d2e;
+}
+
+html:not(.dark) .hljs-addition {
+  /* var(--highlight-addition) */
+  color: #2f6f44;
+}
+
+html:not(.dark) .hljs-emphasis {
+  font-style: italic;
+}
+
+html:not(.dark) .hljs-strong {
+  font-weight: bold;
+}
+
+html:not(.dark) .hljs-formula,
+html:not(.dark) .hljs-operator,
+html:not(.dark) .hljs-params,
+html:not(.dark) .hljs-property,
+html:not(.dark) .hljs-punctuation,
+html:not(.dark) .hljs-tag {
+  /* purposely ignored */
+}
+
+.prose {
+  margin-bottom: 2em;
 }

@@ -1,11 +1,11 @@
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed, PropType } from 'vue'
-import Nav from '../Nav.vue'
-import TabArea from '../TabArea.vue'
-import Tab from '../Tab.vue'
-import PageView from './PageView.vue'
-import DisplayMenu from '../DisplayMenu.vue'
-import type { FrameGroup, PageCollection, TabState } from './SplitView.vue'
+import { defineComponent, ref, onMounted, computed, PropType } from "vue";
+import Nav from "../Nav.vue";
+import TabArea from "../TabArea.vue";
+import Tab from "../Tab.vue";
+import PageView from "./PageView.vue";
+import DisplayMenu from "../DisplayMenu.vue";
+import type { FrameGroup, PageCollection, TabState } from "./SplitView.vue";
 
 export default defineComponent({
   components: {
@@ -21,7 +21,7 @@ export default defineComponent({
       required: true,
     },
     side: {
-      type: String as PropType<'left' | 'right'>,
+      type: String as PropType<"left" | "right">,
       required: true,
     },
     pages: {
@@ -40,20 +40,23 @@ export default defineComponent({
   },
   setup(props, ctx) {
     const handleClick = (id) => {
-      props.tabState.selected = id
-    }
+      props.tabState.selected = id;
+    };
 
-    const tabs = computed(() => props.tabState.tabs)
-    const selected = computed(() => props.tabState.selected)
+    const tabs = computed(() => props.tabState.tabs);
+    const selected = computed(() => props.tabState.selected);
     const page = computed(() => {
       if (props.tabState.selected) {
-        return props.pages[props.tabState.selected]
+        return props.pages[props.tabState.selected];
       } else if (props.otherTabState.selected) {
-        return props.pages[props.otherTabState.selected]
+        return props.pages[props.otherTabState.selected];
       }
-    })
-    const mode = computed(() => props.tabState.mode)
-    const pageKey = computed(() => ([page.value ? page.value.id : false, props.tabState.mode]))
+    });
+    const mode = computed(() => props.tabState.mode);
+    const pageKey = computed(() => [
+      page.value ? page.value.id : false,
+      props.tabState.mode,
+    ]);
 
     return {
       side: props.side,
@@ -64,9 +67,9 @@ export default defineComponent({
       pageKey,
       handleClick,
       frames: props.frames,
-    }
-  }
-})
+    };
+  },
+});
 </script>
 
 <template>
@@ -77,9 +80,9 @@ export default defineComponent({
           v-for="tab in tabs"
           :selected="tab === selected"
           @click="() => handleClick(tab)"
-        >{{ pages[tab].emoji }} {{ pages[tab].title }}</Tab>
+          >{{ pages[tab].emoji }} {{ pages[tab].title }}</Tab
+        >
         <Tab v-if="showSymmetric" :selected="true">👁 View</Tab>
-        <Tab v-if="showSymmetric">⚙️ Meta</Tab>
       </TabArea>
       <DisplayMenu v-if="side === 'right'" />
     </Nav>
