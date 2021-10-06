@@ -157,7 +157,7 @@ export default defineComponent({
       indentOnInput(),
       bracketMatching(),
       closeBrackets(),
-      autocompletion(),
+      autocompletion({activateOnTyping: true}),
       rectangularSelection(),
       highlightActiveLine(),
       highlightSelectionMatches(),
