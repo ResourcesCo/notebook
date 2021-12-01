@@ -116,11 +116,6 @@ export const lightTheme = EditorView.theme(
       caretColor: lightColors.cursor,
     },
 
-    "&.cm-editor": {
-      "&.cm-focused": { outline: 'none' },
-      height: '100%',
-    },
-
     "&.cm-wrap": {
       outline: "none",
     },
@@ -211,11 +206,6 @@ export const darkTheme = EditorView.theme(
       backgroundColor: darkColors.background,
       "& ::selection": { backgroundColor: darkColors.selection },
       caretColor: darkColors.cursor,
-    },
-
-    "&.cm-editor": {
-      height: '100%',
-      "&.cm-focused": { outline: 'none' },
     },
 
     "&.cm-wrap": {
