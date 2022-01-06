@@ -46,8 +46,12 @@ export default defineComponent({
         key: "edit",
         title: "Edit",
         emoji: "📝",
-        body: "",
+        body: sessionStorage.getItem("doc") || "",
       },
+    });
+
+    watch(pages[ids[0]], () => {
+      sessionStorage.setItem("doc", pages[ids[0]].body);
     });
 
     const tabs = Object.keys(pages);
