@@ -4,25 +4,30 @@ import {
   EditorView,
   highlightSpecialChars,
   drawSelection,
-  highlightActiveLine,
   keymap,
   placeholder,
+  rectangularSelection
 } from "@codemirror/view";
-import { EditorState, Compartment } from "@codemirror/state";
-import { history, historyKeymap } from "@codemirror/history";
-import { foldGutter, foldKeymap } from "@codemirror/fold";
+import { EditorState, Compartment, Extension } from "@codemirror/state";
 import {
   indentOnInput,
   LanguageSupport,
   LanguageDescription,
+  foldGutter,
+  foldKeymap,
+  bracketMatching,
+  syntaxHighlighting
 } from "@codemirror/language";
-import { defaultKeymap } from "@codemirror/commands";
-import { bracketMatching } from "@codemirror/matchbrackets";
-import { closeBrackets, closeBracketsKeymap } from "@codemirror/closebrackets";
+import {
+  defaultKeymap, history, historyKeymap
+} from "@codemirror/commands";
 import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
-import { autocompletion, completionKeymap } from "@codemirror/autocomplete";
-import { commentKeymap } from "@codemirror/comment";
-import { rectangularSelection } from "@codemirror/rectangular-selection";
+import {
+  autocompletion,
+  completionKeymap,
+  closeBrackets,
+  closeBracketsKeymap
+} from "@codemirror/autocomplete";
 import { lintKeymap } from "@codemirror/lint";
 import { markdown } from "@codemirror/lang-markdown";
 import {
@@ -141,8 +146,8 @@ export default defineComponent({
     let editor: EditorView;
 
     // TODO: use reactive
-    const darkStyleExtension = [darkHighlightStyle, darkTheme];
-    const lightStyleExtension = [lightHighlightStyle, lightTheme];
+    const darkStyleExtension: readonly Extension[] = [syntaxHighlighting(darkHighlightStyle), darkTheme];
+    const lightStyleExtension: readonly Extension[] = [syntaxHighlighting(lightHighlightStyle), lightTheme];
     const getStyleExtension = () => {
       return isDark.value ? darkStyleExtension : lightStyleExtension;
     };
@@ -157,9 +162,8 @@ export default defineComponent({
       indentOnInput(),
       bracketMatching(),
       closeBrackets(),
-      autocompletion({activateOnTyping: false}),
+      autocompletion({ activateOnTyping: false }),
       rectangularSelection(),
-      highlightActiveLine(),
       highlightSelectionMatches(),
       keymap.of([
         ...closeBracketsKeymap,
@@ -167,7 +171,6 @@ export default defineComponent({
         ...searchKeymap,
         ...historyKeymap,
         ...foldKeymap,
-        ...commentKeymap,
         ...completionKeymap,
         ...lintKeymap,
       ]),
@@ -186,9 +189,7 @@ export default defineComponent({
       const newStyleExtension = getStyleExtension();
       if (newStyleExtension !== styleExtension) {
         styleExtension = newStyleExtension;
-        editor.dispatch({
-          effects: styleCompartment.reconfigure(styleExtension),
-        });
+        editor.dispatch({ effects: styleCompartment.reconfigure(newStyleExtension) })
       }
     });
 

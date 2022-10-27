@@ -45,4 +45,8 @@ export default defineConfig({
     include: ["vue", "vue-router", "@vueuse/core"],
     exclude: ["vue-demi"],
   },
+
+  test: {
+    environment: 'happy-dom'
+  }
 });

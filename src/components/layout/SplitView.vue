@@ -83,7 +83,7 @@ export default defineComponent({
           e.data.length === 2 &&
           e.data[0] === "md"
         ) {
-          pages[tabState.selected].body = e.data[1];
+          pages[tabState.selected || ''].body = e.data[1];
         }
       }
     };
@@ -96,7 +96,7 @@ export default defineComponent({
             element: split.value,
           },
         ],
-        columnMinSizes: 0,
+        columnMinSizes: { [1]: 0 },
       });
       window.addEventListener("message", handleMessage);
     });
@@ -126,22 +126,10 @@ export default defineComponent({
 
 <template>
   <div class="view-container text-gray-700 dark:text-gray-200">
-    <TabView
-      :frames="frames"
-      :pages="pages"
-      :tabState="tabState"
-      :otherTabState="rightTabState"
-      :showSymmetric="false"
-      side="left"
-    />
-    <TabView
-      :frames="frames"
-      :pages="pages"
-      :tabState="rightTabState"
-      :otherTabState="tabState"
-      :showSymmetric="true"
-      side="right"
-    />
+    <TabView :frames="frames" :pages="pages" :tabState="tabState" :otherTabState="rightTabState" :showSymmetric="false"
+      side="left" />
+    <TabView :frames="frames" :pages="pages" :tabState="rightTabState" :otherTabState="tabState" :showSymmetric="true"
+      side="right" />
     <div ref="split" class="view-split">
       <div class="view-split-bar h-full" />
       <div class="view-split-handle p-1">↔</div>
@@ -156,23 +144,27 @@ export default defineComponent({
   grid-template-rows: auto 1fr;
   height: 100%;
 }
+
 .view-split {
   position: relative;
   grid-column: 2;
   grid-row: 1 / span 2;
 }
+
 .view-split-bar {
   position: absolute;
   top: 0;
   bottom: 0;
   background: transparent;
 }
+
 .view-split:hover .view-split-bar,
 .view-split:active .view-split-bar {
   left: -1px;
   right: -1px;
-  @apply bg-gray-200 dark:bg-gray-700;
+  @apply bg-gray-200 dark: bg-gray-700;
 }
+
 .view-split-handle {
   cursor: ew-resize;
   position: absolute;
@@ -180,15 +172,16 @@ export default defineComponent({
   width: 25px;
   top: 4px;
   text-align: center;
-  @apply bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500 rounded-md;
+  @apply bg-gray-100 text-gray-400 dark: bg-gray-700 dark:text-gray-500 rounded-md;
 }
+
 .view-split:hover .view-split-handle,
 .view-split:active .view-split-handle {
   left: -30px;
   width: 60px;
-  @apply bg-gray-200 text-gray-500 border-2 border-gray-300 shadow-md
-    dark:bg-gray-700 dark:text-gray-300 dark:border-gray-400;
+  @apply bg-gray-200 text-gray-500 border-2 border-gray-300 shadow-md dark: bg-gray-700 dark:text-gray-300 dark:border-gray-400;
 }
+
 .view-split-handle svg {
   width: 10px;
   height: 10px;
