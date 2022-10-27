@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed, PropType } from "vue";
+import { defineComponent, computed, PropType } from "vue";
 import Nav from "../Nav.vue";
 import TabArea from "../TabArea.vue";
 import Tab from "../Tab.vue";
@@ -39,7 +39,7 @@ export default defineComponent({
     showSymmetric: Boolean,
   },
   setup(props, ctx) {
-    const handleClick = (id) => {
+    const handleClick = (id: string) => {
       props.tabState.selected = id;
     };
 
@@ -53,10 +53,7 @@ export default defineComponent({
       }
     });
     const mode = computed(() => props.tabState.mode);
-    const pageKey = computed(() => [
-      page.value ? page.value.id : false,
-      props.tabState.mode,
-    ]);
+    const pageKey = computed(() => `${page.value ? page.value.id : '(none)'}-props.tabState.mode`);
 
     return {
       side: props.side,
@@ -76,18 +73,15 @@ export default defineComponent({
   <div :class="['header', side]">
     <Nav class="nav">
       <TabArea>
-        <Tab
-          v-for="tab in tabs"
-          :selected="tab === selected"
-          @click="() => handleClick(tab)"
-          >{{ pages[tab].emoji }} {{ pages[tab].title }}</Tab
-        >
+        <Tab v-for="tab in tabs" :selected="tab === selected" @click="() => handleClick(tab)">{{ pages[tab].emoji }} {{
+            pages[tab].title
+        }}</Tab>
         <Tab v-if="showSymmetric" :selected="true">👁 View</Tab>
       </TabArea>
       <DisplayMenu v-if="side === 'right'" />
     </Nav>
   </div>
-  <div :class="['overflow-auto', 'content', side]">
+  <div :class="['overflow-auto', 'content', side]" v-if="page">
     <PageView :key="pageKey" :page="page" :frames="frames" :mode="mode" />
   </div>
 </template>
@@ -96,12 +90,15 @@ export default defineComponent({
 .header {
   grid-row: 1;
 }
+
 .content {
   grid-row: 2;
 }
+
 .left {
   grid-column: 1;
 }
+
 .right {
   grid-column: 3;
 }

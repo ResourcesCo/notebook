@@ -1,6 +1,4 @@
-import { ref, Ref, watch, computed } from 'vue'
-import { createStore } from "vuex";
-import { UserModule } from "~/types";
+import { Ref, watch, computed } from 'vue'
 import { usePreferredDark, useToggle } from '@vueuse/core'
 import hasLocalStorage from '../store/hasLocalStorage'
 import useStorage from '../store/useStorage'
@@ -12,8 +10,8 @@ const getUrlParamSchema = () => {
 }
 
 export const colorScheme = useStorage(
-  ['settings', 'color-scheme'], 
-  ({hasLocalStorage}: {hasLocalStorage: boolean}) => hasLocalStorage ? 'auto' : getUrlParamSchema()
+  ['settings', 'color-scheme'],
+  ({ hasLocalStorage }: { hasLocalStorage: boolean }) => hasLocalStorage ? 'auto' : getUrlParamSchema()
 ) as Ref<'auto' | 'dark' | 'light'>
 
 const preferredDark = usePreferredDark()
@@ -52,8 +50,3 @@ if (!hasLocalStorage) {
     }
   })
 }
-
-export const install: UserModule = ({ app }) => {
-  const store = createStore({});
-  app.use(store);
-};

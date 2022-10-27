@@ -8,6 +8,7 @@ import css from "highlight.js/lib/languages/css";
 import javascript from "highlight.js/lib/languages/javascript";
 import typescript from "highlight.js/lib/languages/typescript";
 import json from "highlight.js/lib/languages/json";
+// @ts-ignore
 import highlight from "markdown-it-highlightjs/core";
 
 hljs.registerLanguage("xml", xml);

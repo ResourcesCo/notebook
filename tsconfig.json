@@ -17,8 +17,7 @@
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
     "types": [
-      "vite/client",
-      "vite-plugin-vue-layouts/client"
+      "vite/client"
     ],
     "paths": {
       "~/*": [
