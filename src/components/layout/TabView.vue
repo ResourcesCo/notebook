@@ -5,7 +5,7 @@ import TabArea from "../TabArea.vue";
 import Tab from "../Tab.vue";
 import PageView from "./PageView.vue";
 import DisplayMenu from "../DisplayMenu.vue";
-import type { FrameGroup, PageCollection, TabState } from "./SplitView.vue";
+import type { PageCollection, TabState } from "./SplitView.vue";
 
 export default defineComponent({
   components: {
@@ -16,10 +16,6 @@ export default defineComponent({
     DisplayMenu,
   },
   props: {
-    frames: {
-      type: Object as PropType<FrameGroup>,
-      required: true,
-    },
     side: {
       type: String as PropType<"left" | "right">,
       required: true,
@@ -63,7 +59,6 @@ export default defineComponent({
       page,
       pageKey,
       handleClick,
-      frames: props.frames,
     };
   },
 });
@@ -73,16 +68,17 @@ export default defineComponent({
   <div :class="['header', side]">
     <Nav class="nav">
       <TabArea>
-        <Tab v-for="tab in tabs" :selected="tab === selected" @click="() => handleClick(tab)">{{ pages[tab].emoji }} {{
-            pages[tab].title
-        }}</Tab>
-        <Tab v-if="showSymmetric" :selected="true">👁 View</Tab>
+        <Tab v-for="tab in tabs" :selected="tab === selected" @click="() => handleClick(tab)">
+          {{ pages[tab].emoji }} {{ pages[tab].title }}
+        </Tab>
       </TabArea>
+      <Tab :selected="showSymmetric">👁</Tab>
       <DisplayMenu v-if="side === 'right'" />
+      <div class="spacer" v-if="side === 'left'"></div>
     </Nav>
   </div>
   <div :class="['overflow-auto', 'content', side]" v-if="page">
-    <PageView :key="pageKey" :page="page" :frames="frames" :mode="mode" />
+    <PageView :key="pageKey" :page="page" :mode="mode" />
   </div>
 </template>
 
@@ -101,5 +97,9 @@ export default defineComponent({
 
 .right {
   grid-column: 3;
+}
+
+.spacer {
+  width: 26px;
 }
 </style>

@@ -8,17 +8,13 @@ import TabView from "./TabView.vue";
 import { colorScheme } from "../../modules/store";
 import { nanoid } from "nanoid";
 
-export interface FrameGroup {
-  code: HTMLIFrameElement | undefined;
-  view: HTMLIFrameElement | undefined;
-}
-
 export interface Page {
   id: string;
   key: string;
   title: string;
   emoji: string;
   body: string;
+  frame?: HTMLIFrameElement;
 }
 
 export type PageCollection = { [key: string]: Page };
@@ -39,51 +35,48 @@ export default defineComponent({
   setup(props, _ctx) {
     const split = ref();
 
-    const ids = [nanoid(7), nanoid(7), nanoid(7)];
+    const ids = [nanoid(7), nanoid(7)];
     const pages = reactive<PageCollection>({
       [ids[0]]: {
         id: ids[0],
-        key: "edit",
-        title: "Edit",
+        key: "doc-1",
+        title: "Untitled 1",
         emoji: "📝",
-        body: sessionStorage.getItem("doc") || "",
+        body: "",
+      },
+      [ids[1]]: {
+        id: ids[1],
+        key: "doc-2",
+        title: "Untitled 2",
+        emoji: "📝",
+        body: "",
       },
     });
 
-    watch(pages[ids[0]], () => {
-      sessionStorage.setItem("doc", pages[ids[0]].body);
-    });
-
-    const tabs = Object.keys(pages);
-    const selected = tabs[0];
+    const tabs = Object.keys(pages).slice(0, 1);
     const tabState = reactive<TabState>({
       tabs,
-      selected,
+      selected: tabs[0],
       mode: "edit",
     });
 
-    const rightTabs: string[] = [];
+    const rightTabs = Object.keys(pages).slice(1);
     const rightTabState = reactive<TabState>({
       tabs: rightTabs,
-      selected: undefined,
-      mode: "view",
-    });
-
-    const frames = reactive<FrameGroup>({
-      code: undefined,
-      view: undefined,
+      selected: rightTabs[0],
+      mode: "edit",
     });
 
     const handleMessage = (e: MessageEvent) => {
-      if (frames.code) {
+      const page = Object.values(pages).find(p => p.frame?.contentWindow === e.source)
+      if (page) {
         if (
           e.isTrusted &&
-          e.source === frames.code.contentWindow &&
           Array.isArray(e.data) &&
           e.data.length === 2 &&
           e.data[0] === "md"
         ) {
-          pages[tabState.selected || ''].body = e.data[1];
+          page.body = e.data[1];
         }
       }
     };
@@ -102,9 +95,10 @@ export default defineComponent({
     });
 
     watch(colorScheme, () => {
-      for (const frame of Object.values(frames)) {
-        if (frame) {
-          frame.contentWindow?.postMessage!(
+      for (const page of Object.values(pages)) {
+        const contentWindow = page.frame?.contentWindow
+        if (contentWindow) {
+          contentWindow?.postMessage!(
             ["color-scheme", colorScheme.value],
             "*"
           );
@@ -113,7 +107,6 @@ export default defineComponent({
     });
 
     return {
-      frames,
       split,
       colorScheme,
       pages,
@@ -126,10 +119,8 @@ export default defineComponent({
 
 <template>
   <div class="view-container text-gray-700 dark:text-gray-200">
-    <TabView :frames="frames" :pages="pages" :tabState="tabState" :otherTabState="rightTabState" :showSymmetric="false"
-      side="left" />
-    <TabView :frames="frames" :pages="pages" :tabState="rightTabState" :otherTabState="tabState" :showSymmetric="true"
-      side="right" />
+    <TabView :pages="pages" :tabState="tabState" :otherTabState="rightTabState" :showSymmetric="false" side="left" />
+    <TabView :pages="pages" :tabState="rightTabState" :otherTabState="tabState" :showSymmetric="false" side="right" />
     <div ref="split" class="view-split">
       <div class="view-split-bar h-full" />
       <div class="view-split-handle p-1">↔</div>
