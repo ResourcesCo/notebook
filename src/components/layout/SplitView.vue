@@ -1,11 +1,10 @@
 <script lang="ts">
-import { defineComponent, ref, onMounted, watch, reactive } from "vue";
+import { defineComponent, ref, onMounted, reactive } from "vue";
 import Split from "split-grid";
 import Nav from "../Nav.vue";
 import TabArea from "../TabArea.vue";
 import Tab from "../Tab.vue";
 import TabView from "./TabView.vue";
-import { colorScheme } from "../../modules/store";
 import { nanoid } from "nanoid";
 
 export interface Page {
@@ -14,7 +13,6 @@ export interface Page {
   title: string;
   emoji: string;
   body: string;
-  frame?: HTMLIFrameElement;
 }
 
 export type PageCollection = { [key: string]: Page };
@@ -67,20 +65,6 @@ export default defineComponent({
       mode: "edit",
     });
 
-    const handleMessage = (e: MessageEvent) => {
-      const page = Object.values(pages).find(p => p.frame?.contentWindow === e.source)
-      if (page) {
-        if (
-          e.isTrusted &&
-          Array.isArray(e.data) &&
-          e.data.length === 2 &&
-          e.data[0] === "md"
-        ) {
-          page.body = e.data[1];
-        }
-      }
-    };
-
     onMounted(() => {
       Split({
         columnGutters: [
@@ -91,24 +75,10 @@ export default defineComponent({
         ],
         columnMinSizes: { [1]: 0 },
       });
-      window.addEventListener("message", handleMessage);
-    });
-
-    watch(colorScheme, () => {
-      for (const page of Object.values(pages)) {
-        const contentWindow = page.frame?.contentWindow
-        if (contentWindow) {
-          contentWindow?.postMessage!(
-            ["color-scheme", colorScheme.value],
-            "*"
-          );
-        }
-      }
     });
 
     return {
       split,
-      colorScheme,
       pages,
       tabState,
       rightTabState,

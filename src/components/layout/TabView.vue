@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, computed, PropType } from "vue";
+import { defineComponent, computed, toRef, PropType } from "vue";
 import Nav from "../Nav.vue";
 import TabArea from "../TabArea.vue";
 import Tab from "../Tab.vue";
@@ -35,20 +35,16 @@ export default defineComponent({
     showSymmetric: Boolean,
   },
   setup(props, ctx) {
-    const handleClick = (id: string) => {
+    const setSelected = (id: string | undefined) => {
       props.tabState.selected = id;
     };
 
-    const tabs = computed(() => props.tabState.tabs);
-    const selected = computed(() => props.tabState.selected);
-    const page = computed(() => {
-      if (props.tabState.selected) {
-        return props.pages[props.tabState.selected];
-      } else if (props.otherTabState.selected) {
-        return props.pages[props.otherTabState.selected];
-      }
-    });
-    const mode = computed(() => props.tabState.mode);
+    const tabs = toRef(props.tabState, 'tabs');
+    const selected = computed(() => props.tabState.selected ?? props.otherTabState.selected);
+    const page =
+      computed(() => props.tabState.selected ? props.pages[props.tabState.selected] :
+        (props.otherTabState.selected ? props.pages[props.otherTabState.selected] : undefined))
+    const mode = computed(() => props.tabState.selected ? 'edit' : 'view');
     const pageKey = computed(() => `${page.value ? page.value.id : '(none)'}-props.tabState.mode`);
 
     return {
@@ -58,7 +54,7 @@ export default defineComponent({
       mode,
       page,
       pageKey,
-      handleClick,
+      setSelected,
     };
   },
 });
@@ -68,11 +64,11 @@ export default defineComponent({
   <div :class="['header', side]">
     <Nav class="nav">
       <TabArea>
-        <Tab v-for="tab in tabs" :selected="tab === selected" @click="() => handleClick(tab)">
+        <Tab v-for="tab in tabs" :selected="tab === selected" @click="() => setSelected(tab)">
           {{ pages[tab].emoji }} {{ pages[tab].title }}
         </Tab>
       </TabArea>
-      <Tab :selected="showSymmetric">👁</Tab>
+      <Tab :selected="mode === 'view'" @click="() => setSelected(undefined)">👁</Tab>
       <DisplayMenu v-if="side === 'right'" />
       <div class="spacer" v-if="side === 'left'"></div>
     </Nav>

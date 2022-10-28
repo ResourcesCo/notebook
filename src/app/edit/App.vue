@@ -8,8 +8,6 @@ export default defineComponent({
     MarkdownEdit,
   },
   setup(props, ctx) {
-    const iSetup = Math.random()
-    console.log('MarkdownEdit setup', iSetup)
     const page = reactive({
       body: undefined,
     })
@@ -18,7 +16,6 @@ export default defineComponent({
     }, 10, { leading: true })
 
     window.addEventListener('message', e => {
-      console.log('MarkdownEdit setup message', iSetup)
       if (e.isTrusted && e.source === parent && Array.isArray(e.data) && e.data.length === 2 && e.data[0] === 'md') {
         page.body = e.data[1]
       }
