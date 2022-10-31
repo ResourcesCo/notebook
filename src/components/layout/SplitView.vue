@@ -19,7 +19,7 @@ export type PageCollection = { [key: string]: Page };
 
 export interface TabState {
   tabs: string[];
-  selected: string | undefined;
+  selected: string;
   mode: "edit" | "view";
 }
 
@@ -33,7 +33,7 @@ export default defineComponent({
   setup(props, _ctx) {
     const split = ref();
 
-    const ids = [nanoid(7), nanoid(7)];
+    const ids = [nanoid(7), nanoid(7), nanoid(7)];
     const pages = reactive<PageCollection>({
       [ids[0]]: {
         id: ids[0],
@@ -49,20 +49,27 @@ export default defineComponent({
         emoji: "📝",
         body: "",
       },
+      [ids[2]]: {
+        id: ids[1],
+        key: "doc-3",
+        title: "Untitled 3",
+        emoji: "📝",
+        body: "",
+      },
     });
 
-    const tabs = Object.keys(pages).slice(0, 1);
+    const tabs = Object.keys(pages).slice(0, 2);
     const tabState = reactive<TabState>({
       tabs,
       selected: tabs[0],
-      mode: "edit",
+      mode: 'edit'
     });
 
-    const rightTabs = Object.keys(pages).slice(1);
+    const rightTabs = Object.keys(pages).slice(2);
     const rightTabState = reactive<TabState>({
       tabs: rightTabs,
       selected: rightTabs[0],
-      mode: "edit",
+      mode: 'view'
     });
 
     onMounted(() => {

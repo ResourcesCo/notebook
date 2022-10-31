@@ -35,16 +35,20 @@ export default defineComponent({
     showSymmetric: Boolean,
   },
   setup(props, ctx) {
-    const setSelected = (id: string | undefined) => {
+    const setSelected = (id: string) => {
       props.tabState.selected = id;
     };
+    const setMode = (mode: 'edit' | 'view') => {
+      console.log('setting mode', mode)
+      props.tabState.mode = mode
+    }
 
     const tabs = toRef(props.tabState, 'tabs');
-    const selected = computed(() => props.tabState.selected ?? props.otherTabState.selected);
+    const selected = computed(() => props.tabState.mode === 'edit' ? props.tabState.selected : undefined);
     const page =
-      computed(() => props.tabState.selected ? props.pages[props.tabState.selected] :
-        (props.otherTabState.selected ? props.pages[props.otherTabState.selected] : undefined))
-    const mode = computed(() => props.tabState.selected ? 'edit' : 'view');
+      computed(() => props.tabState.mode === 'edit' ? props.pages[props.tabState.selected] :
+        props.pages[props.otherTabState.selected])
+    const mode = toRef(props.tabState, 'mode');
     const pageKey = computed(() => `${page.value ? page.value.id : '(none)'}-props.tabState.mode`);
 
     return {
@@ -55,6 +59,7 @@ export default defineComponent({
       page,
       pageKey,
       setSelected,
+      setMode,
     };
   },
 });
@@ -68,7 +73,7 @@ export default defineComponent({
           {{ pages[tab].emoji }} {{ pages[tab].title }}
         </Tab>
       </TabArea>
-      <Tab :selected="mode === 'view'" @click="() => setSelected(undefined)">👁</Tab>
+      <Tab :selected="mode === 'view'" @click="() => setMode(mode === 'edit' ? 'view' : 'edit')">👁</Tab>
       <DisplayMenu v-if="side === 'right'" />
       <div class="spacer" v-if="side === 'left'"></div>
     </Nav>

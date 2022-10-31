@@ -5,7 +5,6 @@ import {
   highlightSpecialChars,
   drawSelection,
   keymap,
-  placeholder,
   rectangularSelection
 } from "@codemirror/view";
 import { EditorState, Compartment, Extension } from "@codemirror/state";
@@ -177,7 +176,6 @@ export default defineComponent({
       markdownLanguage,
       styleCompartment.of(styleExtension),
       EditorView.lineWrapping,
-      placeholder("# Enter some markdown here..."),
       EditorView.updateListener.of((v) => {
         if (v.docChanged) {
           ctx.emit("change", editor.state.doc);
