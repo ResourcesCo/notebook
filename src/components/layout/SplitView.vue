@@ -96,8 +96,8 @@ export default defineComponent({
 
 <template>
   <div class="view-container text-gray-700 dark:text-gray-200">
-    <TabView :pages="pages" :tabState="tabState" :otherTabState="rightTabState" :showSymmetric="false" side="left" />
-    <TabView :pages="pages" :tabState="rightTabState" :otherTabState="tabState" :showSymmetric="false" side="right" />
+    <TabView :pages="pages" :tabState="tabState" :otherTabState="rightTabState" side="left" />
+    <TabView :pages="pages" :tabState="rightTabState" :otherTabState="tabState" side="right" />
     <div ref="split" class="view-split">
       <div class="view-split-bar h-full" />
       <div class="view-split-handle p-1">↔</div>
@@ -132,6 +132,7 @@ export default defineComponent({
   right: -1px;
   @apply bg-gray-200 dark: bg-gray-700;
 }
+
 
 .view-split-handle {
   cursor: ew-resize;

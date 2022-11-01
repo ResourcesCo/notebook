@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, PropType, ref, toRef, watch, onMounted, onBeforeUnmount } from 'vue'
+import { defineComponent, PropType, ref, toRef, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { colorScheme } from '../../modules/store'
 import type { Page } from './SplitView.vue'
 
@@ -13,8 +13,9 @@ export default defineComponent({
   },
   setup: (props, _ctx) => {
     const frame = ref<HTMLIFrameElement | undefined>(undefined)
-    const loaded = ref(false)
+    const loadedCount = ref(0)
     const body = toRef(props.page, 'body')
+    const id = toRef(props.page, 'id')
     const onMessage = (e: MessageEvent) => {
       if (
         e.isTrusted &&
@@ -32,9 +33,11 @@ export default defineComponent({
     onBeforeUnmount(() => {
       window.removeEventListener('message', onMessage)
     })
-    watch([frame, body, loaded], () => {
+    const mode = computed(() => props.mode === 'edit' ? 'edit' : 'view')
+    const src = computed(() => '/app/' + mode.value + '/?color-scheme=' + colorScheme.value)
+    watch([frame, body, loadedCount, mode], () => {
       const frameValue = frame.value
-      if (loaded.value && frameValue) {
+      if (loadedCount.value > 0 && frameValue) {
         const contentWindow = frameValue.contentWindow
         if (contentWindow) {
           contentWindow.postMessage(['md', body.value], '*')
@@ -51,15 +54,13 @@ export default defineComponent({
       }
     });
 
-    const mode = props.mode === 'edit' ? 'edit' : 'view'
-    const src = '/app/' + mode + '/?color-scheme=' + colorScheme.value
-    const onLoad = () => { loaded.value = true }
-    return { frame, src, onLoad }
+    const onLoad = () => { loadedCount.value += 1 }
+    return { frame, src, onLoad, id }
   }
 })
 </script>
 
 <template>
-  <iframe ref="frame" class="h-full w-full" :src="src" sandbox="allow-scripts allow-popups allow-downloads"
+  <iframe :key="id" ref="frame" class="h-full w-full" :src="src" sandbox="allow-scripts allow-popups allow-downloads"
     @load="onLoad"></iframe>
 </template>

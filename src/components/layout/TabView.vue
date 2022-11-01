@@ -31,16 +31,18 @@ export default defineComponent({
     otherTabState: {
       type: Object as PropType<TabState>,
       required: true,
-    },
-    showSymmetric: Boolean,
+    }
   },
   setup(props, ctx) {
     const setSelected = (id: string) => {
-      props.tabState.selected = id;
+      props.tabState.mode = 'edit'
+      props.tabState.selected = id
     };
-    const setMode = (mode: 'edit' | 'view') => {
-      console.log('setting mode', mode)
-      props.tabState.mode = mode
+    const toggleMode = () => {
+      if (props.tabState.mode === 'edit') {
+        props.otherTabState.mode = 'edit'
+      }
+      props.tabState.mode = props.tabState.mode === 'edit' ? 'view' : 'edit'
     }
 
     const tabs = toRef(props.tabState, 'tabs');
@@ -59,7 +61,7 @@ export default defineComponent({
       page,
       pageKey,
       setSelected,
-      setMode,
+      toggleMode,
     };
   },
 });
@@ -69,11 +71,11 @@ export default defineComponent({
   <div :class="['header', side]">
     <Nav class="nav">
       <TabArea>
-        <Tab v-for="tab in tabs" :selected="tab === selected" @click="() => setSelected(tab)">
+        <Tab v-for="tab in tabs" :selected="tab === selected" @click="() => { setSelected(tab) }">
           {{ pages[tab].emoji }} {{ pages[tab].title }}
         </Tab>
       </TabArea>
-      <Tab :selected="mode === 'view'" @click="() => setMode(mode === 'edit' ? 'view' : 'edit')">👁</Tab>
+      <Tab :selected="mode === 'view'" @click="() => toggleMode()">👁</Tab>
       <DisplayMenu v-if="side === 'right'" />
       <div class="spacer" v-if="side === 'left'"></div>
     </Nav>

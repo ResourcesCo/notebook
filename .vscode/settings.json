@@ -19,4 +19,5 @@
   "editor.wordWrap": "on",
   "editor.formatOnSave": true,
   "autoHide.autoHideSideBar": false,
+  "css.lint.unknownAtRules": "ignore",
 }
