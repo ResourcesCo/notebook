@@ -58,9 +58,10 @@ export default defineComponent({
     return { frame, src, onLoad, id }
   }
 })
+
 </script>
 
 <template>
-  <iframe :key="id" ref="frame" class="h-full w-full" :src="src" sandbox="allow-scripts allow-popups allow-downloads"
+  <iframe ref="frame" class="h-full w-full" :src="src" sandbox="allow-scripts allow-popups allow-downloads"
     @load="onLoad"></iframe>
 </template>

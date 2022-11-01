@@ -51,7 +51,7 @@ export default defineComponent({
       computed(() => props.tabState.mode === 'edit' ? props.pages[props.tabState.selected] :
         props.pages[props.otherTabState.selected])
     const mode = toRef(props.tabState, 'mode');
-    const pageKey = computed(() => `${page.value ? page.value.id : '(none)'}-props.tabState.mode`);
+    const pageKey = computed(() => `${page.value.id}---${props.tabState.mode}`);
 
     return {
       side: props.side,
