@@ -62,6 +62,6 @@ export default defineComponent({
 </script>
 
 <template>
-  <iframe ref="frame" class="h-full w-full" :src="src" sandbox="allow-scripts allow-popups allow-downloads"
-    @load="onLoad"></iframe>
+  <iframe ref="frame" class="h-full w-full" :src="src" style="background: transparent"
+    sandbox="allow-scripts allow-popups allow-downloads" @load="onLoad"></iframe>
 </template>
