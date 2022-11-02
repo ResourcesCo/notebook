@@ -103,6 +103,7 @@ export default defineComponent({
     ];
 
     const markdownLanguage = markdown({
+      addKeymap: false,
       codeLanguages: [
         ...codeLanguages,
         LanguageDescription.of({
@@ -110,6 +111,7 @@ export default defineComponent({
           alias: ["md", "mkd"],
           async load() {
             return markdown({
+              addKeymap: false,
               codeLanguages: [
                 ...codeLanguages,
                 LanguageDescription.of({
@@ -117,6 +119,7 @@ export default defineComponent({
                   alias: ["md", "mkd"],
                   async load() {
                     return markdown({
+                      addKeymap: false,
                       codeLanguages: [
                         ...codeLanguages,
                         LanguageDescription.of({
@@ -124,6 +127,7 @@ export default defineComponent({
                           alias: ["md", "mkd"],
                           async load() {
                             return markdown({
+                              addKeymap: false,
                               codeLanguages,
                             });
                           },
