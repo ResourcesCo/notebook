@@ -46,7 +46,7 @@ export default defineComponent({
     }
 
     const tabs = toRef(props.tabState, 'tabs');
-    const selected = computed(() => props.tabState.mode === 'edit' ? props.tabState.selected : undefined);
+    const selected = toRef(props.tabState, 'selected');
     const page =
       computed(() => props.tabState.mode === 'edit' ? props.pages[props.tabState.selected] :
         props.pages[props.otherTabState.selected])
@@ -70,12 +70,12 @@ export default defineComponent({
 <template>
   <div :class="['header', side]">
     <Nav class="nav">
-      <TabArea>
+      <TabArea :active="mode === 'edit'">
         <Tab v-for="tab in tabs" :selected="tab === selected" @click="() => { setSelected(tab) }">
           {{ pages[tab].emoji }} {{ pages[tab].title }}
         </Tab>
       </TabArea>
-      <Tab :selected="mode === 'view'" @click="() => toggleMode()">👁</Tab>
+      <Tab :selected="mode === 'view'" @click="() => toggleMode()"><span v-if="mode === 'view'">Preview </span>👁</Tab>
       <DisplayMenu v-if="side === 'right'" />
       <div class="spacer" v-if="side === 'left'"></div>
     </Nav>
