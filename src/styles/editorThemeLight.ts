@@ -7,7 +7,7 @@ import { EditorView } from "@codemirror/view"
 // Using https://github.com/one-dark/vscode-one-dark-theme/ as reference for the colors
 
 const foreground = "#403f53",
-  background = "#fff",
+  background = "transparent",
   darkBackground = "#bbb",
   highlightBackground = "#339cec77",
   activeLineBackground = "237cac22",

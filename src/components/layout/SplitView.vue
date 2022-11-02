@@ -1,17 +1,12 @@
 <script lang="ts">
-import { defineComponent, ref, onMounted, watch, reactive } from "vue";
+import { defineComponent, ref, onMounted, reactive, Ref } from "vue";
 import Split from "split-grid";
 import Nav from "../Nav.vue";
 import TabArea from "../TabArea.vue";
 import Tab from "../Tab.vue";
 import TabView from "./TabView.vue";
-import { colorScheme } from "../../modules/store";
 import { nanoid } from "nanoid";
-
-export interface FrameGroup {
-  code: HTMLIFrameElement | undefined;
-  view: HTMLIFrameElement | undefined;
-}
+import { useStorage } from '@vueuse/core'
 
 export interface Page {
   id: string;
@@ -25,7 +20,7 @@ export type PageCollection = { [key: string]: Page };
 
 export interface TabState {
   tabs: string[];
-  selected: string | undefined;
+  selected: string;
   mode: "edit" | "view";
 }
 
@@ -39,54 +34,59 @@ export default defineComponent({
   setup(props, _ctx) {
     const split = ref();
 
-    const ids = [nanoid(7), nanoid(7), nanoid(7)];
+    const ids = [nanoid(7), nanoid(7), nanoid(7), nanoid(7)];
+    const pageBody1: Ref<string> = useStorage('doc-1', '')
+    const pageBody2: Ref<string> = useStorage('doc-2', '')
+    const pageBody3: Ref<string> = useStorage('doc-3', '')
+    const pageBody4: Ref<string> = useStorage('doc-4', '')
+    const page1 = reactive({
+      id: ids[0],
+      key: "doc-1",
+      title: "Untitled 1",
+      emoji: "📝",
+      body: pageBody1,
+    })
+    const page2 = reactive({
+      id: ids[1],
+      key: "doc-2",
+      title: "Untitled 2",
+      emoji: "📝",
+      body: pageBody2,
+    })
+    const page3 = reactive({
+      id: ids[2],
+      key: "doc-3",
+      title: "Untitled 3",
+      emoji: "📝",
+      body: pageBody3,
+    })
+    const page4 = reactive({
+      id: ids[3],
+      key: "doc-4",
+      title: "Untitled 4",
+      emoji: "📝",
+      body: pageBody4,
+    })
     const pages = reactive<PageCollection>({
-      [ids[0]]: {
-        id: ids[0],
-        key: "edit",
-        title: "Edit",
-        emoji: "📝",
-        body: sessionStorage.getItem("doc") || "",
-      },
+      [ids[0]]: page1,
+      [ids[1]]: page2,
+      [ids[2]]: page3,
+      [ids[3]]: page4,
     });
 
-    watch(pages[ids[0]], () => {
-      sessionStorage.setItem("doc", pages[ids[0]].body);
-    });
-
-    const tabs = Object.keys(pages);
-    const selected = tabs[0];
+    const tabs = Object.keys(pages).slice(0, 2);
     const tabState = reactive<TabState>({
       tabs,
-      selected,
-      mode: "edit",
+      selected: tabs[0],
+      mode: 'edit'
     });
 
-    const rightTabs: string[] = [];
+    const rightTabs = Object.keys(pages).slice(2);
     const rightTabState = reactive<TabState>({
       tabs: rightTabs,
-      selected: undefined,
-      mode: "view",
+      selected: rightTabs[0],
+      mode: 'view'
     });
-
-    const frames = reactive<FrameGroup>({
-      code: undefined,
-      view: undefined,
-    });
-
-    const handleMessage = (e: MessageEvent) => {
-      if (frames.code) {
-        if (
-          e.isTrusted &&
-          e.source === frames.code.contentWindow &&
-          Array.isArray(e.data) &&
-          e.data.length === 2 &&
-          e.data[0] === "md"
-        ) {
-          pages[tabState.selected || ''].body = e.data[1];
-        }
-      }
-    };
 
     onMounted(() => {
       Split({
@@ -98,24 +98,10 @@ export default defineComponent({
         ],
         columnMinSizes: { [1]: 0 },
       });
-      window.addEventListener("message", handleMessage);
-    });
-
-    watch(colorScheme, () => {
-      for (const frame of Object.values(frames)) {
-        if (frame) {
-          frame.contentWindow?.postMessage!(
-            ["color-scheme", colorScheme.value],
-            "*"
-          );
-        }
-      }
     });
 
     return {
-      frames,
       split,
-      colorScheme,
       pages,
       tabState,
       rightTabState,
@@ -125,11 +111,9 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="view-container text-gray-700 dark:text-gray-200">
-    <TabView :frames="frames" :pages="pages" :tabState="tabState" :otherTabState="rightTabState" :showSymmetric="false"
-      side="left" />
-    <TabView :frames="frames" :pages="pages" :tabState="rightTabState" :otherTabState="tabState" :showSymmetric="true"
-      side="right" />
+  <div class="view-container text-zinc-700 dark:text-zinc-200">
+    <TabView :pages="pages" :tabState="tabState" :otherTabState="rightTabState" side="left" />
+    <TabView :pages="pages" :tabState="rightTabState" :otherTabState="tabState" side="right" />
     <div ref="split" class="view-split">
       <div class="view-split-bar h-full" />
       <div class="view-split-handle p-1">↔</div>
@@ -162,8 +146,9 @@ export default defineComponent({
 .view-split:active .view-split-bar {
   left: -1px;
   right: -1px;
-  @apply bg-gray-200 dark: bg-gray-700;
+  @apply bg-zinc-400 dark:bg-zinc-700;
 }
+
 
 .view-split-handle {
   cursor: ew-resize;
@@ -172,14 +157,14 @@ export default defineComponent({
   width: 25px;
   top: 4px;
   text-align: center;
-  @apply bg-gray-100 text-gray-400 dark: bg-gray-700 dark:text-gray-500 rounded-md;
+  @apply bg-zinc-300 text-zinc-400 dark:bg-zinc-700 dark:text-zinc-500 rounded-md;
 }
 
 .view-split:hover .view-split-handle,
 .view-split:active .view-split-handle {
   left: -30px;
   width: 60px;
-  @apply bg-gray-200 text-gray-500 border-2 border-gray-300 shadow-md dark: bg-gray-700 dark:text-gray-300 dark:border-gray-400;
+  @apply bg-zinc-400 text-zinc-700 border-2 border-zinc-300 shadow-md dark:bg-zinc-700 dark:text-zinc-300 dark:border-zinc-400;
 }
 
 .view-split-handle svg {

@@ -1,11 +1,11 @@
 <script lang="ts">
-import { defineComponent, computed, PropType } from "vue";
+import { defineComponent, computed, toRef, PropType } from "vue";
 import Nav from "../Nav.vue";
 import TabArea from "../TabArea.vue";
 import Tab from "../Tab.vue";
 import PageView from "./PageView.vue";
 import DisplayMenu from "../DisplayMenu.vue";
-import type { FrameGroup, PageCollection, TabState } from "./SplitView.vue";
+import type { PageCollection, TabState } from "./SplitView.vue";
 
 export default defineComponent({
   components: {
@@ -16,10 +16,6 @@ export default defineComponent({
     DisplayMenu,
   },
   props: {
-    frames: {
-      type: Object as PropType<FrameGroup>,
-      required: true,
-    },
     side: {
       type: String as PropType<"left" | "right">,
       required: true,
@@ -35,25 +31,28 @@ export default defineComponent({
     otherTabState: {
       type: Object as PropType<TabState>,
       required: true,
-    },
-    showSymmetric: Boolean,
+    }
   },
   setup(props, ctx) {
-    const handleClick = (id: string) => {
-      props.tabState.selected = id;
+    const setSelected = (id: string) => {
+      props.tabState.mode = 'edit'
+      props.tabState.selected = id
     };
-
-    const tabs = computed(() => props.tabState.tabs);
-    const selected = computed(() => props.tabState.selected);
-    const page = computed(() => {
-      if (props.tabState.selected) {
-        return props.pages[props.tabState.selected];
-      } else if (props.otherTabState.selected) {
-        return props.pages[props.otherTabState.selected];
+    const toggleMode = () => {
+      if (props.tabState.mode === 'edit') {
+        props.otherTabState.mode = props.otherTabState.mode === 'edit' ? 'view' : 'edit'
+      } else {
+        props.tabState.mode = 'edit'
       }
-    });
-    const mode = computed(() => props.tabState.mode);
-    const pageKey = computed(() => `${page.value ? page.value.id : '(none)'}-props.tabState.mode`);
+    }
+
+    const tabs = toRef(props.tabState, 'tabs');
+    const selected = toRef(props.tabState, 'selected');
+    const page =
+      computed(() => props.tabState.mode === 'edit' ? props.pages[props.tabState.selected] :
+        props.pages[props.otherTabState.selected])
+    const mode = toRef(props.tabState, 'mode');
+    const pageKey = computed(() => `${page.value.id}---${props.tabState.mode}`);
 
     return {
       side: props.side,
@@ -62,8 +61,8 @@ export default defineComponent({
       mode,
       page,
       pageKey,
-      handleClick,
-      frames: props.frames,
+      setSelected,
+      toggleMode,
     };
   },
 });
@@ -72,17 +71,18 @@ export default defineComponent({
 <template>
   <div :class="['header', side]">
     <Nav class="nav">
-      <TabArea>
-        <Tab v-for="tab in tabs" :selected="tab === selected" @click="() => handleClick(tab)">{{ pages[tab].emoji }} {{
-            pages[tab].title
-        }}</Tab>
-        <Tab v-if="showSymmetric" :selected="true">👁 View</Tab>
+      <TabArea :active="mode === 'edit'">
+        <Tab v-for="tab in tabs" :selected="tab === selected" @click="() => { setSelected(tab) }">
+          {{ pages[tab].emoji }} {{ pages[tab].title }}
+        </Tab>
       </TabArea>
+      <Tab :selected="mode === 'view'" @click="() => toggleMode()"><span v-if="mode === 'view'">Preview </span>👁</Tab>
       <DisplayMenu v-if="side === 'right'" />
+      <div class="spacer" v-if="side === 'left'"></div>
     </Nav>
   </div>
   <div :class="['overflow-auto', 'content', side]" v-if="page">
-    <PageView :key="pageKey" :page="page" :frames="frames" :mode="mode" />
+    <PageView :key="pageKey" :page="page" :mode="mode" />
   </div>
 </template>
 
@@ -101,5 +101,9 @@ export default defineComponent({
 
 .right {
   grid-column: 3;
+}
+
+.spacer {
+  width: 26px;
 }
 </style>
