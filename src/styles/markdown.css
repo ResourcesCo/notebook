@@ -13,7 +13,7 @@
 }
 
 html:not(.dark) .prose pre {
-  @apply bg-gray-100;
+  @apply bg-zinc-100;
 }
 
 /*

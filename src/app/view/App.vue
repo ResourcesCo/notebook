@@ -21,7 +21,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="text-gray-700 dark:text-gray-200 flex flex-col h-full">
+  <div class="text-zinc-700 dark:text-zinc-200 flex flex-col h-full">
     <main class="m-1">
       <MarkdownView :value="value" />
     </main>

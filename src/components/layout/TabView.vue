@@ -40,9 +40,10 @@ export default defineComponent({
     };
     const toggleMode = () => {
       if (props.tabState.mode === 'edit') {
-        props.otherTabState.mode = 'edit'
+        props.otherTabState.mode = props.otherTabState.mode === 'edit' ? 'view' : 'edit'
+      } else {
+        props.tabState.mode = 'edit'
       }
-      props.tabState.mode = props.tabState.mode === 'edit' ? 'view' : 'edit'
     }
 
     const tabs = toRef(props.tabState, 'tabs');

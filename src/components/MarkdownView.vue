@@ -43,5 +43,5 @@ export default defineComponent({
 </script>
 
 <template>
-  <div ref="root" class="prose"></div>
+  <div ref="root" class="prose p-2"></div>
 </template>

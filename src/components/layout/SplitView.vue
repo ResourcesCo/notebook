@@ -95,7 +95,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="view-container text-gray-700 dark:text-gray-200">
+  <div class="view-container text-zinc-700 dark:text-zinc-200">
     <TabView :pages="pages" :tabState="tabState" :otherTabState="rightTabState" side="left" />
     <TabView :pages="pages" :tabState="rightTabState" :otherTabState="tabState" side="right" />
     <div ref="split" class="view-split">
@@ -130,7 +130,7 @@ export default defineComponent({
 .view-split:active .view-split-bar {
   left: -1px;
   right: -1px;
-  @apply bg-gray-200 dark: bg-gray-700;
+  @apply bg-zinc-400 dark:bg-zinc-700;
 }
 
 
@@ -141,14 +141,14 @@ export default defineComponent({
   width: 25px;
   top: 4px;
   text-align: center;
-  @apply bg-gray-100 text-gray-400 dark: bg-gray-700 dark:text-gray-500 rounded-md;
+  @apply bg-zinc-300 text-zinc-400 dark:bg-zinc-700 dark:text-zinc-500 rounded-md;
 }
 
 .view-split:hover .view-split-handle,
 .view-split:active .view-split-handle {
   left: -30px;
   width: 60px;
-  @apply bg-gray-200 text-gray-500 border-2 border-gray-300 shadow-md dark: bg-gray-700 dark:text-gray-300 dark:border-gray-400;
+  @apply bg-zinc-400 text-zinc-700 border-2 border-zinc-300 shadow-md dark:bg-zinc-700 dark:text-zinc-300 dark:border-zinc-400;
 }
 
 .view-split-handle svg {
