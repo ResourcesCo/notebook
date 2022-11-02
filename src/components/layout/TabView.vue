@@ -89,6 +89,7 @@ export default defineComponent({
 <style scoped>
 .header {
   grid-row: 1;
+  overflow-x: auto;
 }
 
 .content {

@@ -55,13 +55,13 @@ export default defineComponent({
     });
 
     const onLoad = () => { loadedCount.value += 1 }
-    return { frame, src, onLoad, id }
+    return { frame, src, onLoad, id, loadedCount }
   }
 })
 
 </script>
 
 <template>
-  <iframe ref="frame" class="h-full w-full" :src="src" style="background: transparent"
+  <iframe ref="frame" class="h-full w-full" :src="src" :style="loadedCount === 0 ? 'visibility: hidden' : ''"
     sandbox="allow-scripts allow-popups allow-downloads" @load="onLoad"></iframe>
 </template>
