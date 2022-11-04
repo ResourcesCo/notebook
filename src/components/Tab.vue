@@ -12,7 +12,11 @@ defineProps({
 
 <style scoped>
 .tab {
-  @apply whitespace-nowrap select-none rounded-md px-3 py-1 mr-1 cursor-pointer shadow-sm bg-zinc-300 text-zinc-900 hover:bg-zinc-400 dark:bg-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-600;
+  @apply ml-1 whitespace-nowrap select-none rounded-md px-3 py-1 cursor-pointer shadow-sm bg-zinc-300 text-zinc-900 hover:bg-zinc-400 dark:bg-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-600;
+}
+
+.tab.right {
+  @apply ml-0 mr-1
 }
 
 .selected {

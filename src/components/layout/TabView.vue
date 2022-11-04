@@ -4,8 +4,9 @@ import Nav from "../Nav.vue";
 import TabArea from "../TabArea.vue";
 import Tab from "../Tab.vue";
 import PageView from "./PageView.vue";
-import DisplayMenu from "../DisplayMenu.vue";
+import DisplayButton from "../DisplayButton.vue";
 import type { PageCollection, TabState } from "./SplitView.vue";
+import TabViewButton from "../TabViewButton.vue";
 
 export default defineComponent({
   components: {
@@ -13,8 +14,9 @@ export default defineComponent({
     TabArea,
     Tab,
     PageView,
-    DisplayMenu,
-  },
+    DisplayButton,
+    TabViewButton
+},
   props: {
     side: {
       type: String as PropType<"left" | "right">,
@@ -31,7 +33,7 @@ export default defineComponent({
     otherTabState: {
       type: Object as PropType<TabState>,
       required: true,
-    }
+    },
   },
   setup(props, ctx) {
     const setSelected = (id: string) => {
@@ -46,7 +48,43 @@ export default defineComponent({
       }
     }
 
-    const tabs = toRef(props.tabState, 'tabs');
+    const toggleSettings = () => {
+      props.tabState.settingsOn = !props.tabState.settingsOn
+      props.otherTabState.settingsOn = !props.otherTabState.settingsOn
+      const settingsTab = props.otherTabState.tabs.find(t => {
+        const page = props.pages[t]
+        if (page) {
+          if (page.isSettings) {
+            return true
+          }
+        }
+      })
+      if (settingsTab) {
+        if (props.otherTabState.settingsOn) {        
+          props.otherTabState.lastSelected = props.otherTabState.selected
+          props.otherTabState.selected = settingsTab
+          props.otherTabState.mode = 'edit'
+          props.tabState.mode = 'view'
+        } else if (props.otherTabState.lastSelected !== undefined) {
+          props.otherTabState.selected = props.otherTabState.lastSelected
+        }
+      }
+    }
+
+    const tabs = computed(() => {
+      if (props.tabState.settingsOn) {
+        return props.tabState.tabs
+      } else {
+        return props.tabState.tabs.filter(t => {
+          const page = props.pages[t]
+          if (page) {
+            return !page.isSettings
+          } else {
+            return true
+          }
+        })
+      }
+    });
     const selected = toRef(props.tabState, 'selected');
     const page =
       computed(() => props.tabState.mode === 'edit' ? props.pages[props.tabState.selected] :
@@ -63,6 +101,7 @@ export default defineComponent({
       pageKey,
       setSelected,
       toggleMode,
+      toggleSettings,
     };
   },
 });
@@ -76,8 +115,9 @@ export default defineComponent({
           {{ pages[tab].emoji }} {{ pages[tab].title }}
         </Tab>
       </TabArea>
-      <Tab :selected="mode === 'view'" @click="() => toggleMode()"><span v-if="mode === 'view'">Preview </span>👁</Tab>
-      <DisplayMenu v-if="side === 'right'" />
+      <Tab class="right" :selected="mode === 'view'" @click="() => toggleMode()"><span v-if="mode === 'view'">Preview </span>👁</Tab>
+      <TabViewButton v-if="side === 'right'" @click="() => toggleSettings()">⚙️</TabViewButton>
+      <DisplayButton v-if="side === 'right'" />
       <div class="spacer" v-if="side === 'left'"></div>
     </Nav>
   </div>
@@ -105,6 +145,6 @@ export default defineComponent({
 }
 
 .spacer {
-  width: 26px;
+  width: 30px;
 }
 </style>
