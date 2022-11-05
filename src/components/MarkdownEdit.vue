@@ -36,7 +36,7 @@ import {
   lightTheme,
   darkTheme,
 } from "../styles/editor"
-import { isDark } from "../modules/store"
+import { isDark } from "../store"
 import { insertNewlineContinueMarkup, deleteMarkupBackward } from '../vendor/commands'
 
 const markdownKeymap: readonly KeyBinding[] = [

@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, PropType, ref, toRef, computed, watch, onMounted, onBeforeUnmount } from 'vue'
-import { colorScheme } from '../../modules/store'
-import type { Page } from './SplitView.vue'
+import { colorScheme } from '../../store'
+import type { Page } from '../../store/pages'
 
 export default defineComponent({
   props: {

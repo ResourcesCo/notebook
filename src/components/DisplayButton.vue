@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import TabViewButton from './TabViewButton.vue'
-import { isDark, toggleDark } from '../modules/store'
+import { isDark, toggleDark } from '../store'
 </script>
 
 <template>

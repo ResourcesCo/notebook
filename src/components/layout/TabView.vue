@@ -5,7 +5,7 @@ import TabArea from "../TabArea.vue";
 import Tab from "../Tab.vue";
 import PageView from "./PageView.vue";
 import DisplayButton from "../DisplayButton.vue";
-import type { PageCollection, TabState } from "./SplitView.vue";
+import type { PageCollection, TabState } from "../../store/pages"
 import TabViewButton from "../TabViewButton.vue";
 
 export default defineComponent({
@@ -60,7 +60,7 @@ export default defineComponent({
         }
       })
       if (settingsTab) {
-        if (props.otherTabState.settingsOn) {        
+        if (props.otherTabState.settingsOn) {
           props.otherTabState.lastSelected = props.otherTabState.selected
           props.otherTabState.selected = settingsTab
           props.otherTabState.mode = 'edit'

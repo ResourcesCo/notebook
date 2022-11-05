@@ -3,7 +3,7 @@ import "./styles/main.css";
 import { createApp } from "vue";
 import { createHead } from "@vueuse/head";
 import App from "./App.vue";
-import "./modules/store";
+import "./store";
 
 const app = createApp(App);
 app.use(createHead())
