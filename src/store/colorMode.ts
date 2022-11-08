@@ -4,7 +4,7 @@ import hasLocalStorage from '../store/hasLocalStorage'
 import useStorage from '../store/useStorage'
 
 const getUrlParamSchema = () => {
-  const params = new URLSearchParams(window.location.search);
+  const params = new URLSearchParams(window.location.search)
   const result = params.get("color-scheme") || 'auto'
   return result
 }
@@ -38,7 +38,7 @@ watch(
     }
     const prefersDark = preferredDark.value
     const dark = setting === 'auto' ? prefersDark : (setting === 'dark')
-    document.documentElement.classList[dark ? 'add' : 'remove']("dark");
+    document.documentElement.classList[dark ? 'add' : 'remove']("dark")
   },
   { immediate: true },
 )

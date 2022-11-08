@@ -24,7 +24,7 @@ export default defineComponent({
         e.data.length === 2 &&
         e.data[0] === "md"
       ) {
-        body.value = e.data[1];
+        body.value = e.data[1]
       }
     }
     onMounted(() => {
@@ -50,9 +50,9 @@ export default defineComponent({
         contentWindow?.postMessage!(
           ["color-scheme", colorScheme.value],
           "*"
-        );
+        )
       }
-    });
+    })
 
     const onLoad = () => { loadedCount.value += 1 }
     return { frame, src, onLoad, id, loadedCount }

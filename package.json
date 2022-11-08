@@ -2,7 +2,7 @@
   "name": "@resources/notebook",
   "scripts": {
     "build": "vue-tsc --noEmit && NODE_ENV=production vite build",
-    "dev": "vite --port 3333 --open",
+    "dev": "vite --port 3333",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run"

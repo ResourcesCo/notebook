@@ -15,7 +15,7 @@ export default defineComponent({
     TabView,
   },
   setup(props, _ctx) {
-    const split = ref();
+    const split = ref()
 
     onMounted(() => {
       Split({
@@ -26,17 +26,17 @@ export default defineComponent({
           },
         ],
         columnMinSizes: { [1]: 0 },
-      });
-    });
+      })
+    })
 
     return {
       split,
       pages,
       tabState,
       rightTabState,
-    };
+    }
   },
-});
+})
 </script>
 
 <template>

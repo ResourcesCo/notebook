@@ -5,7 +5,7 @@ import hasLocalStorage from './hasLocalStorage'
 
 let refs: Map<string, any>
 
-function getKeyedRef(key: string, defaultValue: (ctx: {hasLocalStorage: boolean}) => void): Ref;
+function getKeyedRef(key: string, defaultValue: (ctx: {hasLocalStorage: boolean}) => void): Ref
 function getKeyedRef(key: string, defaultValue: Exclude<any, Function>): Ref {
   if (!refs) {
     refs = new Map()

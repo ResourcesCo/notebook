@@ -1,5 +1,5 @@
-import { HighlightStyle } from "@codemirror/language";
-import { tags as t } from "@lezer/highlight";
+import { HighlightStyle } from "@codemirror/language"
+import { tags as t } from "@lezer/highlight"
 
 import editorThemeLight from './editorThemeLight'
 import editorThemeDark from './editorThemeDark'
@@ -33,7 +33,7 @@ export const lightHighlightStyle = HighlightStyle.define([
   { tag: t.comment, color: "#940" },
   { tag: t.meta, color: "#7a757a" },
   { tag: t.invalid, color: "#f00" },
-]);
+])
 
 const chalky = "#e5c07b",
   coral = "#e06c75",
@@ -44,7 +44,7 @@ const chalky = "#e5c07b",
   malibu = "#61afef",
   sage = "#98c379",
   whiskey = "#d19a66",
-  violet = "#c678dd";
+  violet = "#c678dd"
 
 /// The highlighting style for code in the One Dark theme.
 export const darkHighlightStyle = HighlightStyle.define([
@@ -89,7 +89,7 @@ export const darkHighlightStyle = HighlightStyle.define([
   { tag: t.heading, fontWeight: "bold", color: coral },
   { tag: [t.atom, t.bool, t.special(t.variableName)], color: whiskey },
   { tag: t.invalid, color: invalid },
-]);
+])
 
 export const lightTheme = editorThemeLight
 export const darkTheme = editorThemeDark

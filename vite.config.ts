@@ -1,9 +1,9 @@
-import { resolve } from "path";
-import { defineConfig } from "vite";
-import Vue from "@vitejs/plugin-vue";
-import WindiCSS from "vite-plugin-windicss";
+import { resolve } from "path"
+import { defineConfig } from "vite"
+import Vue from "@vitejs/plugin-vue"
+import WindiCSS from "vite-plugin-windicss"
 
-const packageDir = './';
+const packageDir = './'
 
 export default defineConfig({
   resolve: {
@@ -49,4 +49,4 @@ export default defineConfig({
   test: {
     environment: 'happy-dom'
   }
-});
+})

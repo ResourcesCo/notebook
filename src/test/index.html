@@ -10,12 +10,12 @@
       (function () {
         const prefersDark =
           window.matchMedia &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches;
-        const setting = localStorage.getItem("rco/settings/color-scheme") || "auto";
+          window.matchMedia("(prefers-color-scheme: dark)").matches
+        const setting = localStorage.getItem("rco/settings/color-scheme") || "auto"
         if (setting === "dark" || (prefersDark && setting !== "light")) {
-          document.documentElement.classList.toggle("dark", true);
+          document.documentElement.classList.toggle("dark", true)
         }
-      })();
+      })()
     </script>
     <script type="module" src="/src/test/main.ts"></script>
   </body>

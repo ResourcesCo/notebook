@@ -1,12 +1,12 @@
 <script lang="ts">
-import { defineComponent, computed, toRef, PropType } from "vue";
-import Nav from "../Nav.vue";
-import TabArea from "../TabArea.vue";
-import Tab from "../Tab.vue";
-import PageView from "./PageView.vue";
-import DisplayButton from "../DisplayButton.vue";
+import { defineComponent, computed, toRef, PropType } from "vue"
+import Nav from "../Nav.vue"
+import TabArea from "../TabArea.vue"
+import Tab from "../Tab.vue"
+import PageView from "./PageView.vue"
+import DisplayButton from "../DisplayButton.vue"
 import type { PageCollection, TabState } from "../../store/pages"
-import TabViewButton from "../TabViewButton.vue";
+import TabViewButton from "../TabViewButton.vue"
 
 export default defineComponent({
   components: {
@@ -39,7 +39,7 @@ export default defineComponent({
     const setSelected = (id: string) => {
       props.tabState.mode = 'edit'
       props.tabState.selected = id
-    };
+    }
     const toggleMode = () => {
       if (props.tabState.mode === 'edit') {
         props.otherTabState.mode = props.otherTabState.mode === 'edit' ? 'view' : 'edit'
@@ -84,13 +84,13 @@ export default defineComponent({
           }
         })
       }
-    });
-    const selected = toRef(props.tabState, 'selected');
+    })
+    const selected = toRef(props.tabState, 'selected')
     const page =
       computed(() => props.tabState.mode === 'edit' ? props.pages[props.tabState.selected] :
         props.pages[props.otherTabState.selected])
-    const mode = toRef(props.tabState, 'mode');
-    const pageKey = computed(() => `${page.value.id}---${props.tabState.mode}`);
+    const mode = toRef(props.tabState, 'mode')
+    const pageKey = computed(() => `${page.value.id}---${props.tabState.mode}`)
 
     return {
       side: props.side,
@@ -102,9 +102,9 @@ export default defineComponent({
       setSelected,
       toggleMode,
       toggleSettings,
-    };
+    }
   },
-});
+})
 </script>
 
 <template>
