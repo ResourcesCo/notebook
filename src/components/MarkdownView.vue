@@ -8,6 +8,7 @@ import css from "highlight.js/lib/languages/css"
 import javascript from "highlight.js/lib/languages/javascript"
 import typescript from "highlight.js/lib/languages/typescript"
 import json from "highlight.js/lib/languages/json"
+import componentPlugin from "./markdown/componentPlugin"
 // @ts-ignore
 import highlight from "markdown-it-highlightjs/core"
 
@@ -18,7 +19,7 @@ hljs.registerLanguage("typescript", typescript)
 hljs.registerLanguage("json", json)
 hljs.registerLanguage("markdown", markdown)
 
-const md = MarkdownIt().use(highlight, { hljs })
+const md = MarkdownIt().use(highlight, { hljs }).use(componentPlugin)
 
 export default defineComponent({
   props: {
