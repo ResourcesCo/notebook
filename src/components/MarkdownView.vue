@@ -10,6 +10,7 @@ import typescript from "highlight.js/lib/languages/typescript"
 import json from "highlight.js/lib/languages/json"
 import ComponentManager from "./markdown/ComponentManager"
 import Project from "./blocks/Project.vue"
+import LocalStorageTools from "./blocks/LocalStorageTools.vue"
 import type { ProjectInfo } from './blocks/ProjectInfo'
 import { isProjectInfo } from './blocks/ProjectInfo'
 import parseJson from '../utils/parseJson'
@@ -30,9 +31,13 @@ const props = defineProps({
   },
 })
 
-const components = {Project} as const
+const components = {Project, LocalStorageTools} as const
 
-type Block = {html: string} | {tag: 'Project', data: ProjectInfo } | { error: string }
+type Block =
+  {html: string} |
+  {tag: 'Project', data: ProjectInfo } |
+  {tag: 'LocalStorageTools'} |
+  { error: string }
 
 const value = toRef(props, 'value')
 const blocks = ref<Block[]>([])
@@ -54,6 +59,8 @@ watch(value, () => {
             return {tag, data}
           }
           return { error: 'Schema mismatch' }
+        } else if (tag === 'LocalStorageTools') {
+          return {tag}
         }
       }
       return { error: `Missing or invalid component: {tag: ${tag}, id: ${id}}` }
@@ -69,6 +76,7 @@ watch(value, () => {
   <div ref="root" class="prose p-2" v-for="block in blocks">
     <div v-if="'html' in block" v-html="block.html"></div>
     <div v-else-if="'tag' in block && block.tag === 'Project'"><Project :data="block.data" /></div>
+    <div v-else-if="'tag' in block && block.tag === 'LocalStorageTools'"><LocalStorageTools /></div>
     <div v-else-if="'error' in block" style="color: red">{{block.error}}</div>
   </div>
 </template>

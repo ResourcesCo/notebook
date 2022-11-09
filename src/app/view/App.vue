@@ -27,3 +27,9 @@ export default defineComponent({
     </main>
   </div>
 </template>
+
+<style>
+  button {
+    @apply ml-1 whitespace-nowrap select-none rounded-md px-3 py-1 cursor-pointer shadow-sm bg-zinc-300 text-zinc-900 hover:bg-zinc-400 dark:bg-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-600;
+  }
+</style>
