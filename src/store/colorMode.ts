@@ -10,7 +10,7 @@ const getUrlParamSchema = () => {
 }
 
 export const colorScheme = useStorage(
-  ['settings', 'color-scheme'],
+  'rco/settings/color-scheme',
   ({ hasLocalStorage }: { hasLocalStorage: boolean }) => hasLocalStorage ? 'auto' : getUrlParamSchema()
 ) as Ref<'auto' | 'dark' | 'light'>
 
