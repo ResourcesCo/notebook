@@ -3,25 +3,25 @@ import { nanoid } from 'nanoid'
 import { useStorage } from '@vueuse/core'
 
 export interface Page {
-  id: string;
-  key: string;
-  title: string;
-  emoji: string;
-  body: string;
-  isSettings?: true;
+  id: string
+  key: string
+  title: string
+  emoji: string
+  body: string
+  isSettings?: true
 }
 
-export type PageCollection = { [key: string]: Page };
+export type PageCollection = { [key: string]: Page }
 
 export interface TabState {
-  tabs: string[];
-  selected: string;
-  lastSelected: string | undefined;
-  mode: "edit" | "view";
-  settingsOn: boolean;
+  tabs: string[]
+  selected: string
+  lastSelected: string | undefined
+  mode: "edit" | "view"
+  settingsOn: boolean
 }
 
-const ids = [nanoid(7), nanoid(7), nanoid(7), nanoid(7), nanoid(7)];
+const ids = [nanoid(7), nanoid(7), nanoid(7), nanoid(7), nanoid(7)]
 
 const pageBody1: Ref<string> = useStorage('doc-1', '')
 const pageBody2: Ref<string> = useStorage('doc-2', '')
@@ -72,22 +72,22 @@ export const pages = reactive<PageCollection>({
   [ids[2]]: page3,
   [ids[3]]: page4,
   [ids[4]]: page5,
-});
+})
 
-const tabs = [...Object.keys(pages).slice(0, 2), Object.keys(pages)[4]];
+const tabs = [...Object.keys(pages).slice(0, 2), Object.keys(pages)[4]]
 export const tabState = reactive<TabState>({
   tabs,
   selected: tabs[0],
   lastSelected: undefined,
   mode: 'edit',
   settingsOn: false,
-});
+})
 
-const rightTabs = Object.keys(pages).slice(2, 4);
+const rightTabs = Object.keys(pages).slice(2, 4)
 export const rightTabState = reactive<TabState>({
   tabs: rightTabs,
   selected: rightTabs[0],
   lastSelected: undefined,
   mode: 'view',
   settingsOn: false,
-});
+})
