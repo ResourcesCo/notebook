@@ -1,4 +1,4 @@
-import type { StorageExport, StoragesExport } from "./getStorage"
+import type { StoragesExport } from "./getStorage"
 
 function mb(s: string) {
   return '`'.repeat(Math.max(3, ...(s.match(/`{3,}/g) || []).map(s => s.length + 1)))
