@@ -1,7 +1,9 @@
 <script lang="ts">
 import { defineComponent, PropType, ref, toRef, computed, watch, onMounted, onBeforeUnmount } from 'vue'
-import { colorScheme } from '../../store'
 import type { Page } from '../../store/pages'
+import { colorScheme, download } from '../../store'
+import writeMarkdown from '../blocks/LocalStorageTools/writeMarkdown'
+import getLocalStorage from '../blocks/LocalStorageTools/getStorage'
 
 export default defineComponent({
   props: {
@@ -21,10 +23,13 @@ export default defineComponent({
         e.isTrusted &&
         e.source == frame.value?.contentWindow &&
         Array.isArray(e.data) &&
-        e.data.length === 2 &&
-        e.data[0] === "md"
+        e.data.length === 2
       ) {
-        body.value = e.data[1]
+        if (e.data[0] === "md") {
+          body.value = e.data[1]
+        } else if (props.page.isSettings && e.data[0] === 'downloadStorage') {
+          download.value = {name: `local-storage.md`, data: new Blob([writeMarkdown(getLocalStorage())])}
+        }
       }
     }
     onMounted(() => {

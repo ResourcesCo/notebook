@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { isProjectInfo } from './ProjectInfo'
 
 describe('example', () => {
-  it('passes', async () => {
+  it('passes', () => {
     const example = {
       "left": [
         {
