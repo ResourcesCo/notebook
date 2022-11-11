@@ -37,3 +37,14 @@ describe('items in both', () => {
     expect(getStorage()).toEqual({session: {x: 'y', z: 'z'}, local: {a1: 'q', a2: 'v', a3: 'r'}})
   })
 })
+
+describe('items in both', () => {
+  it('passes', () => {
+    sessionStorage.setItem('z', 'z')
+    sessionStorage.setItem('x', 'y')
+    localStorage.setItem('a3', 'r')
+    localStorage.setItem('a2', 'v')
+    localStorage.setItem('a1', 'q')
+    expect(getStorage()).toEqual({session: {x: 'y', z: 'z'}, local: {a1: 'q', a2: 'v', a3: 'r'}})
+  })
+})

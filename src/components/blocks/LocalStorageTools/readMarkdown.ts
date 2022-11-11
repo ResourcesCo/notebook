@@ -14,7 +14,6 @@ function isDeclaration(data: any): data is Declaration {
 }
 
 function readDeclaration(content: string): Declaration | undefined {
-  console.log(content)
   if (content.trimStart().startsWith('[')) {
     try {
       const data = JSON.parse(content)
@@ -37,6 +36,7 @@ export default function readMarkdown(s: string): StoragesExport {
             declaration = readDeclaration(token.content)
           } else {
             result[declaration[0]][declaration[1]] = token.content.slice(0, -1)
+            declaration = undefined
           }
         }
       }

@@ -19,56 +19,58 @@ ${bq}
   })
 })
 
-// describe('multiple', () => {
-//   it('passes', () => {
-//     const bq = '```'
-//     const expected = (
-// `${bq}json
-// ["local","a"]
-// ${bq}
+describe('multiple', () => {
+  it('passes', () => {
+    const bq = '```'
+    const input = (
+`${bq}json
+["local","a"]
+${bq}
 
-// ${bq}md
-// a
-// b
-// ${bq}
+${bq}md
+a
+b
+${bq}
 
-// ${bq}json
-// ["session","b"]
-// ${bq}
+${bq}json
+["session","b"]
+${bq}
 
-// ${bq}md
-// x
-// ${bq}
+${bq}md
+x
+${bq}
 
-// ${bq}json
-// ["session","v"]
-// ${bq}
+${bq}json
+["session","v"]
+${bq}
 
-// ${bq}json
-// {}
-// ${bq}
-// `
-//     )
-//     expect(writeMarkdown({local: {a: 'a\nb'}, session: {b: 'x', v: '{}'}}).trim()).toEqual(expected.trim())
-//   })
-// })
+${bq}json
+{}
+${bq}
+`
+    )
+    const expected = {local: {a: 'a\nb'}, session: {b: 'x', v: '{}'}}
+    expect(readMarkdown(input)).toEqual(expected)
+  })
+})
 
-// describe('fenced', () => {
-//   it('passes', () => {
-//     const bq3 = '```'
-//     const bq4 = '````'
-//     const expected = (
-// `${bq3}json
-// ["local","a"]
-// ${bq3}
+describe('fenced', () => {
+  it('passes', () => {
+    const bq3 = '```'
+    const bq4 = '````'
+    const input = (
+`${bq3}json
+["local","a"]
+${bq3}
 
-// ${bq4}md
-// ${bq3}
-// text
-// ${bq3}
-// ${bq4}
-// `
-//     )
-//     expect(writeMarkdown({local: {a: '```\ntext\n```'}, session: {}}).trim()).toEqual(expected.trim())
-//   })
-// })
+${bq4}md
+${bq3}
+text
+${bq3}
+${bq4}
+`
+    )
+    const expected = {local: {a: '```\ntext\n```'}, session: {}}
+    expect(readMarkdown(input)).toEqual(expected)
+  })
+})

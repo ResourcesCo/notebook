@@ -7,7 +7,7 @@ function exportStorage(storage: Storage): StorageExport {
   const keys = [...Array(storage.length).keys()].map(i => storage.key(i)).filter(isString)
   return Object.fromEntries(
     keys
-    // .sort()
+    .sort()
     .map(key => [key, storage.getItem(key)])
     .filter(([key, value]) => value !== null)
   )
