@@ -38,7 +38,7 @@ describe('items in both', () => {
   })
 })
 
-describe('items in both', () => {
+describe('sorting', () => {
   it('passes', () => {
     sessionStorage.setItem('z', 'z')
     sessionStorage.setItem('x', 'y')
