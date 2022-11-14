@@ -6,7 +6,7 @@ import Nav from '../Nav.vue'
 import TabArea from '../TabArea.vue'
 import Tab from '../Tab.vue'
 import TabView from './TabView.vue'
-import DownloadModal from '../DownloadModal.vue'
+import Settings from '~/store/Settings'
 
 export default defineComponent({
   components: {
@@ -14,7 +14,7 @@ export default defineComponent({
     TabArea,
     Tab,
     TabView,
-    DownloadModal
+    Settings
 },
   setup(props, _ctx) {
     const split = ref()
@@ -50,7 +50,7 @@ export default defineComponent({
       <div class="view-split-handle p-1">↔</div>
     </div>
   </div>
-  <DownloadModal></DownloadModal>
+  <Settings></Settings>
 </template>
 
 <style type="text/css">

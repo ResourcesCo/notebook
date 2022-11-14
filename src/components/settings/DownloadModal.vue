@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import {ref, watch} from 'vue'
 import {saveAs} from 'file-saver'
-import {download} from '../store'
+import {download} from '../../store'
 
 const name = ref('')
 
