@@ -6,7 +6,7 @@ import Nav from '../Nav.vue'
 import TabArea from '../TabArea.vue'
 import Tab from '../Tab.vue'
 import TabView from './TabView.vue'
-import Settings from '~/store/Settings'
+import Settings from '../settings/Settings.vue'
 
 export default defineComponent({
   components: {
