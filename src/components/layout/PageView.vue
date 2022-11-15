@@ -1,9 +1,8 @@
 <script lang="ts">
 import { defineComponent, PropType, ref, toRef, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import type { Page } from '../../store/pages'
-import { colorScheme, download } from '../../store'
-import writeMarkdown from '../blocks/LocalStorageTools/writeMarkdown'
-import getLocalStorage from '../blocks/LocalStorageTools/getStorage'
+import { colorScheme } from '../../store'
+import { handleMessage as handleSettingsMessage } from '../../store/settings'
 
 export default defineComponent({
   props: {
@@ -27,8 +26,8 @@ export default defineComponent({
       ) {
         if (e.data[0] === "md") {
           body.value = e.data[1]
-        } else if (props.page.isSettings && e.data[0] === 'downloadStorage') {
-          download.value = {name: `local-storage.md`, data: new Blob([writeMarkdown(getLocalStorage())])}
+        } else if (props.page.isSettings) {
+          handleSettingsMessage(e.data)
         }
       }
     }

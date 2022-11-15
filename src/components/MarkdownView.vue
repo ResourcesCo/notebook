@@ -14,7 +14,7 @@ import LocalStorageTools from "./blocks/LocalStorageTools"
 import type { ProjectInfo } from './blocks/ProjectInfo'
 import { isProjectInfo } from './blocks/ProjectInfo'
 import parseJson from '../utils/parseJson'
-import Settings from '../store/Settings'
+import SettingsClient from '../store/SettingsClient'
 // @ts-ignore
 import highlight from "markdown-it-highlightjs/core"
 
@@ -31,7 +31,7 @@ const props = defineProps({
     default: "",
   },
   settings: {
-    type: Object as PropType<Settings>,
+    type: Object as PropType<SettingsClient>,
     required: true
   }
 })

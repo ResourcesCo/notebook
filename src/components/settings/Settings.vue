@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import DownloadModal from './DownloadModal.vue';
+import DownloadModal from './DownloadModal.vue'
 </script>
 
 <template>

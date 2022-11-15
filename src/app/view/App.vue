@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import MarkdownView from '../../components/MarkdownView.vue'
-import Settings from '~/store/Settings';
+import SettingsClient from '~/store/SettingsClient';
 
 const value = ref('')
-const settings = new Settings()
+const settings = new SettingsClient()
 
 window.addEventListener('message', e => {
   if (e.isTrusted && e.source === parent && Array.isArray(e.data) && e.data.length === 2 && e.data[0] === 'md') {

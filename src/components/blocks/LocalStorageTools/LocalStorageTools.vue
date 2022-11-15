@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { PropType } from 'vue';
-import Settings from '~/store/Settings';
+import SettingsClient from '~/store/SettingsClient';
 
 const {settings} = defineProps({
   settings: {
-    type: Object as PropType<Settings>,
+    type: Object as PropType<SettingsClient>,
     required: true
   }
 })
