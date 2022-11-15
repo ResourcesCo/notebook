@@ -1,7 +1,9 @@
 <script lang="ts" setup>
-import DownloadModal from './DownloadModal.vue'
+import ExportLocalStorageModal from './ExportLocalStorageModal.vue'
+import ImportLocalStorageModal from './ImportLocalStorageModal.vue'
 </script>
 
 <template>
-  <DownloadModal></DownloadModal>
+  <ExportLocalStorageModal></ExportLocalStorageModal>
+  <ImportLocalStorageModal></ImportLocalStorageModal>
 </template>

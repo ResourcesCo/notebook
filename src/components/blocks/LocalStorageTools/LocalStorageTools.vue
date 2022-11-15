@@ -9,15 +9,12 @@ const {settings} = defineProps({
   }
 })
 
-function downloadStorage() {
-  settings.downloadStorage()
-}
 </script>
 
 <template>
   <div>
-    <button>Import</button>
-    <button @click="downloadStorage">Export</button>
+    <button @click="() => settings.importLocalStorage()">Import</button>
+    <button @click="() => settings.exportLocalStorage()">Export</button>
   </div>
 </template>
 

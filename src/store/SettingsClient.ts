@@ -1,5 +1,8 @@
 export default class Settings {
-  downloadStorage() {
-    parent.postMessage(['downloadStorage', undefined], '*')
+  exportLocalStorage() {
+    parent.postMessage(['exportLocalStorage'], '*')
+  }
+  importLocalStorage() {
+    parent.postMessage(['importLocalStorage'], '*')
   }
 }

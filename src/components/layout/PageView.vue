@@ -22,9 +22,9 @@ export default defineComponent({
         e.isTrusted &&
         e.source == frame.value?.contentWindow &&
         Array.isArray(e.data) &&
-        e.data.length === 2
+        e.data.length >= 1
       ) {
-        if (e.data[0] === "md") {
+        if (e.data[0] === "md" && e.data.length === 2) {
           body.value = e.data[1]
         } else if (props.page.isSettings) {
           handleSettingsMessage(e.data)
