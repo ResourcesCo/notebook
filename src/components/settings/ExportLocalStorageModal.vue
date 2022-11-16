@@ -22,6 +22,7 @@ function dismiss() {
 function click() {
   if (action.value) {
     saveAs(action.value.data, name.value)
+    dismiss()
   }
 }
 </script>

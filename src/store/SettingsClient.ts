@@ -5,4 +5,7 @@ export default class Settings {
   importLocalStorage() {
     parent.postMessage(['importLocalStorage'], '*')
   }
+  clearLocalStorage() {
+    parent.postMessage(['clearLocalStorage'], '*')
+  }
 }

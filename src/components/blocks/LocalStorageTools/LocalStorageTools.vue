@@ -15,6 +15,7 @@ const {settings} = defineProps({
   <div>
     <button @click="() => settings.importLocalStorage()">Import</button>
     <button @click="() => settings.exportLocalStorage()">Export</button>
+    <button @click="() => settings.clearLocalStorage()">Clear</button>
   </div>
 </template>
 
