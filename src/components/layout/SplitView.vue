@@ -6,7 +6,6 @@ import Nav from '../Nav.vue'
 import TabArea from '../TabArea.vue'
 import Tab from '../Tab.vue'
 import TabView from './TabView.vue'
-import Settings from '../settings/Settings.vue'
 
 export default defineComponent({
   components: {
@@ -14,7 +13,6 @@ export default defineComponent({
     TabArea,
     Tab,
     TabView,
-    Settings
 },
   setup(props, _ctx) {
     const split = ref()
@@ -50,7 +48,6 @@ export default defineComponent({
       <div class="view-split-handle p-1">↔</div>
     </div>
   </div>
-  <Settings></Settings>
 </template>
 
 <style type="text/css">

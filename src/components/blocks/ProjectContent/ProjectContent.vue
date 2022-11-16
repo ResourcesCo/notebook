@@ -13,24 +13,26 @@ const {data} = defineProps({
 
 <template>
   <div v-for="[name, file] in Object.entries(data['files'])">
-    {{ file.emoji }}
-    {{ file.title }}
-    <span>{{ name }}</span>
+    <span class="emoji" contenteditable>{{ file.emoji }}</span>
+    <span class="title" contenteditable>{{ file.title }}</span>
+    <span class="name" contenteditable>{{ name }}</span>
     <span v-if="file.role" class="tag">{{ file.role }}</span>
   </div>
 </template>
 
 <style>
   span {
-    font-size: 70%;
-    color: #f7f7f7;
     background-color: #555;
     padding: 3px;
     border-radius: 3px;
-    @apply mx-1 bg-slate-200 dark:bg-slate-800;
+    @apply px-2 focus:outline-gray-800 mx-1 slate-800 bg-slate-200 dark:slate-50 dark:bg-slate-800;
+  }
+
+  span.name {
+    @apply text-xs;
   }
 
   span.tag {
-    @apply bg-teal-700;
+    @apply text-xs bg-teal-200 dark:bg-slate-600;
   }
 </style>

@@ -121,7 +121,7 @@ export default defineComponent({
       <div class="spacer" v-if="side === 'left'"></div>
     </Nav>
   </div>
-  <div :class="['overflow-auto', 'content', side]" v-if="page">
+  <div :class="['overflow-auto', 'content', 'relative', side]" v-if="page">
     <PageView :key="pageKey" :page="page" :mode="mode" />
   </div>
 </template>

@@ -3,6 +3,7 @@ import { defineComponent, PropType, ref, toRef, computed, watch, onMounted, onBe
 import type { Page } from '../../store/pages'
 import { colorScheme } from '../../store'
 import { handleMessage as handleSettingsMessage } from '../../store/settings'
+import Settings from '../settings/Settings.vue'
 
 export default defineComponent({
   props: {
@@ -12,6 +13,7 @@ export default defineComponent({
     },
     mode: String,
   },
+  components: {Settings},
   setup: (props, _ctx) => {
     const frame = ref<HTMLIFrameElement | undefined>(undefined)
     const loadedCount = ref(0)
@@ -39,6 +41,7 @@ export default defineComponent({
     })
     const mode = computed(() => props.mode === 'edit' ? 'edit' : 'view')
     const src = computed(() => '/app/' + mode.value + '/?color-scheme=' + colorScheme.value)
+    const isSettingsView = computed(() => props.page.isSettings && mode.value === 'view')
     watch([frame, body, loadedCount, mode], () => {
       const frameValue = frame.value
       if (loadedCount.value > 0 && frameValue) {
@@ -59,7 +62,7 @@ export default defineComponent({
     })
 
     const onLoad = () => { loadedCount.value += 1 }
-    return { frame, src, onLoad, id, loadedCount }
+    return { frame, src, onLoad, id, loadedCount, isSettingsView }
   }
 })
 
@@ -68,4 +71,5 @@ export default defineComponent({
 <template>
   <iframe ref="frame" class="h-full w-full" :src="src" :style="loadedCount === 0 ? 'visibility: hidden' : ''"
     sandbox="allow-scripts allow-popups allow-downloads" @load="onLoad"></iframe>
+  <Settings v-if="isSettingsView"></Settings>
 </template>
