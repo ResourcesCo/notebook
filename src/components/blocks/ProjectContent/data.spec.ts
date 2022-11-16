@@ -1,35 +1,33 @@
 import { describe, expect, it } from 'vitest'
-import { isProjectInfo } from './ProjectInfo'
+import { validate } from './data'
 
 describe('example', () => {
   it('passes', () => {
     const example = {
-      "left": [
-        {
+      "files": {
+        "tasks.md": {
           "emoji": "✅",
           "title": "Tasks"
         },
-        {
+        "scratch-pad.md": {
           "emoji": "📑",
           "title": "Scratch Pad"
         },
-        {
+        "settings.md": {
           "emoji": "⚙️",
           "title": "Settings",
           "role": "Settings"
-        }
-      ],
-      "right": [
-        {
+        },
+        "this-week.md": {
           "emoji": "📆",
           "title": "This Week"
-        }, 
-        {
-          "emoji": "📐", 
-          "title": "Design Notes" 
+        },
+        "design-notes.md": {
+          "emoji": "📐",
+          "title": "Design Notes"
         }
-      ]
+      }
     }
-    expect(isProjectInfo(example)).toBeTruthy()
+    expect(validate(example)).toBeTruthy()
   })
 })
