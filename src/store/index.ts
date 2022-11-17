@@ -1,3 +1,1 @@
-import { ref } from 'vue'
-
-export * from './colorMode'
+export { colorScheme, isDark, toggleDark } from './colorMode'
