@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue'
 import Split from 'split-grid'
-import { pages, tabState, rightTabState } from '../../store/pages'
+import { pages, tabState, rightTabState } from '../../store/notebook'
 import Nav from '../Nav.vue'
 import TabArea from '../TabArea.vue'
 import Tab from '../Tab.vue'

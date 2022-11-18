@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, PropType, ref, toRef, computed, watch, onMounted, onBeforeUnmount } from 'vue'
-import type { Page } from '../../store/pages'
+import type { Page } from '../../store/notebook'
 import { colorScheme } from '../../store'
 import { handleMessage as handleSettingsMessage } from '../../store/settings'
 import Settings from '../settings/Settings.vue'

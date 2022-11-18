@@ -5,7 +5,7 @@ import TabArea from "../TabArea.vue"
 import Tab from "../Tab.vue"
 import PageView from "./PageView.vue"
 import DisplayButton from "../DisplayButton.vue"
-import type { PageCollection, TabState } from "../../store/pages"
+import type { PageCollection, TabState } from "../../store/notebook"
 import TabViewButton from "../TabViewButton.vue"
 
 export default defineComponent({
