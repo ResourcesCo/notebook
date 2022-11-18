@@ -1,11 +1,11 @@
 <script lang="ts">
-import { defineComponent, computed, toRef, PropType } from "vue"
+import { defineComponent, computed, toRef, reactive, PropType } from "vue"
 import Nav from "../Nav.vue"
 import TabArea from "../TabArea.vue"
 import Tab from "../Tab.vue"
 import PageView from "./PageView.vue"
 import DisplayButton from "../DisplayButton.vue"
-import type { PageCollection, TabState } from "../../store/notebook"
+import type { Notebook, TabState } from "../../store/notebook"
 import TabViewButton from "../TabViewButton.vue"
 
 export default defineComponent({
@@ -18,12 +18,12 @@ export default defineComponent({
     TabViewButton
 },
   props: {
-    side: {
-      type: String as PropType<"left" | "right">,
+    notebook: {
+      type: Object as PropType<Notebook>,
       required: true,
     },
-    pages: {
-      type: Object as PropType<PageCollection>,
+    side: {
+      type: String as PropType<"left" | "right">,
       required: true,
     },
     tabState: {
@@ -37,68 +37,70 @@ export default defineComponent({
   },
   setup(props, ctx) {
     const setSelected = (id: string) => {
-      props.tabState.mode = 'edit'
+      props.tabState.show = 'self'
       props.tabState.selected = id
     }
     const toggleMode = () => {
-      if (props.tabState.mode === 'edit') {
-        props.otherTabState.mode = props.otherTabState.mode === 'edit' ? 'view' : 'edit'
+      if (props.tabState.show === 'self') {
+        props.otherTabState.show = props.otherTabState.show === 'self' ? 'other' : 'self'
       } else {
-        props.tabState.mode = 'edit'
+        props.tabState.show = 'self'
       }
     }
 
     const toggleSettings = () => {
-      props.tabState.settingsOn = !props.tabState.settingsOn
-      props.otherTabState.settingsOn = !props.otherTabState.settingsOn
-      const settingsTab = props.otherTabState.tabs.find(t => {
-        const page = props.pages[t]
-        if (page) {
-          if (page.isSettings) {
-            return true
+      const i = props.otherTabState.tabs.findIndex(s => s === "_settings.md")
+      if (i === -1) {
+        props.otherTabState.tabs.unshift("_settings.md")
+        props.tabState.show = "other"
+        props.otherTabState.lastSelected = props.otherTabState.selected
+        props.otherTabState.selected = "_settings.md"
+      } else {
+        props.otherTabState.tabs.splice(i, 1)
+        if (props.otherTabState.selected === "_settings.md") {
+          if (props.otherTabState.lastSelected !== null && props.otherTabState.lastSelected !== "_settings.md") {
+            props.otherTabState.selected = props.otherTabState.lastSelected
+            props.otherTabState.lastSelected = null
+          } else if (props.otherTabState.tabs.length > 0) {
+            props.otherTabState.selected = props.otherTabState.tabs[0]
           }
-        }
-      })
-      if (settingsTab) {
-        if (props.otherTabState.settingsOn) {
-          props.otherTabState.lastSelected = props.otherTabState.selected
-          props.otherTabState.selected = settingsTab
-          props.otherTabState.mode = 'edit'
-          props.tabState.mode = 'view'
-        } else if (props.otherTabState.lastSelected !== undefined) {
-          props.otherTabState.selected = props.otherTabState.lastSelected
         }
       }
     }
 
     const tabs = computed(() => {
-      if (props.tabState.settingsOn) {
-        return props.tabState.tabs
-      } else {
-        return props.tabState.tabs.filter(t => {
-          const page = props.pages[t]
-          if (page) {
-            return !page.isSettings
-          } else {
-            return true
-          }
+      return props.tabState.tabs
+    })
+    const selected = toRef(props.tabState, 'selected')
+    const filename = computed(() => (
+      props.tabState.show === 'self' ? props.tabState.selected : props.otherTabState.selected
+    ))
+    const mode = computed(() => props.tabState.show === 'self' ? 'edit' : 'view')
+    const pageKey = computed(() => `${filename.value}---${mode.value}`)
+    const page = computed(() => {
+      const isSettings = filename.value === '_settings.md'
+      const body = (
+        (typeof filename.value === 'string' && filename.value in props.notebook.fileData) ?
+        toRef(props.notebook.fileData, filename.value) :
+        null
+      )
+      if (body) {
+        return reactive({
+          body,
+          isSettings,
         })
       }
     })
-    const selected = toRef(props.tabState, 'selected')
-    const page =
-      computed(() => props.tabState.mode === 'edit' ? props.pages[props.tabState.selected] :
-        props.pages[props.otherTabState.selected])
-    const mode = toRef(props.tabState, 'mode')
-    const pageKey = computed(() => `${page.value.id}---${props.tabState.mode}`)
 
     return {
+      files: props.notebook.content.files,
       side: props.side,
       tabs,
       selected,
+      filename,
       mode,
-      page,
       pageKey,
+      page,
       setSelected,
       toggleMode,
       toggleSettings,
@@ -112,7 +114,7 @@ export default defineComponent({
     <Nav class="nav">
       <TabArea :active="mode === 'edit'">
         <Tab v-for="tab in tabs" :selected="tab === selected" @click="() => { setSelected(tab) }">
-          {{ pages[tab].emoji }} {{ pages[tab].title }}
+          {{ files[tab].emoji }} {{ files[tab].title }}
         </Tab>
       </TabArea>
       <Tab class="right" :selected="mode === 'view'" @click="() => toggleMode()"><span v-if="mode === 'view'">Preview </span>👁</Tab>

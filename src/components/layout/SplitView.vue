@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue'
 import Split from 'split-grid'
-import { pages, tabState, rightTabState } from '../../store/notebook'
+import { notebook } from '../../store/notebook'
 import Nav from '../Nav.vue'
 import TabArea from '../TabArea.vue'
 import Tab from '../Tab.vue'
@@ -31,9 +31,7 @@ export default defineComponent({
 
     return {
       split,
-      pages,
-      tabState,
-      rightTabState,
+      notebook,
     }
   },
 })
@@ -41,8 +39,8 @@ export default defineComponent({
 
 <template>
   <div class="view-container text-zinc-700 dark:text-zinc-200">
-    <TabView :pages="pages" :tabState="tabState" :otherTabState="rightTabState" side="left" />
-    <TabView :pages="pages" :tabState="rightTabState" :otherTabState="tabState" side="right" />
+    <TabView :notebook="notebook" :tabState="notebook.view.left" :otherTabState="notebook.view.right" side="left" />
+    <TabView :notebook="notebook" :tabState="notebook.view.right" :otherTabState="notebook.view.left" side="right" />
     <div ref="split" class="view-split">
       <div class="view-split-bar h-full" />
       <div class="view-split-handle p-1">↔</div>
