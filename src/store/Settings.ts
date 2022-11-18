@@ -1,5 +1,5 @@
-import writeMarkdown from '../components/blocks/LocalStorageTools/writeMarkdown'
-import getLocalStorage from '../components/blocks/LocalStorageTools/getStorage'
+import writeMarkdown from '../components/data/LocalStorageTools/writeMarkdown'
+import getLocalStorage from '../components/data/LocalStorageTools/getStorage'
 
 import { ref } from 'vue'
 

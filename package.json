@@ -24,6 +24,7 @@
     "@codemirror/view": "^6.4.0",
     "@vueuse/core": "^9.4.0",
     "@vueuse/head": "^0.9.8",
+    "fflate": "^0.7.4",
     "file-saver": "^2.0.5",
     "highlight.js": "^11.6.0",
     "lodash": "^4.17.21",

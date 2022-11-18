@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import type { ProjectContentInfo } from './data'
+import type { NotebookContentInfo } from './data'
 
 import { PropType } from 'vue'
 
 const {data} = defineProps({
   data: {
-    type: Object as PropType<ProjectContentInfo>,
+    type: Object as PropType<NotebookContentInfo>,
     required: true
   }
 })

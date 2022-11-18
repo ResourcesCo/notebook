@@ -1,7 +1,7 @@
 import { isPlainObject, isString } from "lodash"
 
 export type FileInfo = {emoji: String, title: String, role?: 'settings'}
-export type ProjectContentInfo = {files: {[key: string]: FileInfo}}
+export type NotebookContentInfo = {files: {[key: string]: FileInfo}}
 
 function validateFile(file: any): boolean {
   if (isPlainObject(file)) {
@@ -10,7 +10,7 @@ function validateFile(file: any): boolean {
   return false
 }
 
-export function validate(data: any): data is ProjectContentInfo {
+export function validate(data: any): data is NotebookContentInfo {
   return (
     isPlainObject(data) &&
     isPlainObject(data['files']) &&

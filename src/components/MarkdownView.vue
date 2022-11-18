@@ -9,8 +9,8 @@ import javascript from "highlight.js/lib/languages/javascript"
 import typescript from "highlight.js/lib/languages/typescript"
 import json from "highlight.js/lib/languages/json"
 import ComponentManager from "./markdown/ComponentManager"
-import LocalStorageTools from "./blocks/LocalStorageTools"
-import ProjectContent, { ProjectContentInfo, validate as validateProjectContent } from './blocks/ProjectContent'
+import LocalStorageTools from "./data/LocalStorageTools"
+import NotebookContent, { NotebookContentInfo, validate as validateNotebookContent } from './data/NotebookContent'
 import parseJson from '../utils/parseJson'
 import SettingsClient from '../store/SettingsClient'
 // @ts-ignore
@@ -34,11 +34,11 @@ const props = defineProps({
   }
 })
 
-const components = {ProjectContent, LocalStorageTools} as const
+const components = {NotebookContent, LocalStorageTools} as const
 
 type Block =
   {html: string} |
-  {tag: 'ProjectContent', data: ProjectContentInfo } |
+  {tag: 'NotebookContent', data: NotebookContentInfo } |
   {tag: 'LocalStorageTools'} |
   { error: string }
 
@@ -56,9 +56,9 @@ watch(value, () => {
       const [tag, id] = inside.split('-')
       const component = componentManager.components.find(({id: _id}) => id === String(_id))
       if (component && Object.keys(components).includes(tag)) {
-        if (tag === 'ProjectContent') {
+        if (tag === 'NotebookContent') {
           const data = parseJson(component.data)
-          if (validateProjectContent(data)) {
+          if (validateNotebookContent(data)) {
             return {tag, data}
           }
           return { error: 'Schema mismatch' }
@@ -78,7 +78,7 @@ watch(value, () => {
 <template>
   <div ref="root" class="prose p-2" v-for="block in blocks">
     <div v-if="'html' in block" v-html="block.html"></div>
-    <div v-else-if="'tag' in block && block.tag === 'ProjectContent'"><ProjectContent :data="block.data" /></div>
+    <div v-else-if="'tag' in block && block.tag === 'NotebookContent'"><NotebookContent :data="block.data" /></div>
     <div v-else-if="'tag' in block && block.tag === 'LocalStorageTools'"><LocalStorageTools :settings="settings" /></div>
     <div v-else-if="'error' in block" style="color: red">{{block.error}}</div>
   </div>
