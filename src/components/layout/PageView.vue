@@ -1,11 +1,16 @@
 <script lang="ts">
-import { defineComponent, PropType, Ref, ref, toRef, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { defineComponent, PropType, Ref, ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { Notebook } from '~/store/notebook'
 import { colorScheme } from '../../store'
 import { handleMessage as handleSettingsMessage } from '../../store/settings'
 import Settings from '../settings/Settings.vue'
 
 export default defineComponent({
   props: {
+    notebook: {
+      type: Object as PropType<Notebook>,
+      required: true,
+    },
     page: {
       type: Object as PropType<{body: Ref<string>, isSettings: boolean}>,
       required: true,
@@ -16,10 +21,11 @@ export default defineComponent({
     },
   },
   components: {Settings},
-  setup: ({page, mode: _mode}, _ctx) => {
+  setup: ({notebook, page, mode: _mode}, _ctx) => {
     const frame = ref<HTMLIFrameElement | undefined>(undefined)
     const lastBodyUpdate = ref<string | undefined>(undefined)
     const loadedCount = ref(0)
+    const prepareSettingsComplete = ref(false)
     const onMessage = (e: MessageEvent) => {
       if (
         e.isTrusted &&
@@ -31,7 +37,7 @@ export default defineComponent({
           page.body.value = e.data[1]
           lastBodyUpdate.value = e.data[1]
         } else if (page.isSettings) {
-          handleSettingsMessage(e.data)
+          handleSettingsMessage(e.data, notebook)
         }
       }
     }
@@ -48,8 +54,15 @@ export default defineComponent({
       const frameValue = frame.value
       if (loadedCount.value > 0 && frameValue) {
         const contentWindow = frameValue.contentWindow
-        if (contentWindow && lastBodyUpdate.value !== page.body.value) {
+        if (contentWindow && (mode.value === 'view' || (lastBodyUpdate.value !== page.body.value))) {
           contentWindow.postMessage(['md', page.body.value], '*')
+        }
+        if (mode.value === 'edit' && !prepareSettingsComplete.value) {
+          prepareSettingsComplete.value = true
+          const self = this
+          setTimeout(() => {
+            notebook.resetSettings()
+          }, 50)
         }
       }
     })

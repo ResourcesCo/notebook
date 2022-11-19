@@ -1,22 +1,34 @@
 <script lang="ts" setup>
-import type { NotebookContentInfo } from './data'
-
 import { PropType } from 'vue'
+import type { NotebookContentInfo } from './data'
+import SettingsClient from '~/store/SettingsClient'
 
-const {data} = defineProps({
+const {data, settings} = defineProps({
   data: {
     type: Object as PropType<NotebookContentInfo>,
     required: true
-  }
+  },
+  settings: {
+    type: Object as PropType<SettingsClient>,
+    required: true
+  },
 })
+
 </script>
 
 <template>
-  <div v-for="[name, file] in Object.entries(data['files'])">
-    <span class="emoji" contenteditable>{{ file.emoji }}</span>
-    <span class="title" contenteditable>{{ file.title }}</span>
-    <span class="name" contenteditable>{{ name }}</span>
-    <span v-if="file.role" class="tag">{{ file.role }}</span>
+  <div>
+    <div v-for="[name, file] in Object.entries(data['files'])">
+      <span class="emoji">{{ file.emoji }}</span>
+      <span class="title">{{ file.title }}</span>
+      <span class="name">{{ name }}</span>
+      <span class="delete" v-if="file.delete">delete</span>
+      <span class="rename" v-if="file.rename">→ {{file.rename}}</span>
+    </div>
+    <div class="pt-5">
+      <button @click="() => settings.applyContentChanges(data)">Apply</button>
+      <button @click="() => settings.resetContentChanges()">Reset</button>
+    </div>
   </div>
 </template>
 
@@ -32,7 +44,11 @@ const {data} = defineProps({
     @apply text-xs;
   }
 
-  span.tag {
-    @apply text-xs bg-teal-200 dark:bg-slate-600;
+  span.delete {
+    @apply text-xs bg-red-400 dark:bg-red-600;
+  }
+
+  span.rename {
+    @apply text-xs bg-orange-500 text-slate-900 dark:bg-orange-500 dark:text-slate-900;
   }
 </style>

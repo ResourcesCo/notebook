@@ -56,18 +56,24 @@ export default defineComponent({
         props.otherTabState.show = "self"
         props.tabState.show = "other"
         props.otherTabState.lastSelected = props.otherTabState.selected
-      } else {
+      } else if (
+        props.otherTabState.selected === '_settings.md' &&
+        props.otherTabState.show === 'self' &&
+        props.tabState.show === 'other'
+      ) {
         props.otherTabState.tabs.splice(i, 1)
-        if (props.otherTabState.selected === "_settings.md") {
-          if (props.otherTabState.lastSelected !== null && props.otherTabState.tabs.includes(props.otherTabState.lastSelected)) {
-            props.otherTabState.selected = props.otherTabState.lastSelected
-          } else if (props.otherTabState.tabs.length > 0) {
-            props.otherTabState.selected = props.otherTabState.tabs[0]
-          }
+        if (props.otherTabState.lastSelected !== null && props.otherTabState.tabs.includes(props.otherTabState.lastSelected)) {
+          props.otherTabState.selected = props.otherTabState.lastSelected
+        } else if (props.otherTabState.tabs.length > 0) {
+          props.otherTabState.selected = props.otherTabState.tabs[0]
         }
         props.otherTabState.show = 'self'
         props.tabState.show = 'other'
         props.otherTabState.lastSelected = null
+      } else {
+        props.otherTabState.selected = '_settings.md'
+        props.otherTabState.show = 'self'
+        props.tabState.show = 'other'
       }
     }
 
@@ -96,7 +102,7 @@ export default defineComponent({
     })
 
     return {
-      files: props.notebook.content.files,
+      notebook: props.notebook,
       side: props.side,
       tabs,
       selected,
@@ -117,7 +123,7 @@ export default defineComponent({
     <Nav class="nav">
       <TabArea :active="mode === 'edit'">
         <Tab v-for="tab in tabs" :selected="tab === selected" @click="() => { setSelected(tab) }">
-          {{ files[tab].emoji }} {{ files[tab].title }}
+          {{ notebook.content.files[tab].emoji }} {{ notebook.content.files[tab].title }}
         </Tab>
       </TabArea>
       <Tab class="right" :selected="mode === 'view'" @click="() => toggleMode()"><span v-if="mode === 'view'">Preview </span>👁</Tab>
@@ -127,7 +133,7 @@ export default defineComponent({
     </Nav>
   </div>
   <div :class="['overflow-auto', 'content', 'relative', side]" v-if="page">
-    <PageView :key="pageKey" :page="page" :mode="mode" />
+    <PageView :notebook="notebook" :key="pageKey" :page="page" :mode="mode" />
   </div>
 </template>
 
