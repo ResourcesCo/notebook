@@ -1,4 +1,5 @@
 <script lang="ts">
+import { useEventListener } from '@vueuse/core'
 import { defineComponent, PropType, Ref, ref, computed, watch, onMounted, onBeforeUnmount, onBeforeMount } from 'vue'
 import { Notebook } from '~/store/notebook'
 import { colorScheme } from '../../store'
@@ -27,7 +28,10 @@ export default defineComponent({
     const loadedCount = ref(0)
     const prepareSettingsComplete = ref(false)
     const initialColorScheme = ref('dark')
-    const onMessage = (e: MessageEvent) => {
+    onBeforeMount(() => {
+      initialColorScheme.value = colorScheme.value
+    })
+    useEventListener('message', (e: MessageEvent) => {
       if (
         e.isTrusted &&
         e.source == frame.value?.contentWindow &&
@@ -41,15 +45,6 @@ export default defineComponent({
           handleSettingsMessage(e.data, notebook)
         }
       }
-    }
-    onBeforeMount(() => {
-      initialColorScheme.value = colorScheme.value
-    })
-    onMounted(() => {
-      window.addEventListener('message', onMessage)
-    })
-    onBeforeUnmount(() => {
-      window.removeEventListener('message', onMessage)
     })
     const mode = computed(() => _mode === 'edit' ? 'edit' : 'view')
     const src = computed(() => '/app/' + mode.value + '/?color-scheme=' + initialColorScheme.value)

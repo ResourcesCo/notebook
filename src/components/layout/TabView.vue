@@ -36,10 +36,6 @@ export default defineComponent({
     },
   },
   setup(props, ctx) {
-    const setSelected = (id: string) => {
-      props.tabState.show = 'self'
-      props.tabState.selected = id
-    }
     const toggleMode = () => {
       if (props.tabState.show === 'self') {
         props.otherTabState.show = props.otherTabState.show === 'self' ? 'other' : 'self'
@@ -77,10 +73,6 @@ export default defineComponent({
       }
     }
 
-    const tabs = computed(() => {
-      return props.tabState.tabs
-    })
-    const selected = toRef(props.tabState, 'selected')
     const filename = computed(() => (
       props.tabState.show === 'self' ? props.tabState.selected : props.otherTabState.selected
     ))
@@ -103,14 +95,12 @@ export default defineComponent({
 
     return {
       notebook: props.notebook,
+      tabState: props.tabState,
       side: props.side,
-      tabs,
-      selected,
       filename,
       mode,
       pageKey,
       page,
-      setSelected,
       toggleMode,
       toggleSettings,
     }
@@ -122,7 +112,11 @@ export default defineComponent({
   <div :class="['header', side]">
     <Nav class="nav">
       <TabArea :active="mode === 'edit'">
-        <Tab v-for="tab in tabs" :selected="tab === selected" @click="() => { setSelected(tab) }">
+        <Tab
+          v-for="tab in tabState.tabs"
+          :selected="tab === tabState.selected"
+          @click="() => { tabState.selected = tab; tabState.show = 'self'; }"
+        >
           {{ notebook.content.files[tab].emoji }} {{ notebook.content.files[tab].title }}
         </Tab>
       </TabArea>
