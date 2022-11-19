@@ -157,8 +157,14 @@ export class Notebook {
   }
 
   applyViewChanges(view: NotebookView) {
-    this.view.left = view.left
-    this.view.right = view.right
+    this.view.left.tabs = [...view.left.tabs]
+    this.view.right.tabs = [...view.right.tabs]
+    this.view.left.selected = view.left.selected
+    this.view.right.selected = view.right.selected
+    this.view.left.show = view.left.show
+    this.view.right.show = view.right.show
+    this.view.left.lastSelected = view.left.lastSelected
+    this.view.right.lastSelected = view.right.lastSelected
   }
 
   migrateOldData(content: NotebookContent, view: NotebookView) {

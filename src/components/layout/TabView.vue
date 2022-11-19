@@ -120,7 +120,11 @@ export default defineComponent({
           {{ notebook.content.files[tab].emoji }} {{ notebook.content.files[tab].title }}
         </Tab>
       </TabArea>
-      <Tab class="right" :selected="mode === 'view'" @click="() => toggleMode()"><span v-if="mode === 'view'">Preview </span>👁</Tab>
+      <Tab
+        class="right"
+        :selected="tabState.show === 'other' || otherTabState.show === 'other'"
+        @click="() => toggleMode()"
+      ><span v-if="tabState.show === 'other'">Preview </span>👁</Tab>
       <TabViewButton v-if="side === 'right'" @click="() => toggleSettings()">⚙️</TabViewButton>
       <DisplayButton v-if="side === 'right'" />
       <div class="spacer" v-if="side === 'left'"></div>

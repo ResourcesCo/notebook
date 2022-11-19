@@ -40,7 +40,9 @@ function click() {
   const data = action.value?.data
   if (data) {
     notebook.applyViewChanges(data)
-    notebook.resetSettings()
+    setTimeout(() => {
+      notebook.resetSettings()
+    }, 50)
   }
   dismiss()
 }
