@@ -72,9 +72,9 @@ export class Notebook {
         "show": "self",
       },
     }
-    this.prefix = prefix || '/.notebook'
-    if (prefix === undefined && localStorage.getItem(`.notebook`) === null) {
-      const haveOldData = [1, 2, 3, 4, 5].some(i => localStorage.getItem(`doc-${i}`) !== null)
+    this.prefix = prefix || '.notebook'
+    if (prefix === undefined && (localStorage.getItem(`.notebook/_content.json`) || '').trim() === '') {
+      const haveOldData = [1, 2, 3, 4, 5].some(i => (localStorage.getItem(`doc-${i}`) || '').trim().length > 0)
       if (haveOldData) {
         this.migrateOldData(defaultContent, defaultView)
       }
@@ -162,26 +162,35 @@ export class Notebook {
   }
 
   migrateOldData(content: NotebookContent, view: NotebookView) {
+    let number = 1;
+    const newKeys: string[] = []
     for (const i of [1, 2, 3, 4, 5]) {
       const oldKey = `doc-${i}`
-      const newKey = `doc-${i}.md`
-      const data = (
-        (
-          i === 5 ?
-          'NOTE: This was previously called the Settings page.\n' +
-          'It has been moved to Untitled 5 to make room for the new settings page.\n\n---\n' : ''
-        ) + (localStorage.getItem(oldKey) || '')
-      )
-      this.fileData[newKey] = useStorage(
-        `${this.prefix}/${newKey}`, data
-      )
-      localStorage.removeItem(oldKey)
-      content.files[newKey] = {
-        emoji: '📝',
-        title: `Untitled ${i}`
+      const savedData = (localStorage.getItem(oldKey) || '').trim()
+      if (savedData.length > 0) {
+        const newKey = `untitled-${number}.md`
+        const data = (
+          (
+            oldKey === 'doc-5' ?
+            'NOTE: This was previously called the Settings page.\n' +
+            'It has been moved to this page to make room for the new settings page.\n\n---\n' : ''
+          ) + (localStorage.getItem(oldKey) || '')
+        )
+        this.fileData[newKey] = useStorage(
+          `${this.prefix}/${newKey}`, data
+        )
+        localStorage.removeItem(oldKey)
+        content.files[newKey] = {
+          emoji: '📝',
+          title: `Untitled ${number}`
+        }
+        newKeys.push(newKey)
+        number++;
       }
-      view[i <= 2 ? 'left' : 'right'].tabs.push(newKey)
     }
+    const divide = Math.ceil(newKeys.length / 2)
+    view.left.tabs = [...view.left.tabs, ...newKeys.slice(0, divide)]
+    view.right.tabs = [...view.right.tabs, ...newKeys.slice(divide)]
   }
 }
 

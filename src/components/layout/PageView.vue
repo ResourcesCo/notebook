@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, PropType, Ref, ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { defineComponent, PropType, Ref, ref, computed, watch, onMounted, onBeforeUnmount, onBeforeMount } from 'vue'
 import { Notebook } from '~/store/notebook'
 import { colorScheme } from '../../store'
 import { handleMessage as handleSettingsMessage } from '../../store/settings'
@@ -26,6 +26,7 @@ export default defineComponent({
     const lastBodyUpdate = ref<string | undefined>(undefined)
     const loadedCount = ref(0)
     const prepareSettingsComplete = ref(false)
+    const initialColorScheme = ref('dark')
     const onMessage = (e: MessageEvent) => {
       if (
         e.isTrusted &&
@@ -41,6 +42,9 @@ export default defineComponent({
         }
       }
     }
+    onBeforeMount(() => {
+      initialColorScheme.value = colorScheme.value
+    })
     onMounted(() => {
       window.addEventListener('message', onMessage)
     })
@@ -48,7 +52,7 @@ export default defineComponent({
       window.removeEventListener('message', onMessage)
     })
     const mode = computed(() => _mode === 'edit' ? 'edit' : 'view')
-    const src = computed(() => '/app/' + mode.value + '/?color-scheme=' + colorScheme.value)
+    const src = computed(() => '/app/' + mode.value + '/?color-scheme=' + initialColorScheme.value)
     const isSettingsView = computed(() => page.isSettings && mode.value === 'view')
     watch([page.body, frame, loadedCount, mode], () => {
       const frameValue = frame.value
