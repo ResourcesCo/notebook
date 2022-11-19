@@ -51,20 +51,23 @@ export default defineComponent({
     const toggleSettings = () => {
       const i = props.otherTabState.tabs.findIndex(s => s === "_settings.md")
       if (i === -1) {
-        props.otherTabState.tabs.unshift("_settings.md")
+        props.otherTabState.tabs.push("_settings.md")
+        props.otherTabState.selected = "_settings.md"
+        props.otherTabState.show = "self"
         props.tabState.show = "other"
         props.otherTabState.lastSelected = props.otherTabState.selected
-        props.otherTabState.selected = "_settings.md"
       } else {
         props.otherTabState.tabs.splice(i, 1)
         if (props.otherTabState.selected === "_settings.md") {
-          if (props.otherTabState.lastSelected !== null && props.otherTabState.lastSelected !== "_settings.md") {
+          if (props.otherTabState.lastSelected !== null && props.otherTabState.tabs.includes(props.otherTabState.lastSelected)) {
             props.otherTabState.selected = props.otherTabState.lastSelected
-            props.otherTabState.lastSelected = null
           } else if (props.otherTabState.tabs.length > 0) {
             props.otherTabState.selected = props.otherTabState.tabs[0]
           }
         }
+        props.otherTabState.show = 'self'
+        props.tabState.show = 'other'
+        props.otherTabState.lastSelected = null
       }
     }
 
@@ -80,15 +83,15 @@ export default defineComponent({
     const page = computed(() => {
       const isSettings = filename.value === '_settings.md'
       const body = (
-        (typeof filename.value === 'string' && filename.value in props.notebook.fileData) ?
-        toRef(props.notebook.fileData, filename.value) :
+        (typeof filename.value === 'string') ?
+        props.notebook.getFile(filename.value) :
         null
       )
       if (body) {
-        return reactive({
+        return {
           body,
           isSettings,
-        })
+        }
       }
     })
 

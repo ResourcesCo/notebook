@@ -8,7 +8,6 @@ export default defineComponent({
     MarkdownEdit,
   },
   setup(props, ctx) {
-    const update = ref(true)
     const page = reactive({
       body: '',
     })
@@ -18,10 +17,7 @@ export default defineComponent({
 
     window.addEventListener('message', e => {
       if (e.isTrusted && e.source === parent && Array.isArray(e.data) && e.data.length === 2 && e.data[0] === 'md') {
-        if (update.value) {
-          page.body = e.data[1]
-          update.value = false
-        }
+        page.body = e.data[1]
       }
     })
 

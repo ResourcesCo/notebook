@@ -1,5 +1,5 @@
-import { reactive, Ref } from 'vue'
-import { useStorage, toReactive } from '@vueuse/core'
+import { reactive, toRef, Ref } from 'vue'
+import { useStorage, toReactive, watchDebounced } from '@vueuse/core'
 import defaultNewTab from './content/_newtab.md?raw'
 import defaultWelcome from './content/_welcome.md?raw'
 import defaultSettings from './content/_settings.md?raw'
@@ -35,6 +35,7 @@ export class Notebook {
   prefix: string
   fileData: {[key: string]: Ref<string>} = reactive({})
   content: NotebookContent
+  savedView: Ref<NotebookView>
   view: NotebookView
 
   constructor(prefix: string | undefined = undefined) {
@@ -76,8 +77,13 @@ export class Notebook {
       }
     }
     this.content = toReactive(useStorage(`${this.prefix}/_content.json`, defaultContent))
-    this.view = toReactive(useStorage(`${this.prefix}/_view.json`, defaultView))
-    for (const name of Object.keys(this.content.files)) {
+    this.savedView = useStorage(`${this.prefix}/_view.json`, defaultView)
+    this.view = toReactive(useStorage(`${this.prefix}/_view.json`, this.savedView.value, sessionStorage))
+    watchDebounced(this.view, () => this.savedView.value = this.view, {debounce: 200, maxWait: 500})
+  }
+
+  getFile(name: string) {
+    if (!(name in this.fileData)) {
       this.fileData[name] = useStorage(
         `${this.prefix}/${name}`,
         defaultFileData[name] ?? '',
@@ -85,6 +91,7 @@ export class Notebook {
         {writeDefaults: false}
       )
     }
+    return toRef(this.fileData, name)
   }
 
   migrateOldData(content: NotebookContent, view: NotebookView) {

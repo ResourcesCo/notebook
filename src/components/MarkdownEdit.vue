@@ -8,7 +8,7 @@ import {
   rectangularSelection,
   KeyBinding
 } from "@codemirror/view"
-import { EditorState, Compartment, Extension, Prec } from "@codemirror/state"
+import { EditorState, Compartment, Extension, Prec, Text } from "@codemirror/state"
 import {
   indentOnInput,
   LanguageSupport,
@@ -204,14 +204,27 @@ export default defineComponent({
     })
 
     watch(props.page, () => {
+      const pos = editor.state.selection.main.anchor
+      const line = editor.state.doc.lineAt(pos)
+      const newText = editor.state.toText(props.page.body)
+      let N = newText.length
+      try {
+        const newLine = newText.line(line.number)
+        if (newLine.text === line.text) {
+          N = newLine.from + (pos - line.from)
+        } else {
+          N = newLine.to
+        }
+      } catch (err) {}
       const tr = editor.state.update({
         changes: {
           from: 0,
           to: editor.state.doc.length,
-          insert: props.page.body,
+          insert: newText,
         },
       })
       editor.dispatch(tr)
+      editor.dispatch({selection: {anchor: N, head: N}})
     })
 
     onMounted(() => {

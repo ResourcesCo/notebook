@@ -7,7 +7,7 @@ import Settings from '../settings/Settings.vue'
 export default defineComponent({
   props: {
     page: {
-      type: Object as PropType<{body: string, isSettings: boolean}>,
+      type: Object as PropType<{body: Ref<string>, isSettings: boolean}>,
       required: true,
     },
     mode: {
@@ -18,6 +18,7 @@ export default defineComponent({
   components: {Settings},
   setup: ({page, mode: _mode}, _ctx) => {
     const frame = ref<HTMLIFrameElement | undefined>(undefined)
+    const lastBodyUpdate = ref<string | undefined>(undefined)
     const loadedCount = ref(0)
     const onMessage = (e: MessageEvent) => {
       if (
@@ -27,7 +28,8 @@ export default defineComponent({
         e.data.length >= 1
       ) {
         if (e.data[0] === "md" && e.data.length === 2) {
-          page.body = e.data[1]
+          page.body.value = e.data[1]
+          lastBodyUpdate.value = e.data[1]
         } else if (page.isSettings) {
           handleSettingsMessage(e.data)
         }
@@ -41,17 +43,16 @@ export default defineComponent({
     })
     const mode = computed(() => _mode === 'edit' ? 'edit' : 'view')
     const src = computed(() => '/app/' + mode.value + '/?color-scheme=' + colorScheme.value)
-    const body = toRef(page, 'body')
     const isSettingsView = computed(() => page.isSettings && mode.value === 'view')
-    watch([frame, body, loadedCount, mode], () => {
+    watch([page.body, frame, loadedCount, mode], () => {
       const frameValue = frame.value
       if (loadedCount.value > 0 && frameValue) {
         const contentWindow = frameValue.contentWindow
-        if (contentWindow) {
-          contentWindow.postMessage(['md', page.body], '*')
+        if (contentWindow && lastBodyUpdate.value !== page.body.value) {
+          contentWindow.postMessage(['md', page.body.value], '*')
         }
       }
-    }, { immediate: true })
+    })
     watch(colorScheme, () => {
       const contentWindow = frame.value?.contentWindow
       if (contentWindow) {
