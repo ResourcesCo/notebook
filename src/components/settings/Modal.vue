@@ -24,7 +24,7 @@ const emit = defineEmits<{
   </div>
 </template>
 
-<style>
+<style scoped>
   html div.backdrop {
     background-color: rgba(245, 245, 244, 0.7);
   }

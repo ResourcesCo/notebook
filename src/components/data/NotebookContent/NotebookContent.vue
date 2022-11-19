@@ -2,6 +2,7 @@
 import { PropType } from 'vue'
 import type { NotebookContentInfo } from './data'
 import SettingsClient from '~/store/SettingsClient'
+import Button from '~/components/settings/Button.vue'
 
 const {data, settings} = defineProps({
   data: {
@@ -18,7 +19,7 @@ const {data, settings} = defineProps({
 
 <template>
   <div>
-    <div v-for="[name, file] in Object.entries(data['files'])">
+    <div v-for="[name, file] in Object.entries(data['files'])" class="my-2">
       <span class="emoji">{{ file.emoji }}</span>
       <span class="title">{{ file.title }}</span>
       <span class="name">{{ name }}</span>
@@ -26,13 +27,13 @@ const {data, settings} = defineProps({
       <span class="rename" v-if="file.rename">→ {{file.rename}}</span>
     </div>
     <div class="pt-5">
-      <button @click="() => settings.applyContentChanges(data)">Apply</button>
-      <button @click="() => settings.resetContentChanges()">Reset</button>
+      <Button @click="() => settings.applyContentChanges(data)">Apply</Button>
+      <Button @click="() => settings.resetContentChanges()">Reset</Button>
     </div>
   </div>
 </template>
 
-<style>
+<style scoped>
   span {
     background-color: #555;
     padding: 3px;

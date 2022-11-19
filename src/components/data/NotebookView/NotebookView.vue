@@ -2,6 +2,7 @@
 import { PropType } from 'vue'
 import type { NotebookView as NotebookViewType } from '../../../store/notebook'
 import SettingsClient from '~/store/SettingsClient'
+import Button from '~/components/settings/Button.vue'
 
 const {data, settings} = defineProps({
   data: {
@@ -24,20 +25,20 @@ const sides = ['left', 'right'] as const
         <span class="name">{{side}}</span>
         <span class="tag">{{data[side].show}}</span>
       </div>
-      <div class="pl-5" v-for="tab in data[side].tabs">
+      <div class="pl-5 my-1" v-for="tab in data[side].tabs">
         <span class="name">{{tab}}</span>
         <span v-if="tab == data[side].selected" class="tag">selected</span>
         <span v-if="tab == data[side].lastSelected" class="tag">last selected</span>
       </div>
     </div>
     <div class="pt-5">
-      <button @click="() => settings.applyViewChanges(data)">Apply</button>
-      <button @click="() => settings.resetViewChanges()">Reset</button>
+      <Button @click="() => settings.applyViewChanges(data)">Apply</Button>
+      <Button @click="() => settings.resetViewChanges()">Reset</Button>
     </div>
   </div>
 </template>
 
-<style>
+<style scoped>
   span {
     background-color: #555;
     padding: 3px;

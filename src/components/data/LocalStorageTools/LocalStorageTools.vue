@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import { PropType } from 'vue';
-import SettingsClient from '~/store/SettingsClient';
+import { PropType } from 'vue'
+import SettingsClient from '~/store/SettingsClient'
+import Button from '~/components/settings/Button.vue'
 
 const {settings} = defineProps({
   settings: {
@@ -13,11 +14,11 @@ const {settings} = defineProps({
 
 <template>
   <div>
-    <button @click="() => settings.importLocalStorage()">Import</button>
-    <button @click="() => settings.exportLocalStorage()">Export</button>
-    <button @click="() => settings.clearLocalStorage()">Clear</button>
+    <Button @click="() => settings.importLocalStorage()">Import</Button>
+    <Button @click="() => settings.exportLocalStorage()">Export</Button>
+    <Button @click="() => settings.clearLocalStorage()">Clear</Button>
   </div>
 </template>
 
-<style>
+<style scoped>
 </style>

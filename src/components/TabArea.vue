@@ -8,7 +8,7 @@ const { active } = defineProps({ active: Boolean })
   </div>
 </template>
 
-<style>
+<style scoped>
   div.root.inactive {
     @apply opacity-30;
   }

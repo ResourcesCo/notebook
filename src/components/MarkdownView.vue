@@ -80,7 +80,7 @@ watch(value, () => {
 </script>
 
 <template>
-  <div ref="root" class="prose p-2" v-for="block in blocks">
+  <div class="prze p-2" v-for="block in blocks">
     <div v-if="'html' in block" v-html="block.html"></div>
     <div v-else-if="'tag' in block && block.tag === 'NotebookContent'"><NotebookContent :data="block.data" :settings="settings" /></div>
     <div v-else-if="'tag' in block && block.tag === 'NotebookView'"><NotebookView :data="block.data" :settings="settings" /></div>
