@@ -149,9 +149,14 @@ export class Notebook {
           }
         }
         localStorage.removeItem(`${this.prefix}/${name}`)
-      } else if (!file.delete) {
+      } else if (!file.delete && this.content.files[name]) {
         this.content.files[name].emoji = file.emoji
         this.content.files[name].title = file.title
+      } else {
+        this.content.files[name] = {
+          emoji: file.emoji,
+          title: file.title,
+        }
       }
     }
   }
