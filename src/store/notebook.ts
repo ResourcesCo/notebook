@@ -135,6 +135,10 @@ export class Notebook {
     for (const [name, file] of Object.entries(data.files)) {
       if (typeof file.rename === 'string') {
         const rename = file.rename
+        if (rename === name) {
+          console.error('ERROR: trying to rename to the same name; skipping')
+          continue
+        }
         const newFile = this.getFile(rename)
         const oldFile = this.getFile(name)
         newFile.value = oldFile.value
