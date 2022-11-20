@@ -16,7 +16,7 @@ const status = computed<{messages: string[], deletes: string[]}>(() => {
       if (file.rename && file.rename === file.name) {
         messages.push(`Cannot rename ${JSON.stringify(file.name)} to the same name.`)
       }
-      if (file.delete || file.rename && !(file.name in notebook.content.files)) {
+      if ((file.delete || file.rename) && !(file.name in notebook.content.files)) {
         messages.push(
           `The file ${JSON.stringify(file.name)} does not exist and can't be ${file.delete ? 'deleted' : 'renamed'}.`
         )
