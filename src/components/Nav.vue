@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <nav class="flex p-1">
+  <nav class="flex py-1 border-collapse">
     <slot />
   </nav>
 </template>

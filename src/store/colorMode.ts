@@ -1,16 +1,45 @@
-import { Ref, watch, computed } from 'vue'
-import { usePreferredDark, useToggle } from '@vueuse/core'
-import hasLocalStorage from '../store/hasLocalStorage'
-import useStorage from '../store/useStorage'
+import { Ref, ref, watch, computed } from 'vue'
+import { usePreferredDark, useToggle, useStorage as _useStorage } from '@vueuse/core'
+
+const tryLocalStorage = () => {
+  try {
+    if (window.localStorage) {
+      return true
+    }
+  } catch (err) {
+    // do nothing
+  }
+  return false
+}
+
+const hasLocalStorage = tryLocalStorage()
+
+let refs: Map<string, any>
+
+function getKeyedRef(key: string, defaultValue: (ctx: {hasLocalStorage: boolean}) => void): Ref
+function getKeyedRef(key: string, defaultValue: Exclude<any, Function>): Ref {
+  if (!refs) {
+    refs = new Map()
+  }
+  if (!refs.has(key)) {
+    refs.set(key, ref(defaultValue))
+  }
+  return refs.get(key)
+}
+
+const useStorage = (key: string, defaultValue: unknown) => {
+  const value = typeof defaultValue === 'function' ? defaultValue({hasLocalStorage}) : (defaultValue || null)
+  return hasLocalStorage ? _useStorage(key, value) : getKeyedRef(key, value)
+}
 
 const getUrlParamSchema = () => {
-  const params = new URLSearchParams(window.location.search);
+  const params = new URLSearchParams(window.location.search)
   const result = params.get("color-scheme") || 'auto'
   return result
 }
 
 export const colorScheme = useStorage(
-  ['settings', 'color-scheme'],
+  'rco/settings/color-scheme',
   ({ hasLocalStorage }: { hasLocalStorage: boolean }) => hasLocalStorage ? 'auto' : getUrlParamSchema()
 ) as Ref<'auto' | 'dark' | 'light'>
 
@@ -38,7 +67,7 @@ watch(
     }
     const prefersDark = preferredDark.value
     const dark = setting === 'auto' ? prefersDark : (setting === 'dark')
-    document.documentElement.classList[dark ? 'add' : 'remove']("dark");
+    document.documentElement.classList[dark ? 'add' : 'remove']("dark")
   },
   { immediate: true },
 )

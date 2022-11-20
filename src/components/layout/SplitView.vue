@@ -1,28 +1,11 @@
 <script lang="ts">
-import { defineComponent, ref, onMounted, reactive, Ref } from "vue";
-import Split from "split-grid";
-import Nav from "../Nav.vue";
-import TabArea from "../TabArea.vue";
-import Tab from "../Tab.vue";
-import TabView from "./TabView.vue";
-import { nanoid } from "nanoid";
-import { useStorage } from '@vueuse/core'
-
-export interface Page {
-  id: string;
-  key: string;
-  title: string;
-  emoji: string;
-  body: string;
-}
-
-export type PageCollection = { [key: string]: Page };
-
-export interface TabState {
-  tabs: string[];
-  selected: string;
-  mode: "edit" | "view";
-}
+import { defineComponent, ref, onMounted } from 'vue'
+import Split from 'split-grid'
+import { notebook } from '../../store/notebook'
+import Nav from '../Nav.vue'
+import TabArea from '../TabArea.vue'
+import Tab from '../Tab.vue'
+import TabView from './TabView.vue'
 
 export default defineComponent({
   components: {
@@ -30,63 +13,9 @@ export default defineComponent({
     TabArea,
     Tab,
     TabView,
-  },
+},
   setup(props, _ctx) {
-    const split = ref();
-
-    const ids = [nanoid(7), nanoid(7), nanoid(7), nanoid(7)];
-    const pageBody1: Ref<string> = useStorage('doc-1', '')
-    const pageBody2: Ref<string> = useStorage('doc-2', '')
-    const pageBody3: Ref<string> = useStorage('doc-3', '')
-    const pageBody4: Ref<string> = useStorage('doc-4', '')
-    const page1 = reactive({
-      id: ids[0],
-      key: "doc-1",
-      title: "Untitled 1",
-      emoji: "📝",
-      body: pageBody1,
-    })
-    const page2 = reactive({
-      id: ids[1],
-      key: "doc-2",
-      title: "Untitled 2",
-      emoji: "📝",
-      body: pageBody2,
-    })
-    const page3 = reactive({
-      id: ids[2],
-      key: "doc-3",
-      title: "Untitled 3",
-      emoji: "📝",
-      body: pageBody3,
-    })
-    const page4 = reactive({
-      id: ids[3],
-      key: "doc-4",
-      title: "Untitled 4",
-      emoji: "📝",
-      body: pageBody4,
-    })
-    const pages = reactive<PageCollection>({
-      [ids[0]]: page1,
-      [ids[1]]: page2,
-      [ids[2]]: page3,
-      [ids[3]]: page4,
-    });
-
-    const tabs = Object.keys(pages).slice(0, 2);
-    const tabState = reactive<TabState>({
-      tabs,
-      selected: tabs[0],
-      mode: 'edit'
-    });
-
-    const rightTabs = Object.keys(pages).slice(2);
-    const rightTabState = reactive<TabState>({
-      tabs: rightTabs,
-      selected: rightTabs[0],
-      mode: 'view'
-    });
+    const split = ref()
 
     onMounted(() => {
       Split({
@@ -97,23 +26,21 @@ export default defineComponent({
           },
         ],
         columnMinSizes: { [1]: 0 },
-      });
-    });
+      })
+    })
 
     return {
       split,
-      pages,
-      tabState,
-      rightTabState,
-    };
+      notebook,
+    }
   },
-});
+})
 </script>
 
 <template>
   <div class="view-container text-zinc-700 dark:text-zinc-200">
-    <TabView :pages="pages" :tabState="tabState" :otherTabState="rightTabState" side="left" />
-    <TabView :pages="pages" :tabState="rightTabState" :otherTabState="tabState" side="right" />
+    <TabView :notebook="notebook" :tabState="notebook.view.left" :otherTabState="notebook.view.right" side="left" />
+    <TabView :notebook="notebook" :tabState="notebook.view.right" :otherTabState="notebook.view.left" side="right" />
     <div ref="split" class="view-split">
       <div class="view-split-bar h-full" />
       <div class="view-split-handle p-1">↔</div>

@@ -1,5 +1,5 @@
-<script lang="ts">
-import { defineComponent, ref, onMounted, watch } from "vue"
+<script lang="ts" setup>
+import { defineComponent, ref, onMounted, watch, PropType, Ref, watchEffect } from "vue"
 import {
   EditorView,
   highlightSpecialChars,
@@ -8,7 +8,7 @@ import {
   rectangularSelection,
   KeyBinding
 } from "@codemirror/view"
-import { EditorState, Compartment, Extension, Prec } from "@codemirror/state"
+import { EditorState, Compartment, Extension, Prec, Text } from "@codemirror/state"
 import {
   indentOnInput,
   LanguageSupport,
@@ -36,8 +36,19 @@ import {
   lightTheme,
   darkTheme,
 } from "../styles/editor"
-import { isDark } from "../modules/store"
+import { isDark } from "../store"
 import { insertNewlineContinueMarkup, deleteMarkupBackward } from '../vendor/commands'
+
+const props = defineProps({
+  page: {
+    type: Object as PropType<{body: string}>,
+    required: true,
+  },
+})
+
+const emit = defineEmits<{
+  (e: 'change', value: Text): void
+}>()
 
 const markdownKeymap: readonly KeyBinding[] = [
   {key: "Enter", run: insertNewlineContinueMarkup},
@@ -49,193 +60,195 @@ const markdown = ({codeLanguages}: {codeLanguages: readonly LanguageDescription[
   return new LanguageSupport(language, [...(support as Extension[]), Prec.high(keymap.of(markdownKeymap))])
 }
 
-export default defineComponent({
-  emits: ["change"],
-  props: ["page"],
-  setup(props, ctx) {
-    const codeLanguages = [
-      LanguageDescription.of({
-        name: "javascript",
-        alias: ["js", "jsx"],
-        async load() {
-          const { jsxLanguage } = await import("@codemirror/lang-javascript")
-          return new LanguageSupport(jsxLanguage)
-        },
-      }),
-      LanguageDescription.of({
-        name: "typescript",
-        alias: ["ts", "tsx"],
-        async load() {
-          const { tsxLanguage } = await import("@codemirror/lang-javascript")
-          return new LanguageSupport(tsxLanguage)
-        },
-      }),
-      LanguageDescription.of({
-        name: "css",
-        async load() {
-          const { cssLanguage } = await import("@codemirror/lang-css")
-          return new LanguageSupport(cssLanguage)
-        },
-      }),
-      LanguageDescription.of({
-        name: "python",
-        alias: ["py"],
-        async load() {
-          const { pythonLanguage } = await import("@codemirror/lang-python")
-          return new LanguageSupport(pythonLanguage)
-        },
-      }),
-      LanguageDescription.of({
-        name: "json",
-        async load() {
-          const { jsonLanguage } = await import("@codemirror/lang-json")
-          return new LanguageSupport(jsonLanguage)
-        },
-      }),
-      LanguageDescription.of({
-        name: "sql",
-        async load() {
-          const { sql, PostgreSQL } = await import("@codemirror/lang-sql")
-          return sql({ dialect: PostgreSQL })
-        },
-      }),
-      LanguageDescription.of({
-        name: "html",
-        alias: ["htm"],
-        async load() {
-          const { jsxLanguage } = await import("@codemirror/lang-javascript")
-          const javascript = new LanguageSupport(jsxLanguage)
-          const { cssLanguage } = await import("@codemirror/lang-css")
-          const css = new LanguageSupport(cssLanguage)
-          const { htmlLanguage } = await import("@codemirror/lang-html")
+const codeLanguages = [
+  LanguageDescription.of({
+    name: "javascript",
+    alias: ["js", "jsx"],
+    async load() {
+      const { jsxLanguage } = await import("@codemirror/lang-javascript")
+      return new LanguageSupport(jsxLanguage)
+    },
+  }),
+  LanguageDescription.of({
+    name: "typescript",
+    alias: ["ts", "tsx"],
+    async load() {
+      const { tsxLanguage } = await import("@codemirror/lang-javascript")
+      return new LanguageSupport(tsxLanguage)
+    },
+  }),
+  LanguageDescription.of({
+    name: "css",
+    async load() {
+      const { cssLanguage } = await import("@codemirror/lang-css")
+      return new LanguageSupport(cssLanguage)
+    },
+  }),
+  LanguageDescription.of({
+    name: "python",
+    alias: ["py"],
+    async load() {
+      const { pythonLanguage } = await import("@codemirror/lang-python")
+      return new LanguageSupport(pythonLanguage)
+    },
+  }),
+  LanguageDescription.of({
+    name: "json",
+    async load() {
+      const { jsonLanguage } = await import("@codemirror/lang-json")
+      return new LanguageSupport(jsonLanguage)
+    },
+  }),
+  LanguageDescription.of({
+    name: "sql",
+    async load() {
+      const { sql, PostgreSQL } = await import("@codemirror/lang-sql")
+      return sql({ dialect: PostgreSQL })
+    },
+  }),
+  LanguageDescription.of({
+    name: "html",
+    alias: ["htm"],
+    async load() {
+      const { jsxLanguage } = await import("@codemirror/lang-javascript")
+      const javascript = new LanguageSupport(jsxLanguage)
+      const { cssLanguage } = await import("@codemirror/lang-css")
+      const css = new LanguageSupport(cssLanguage)
+      const { htmlLanguage } = await import("@codemirror/lang-html")
 
-          return new LanguageSupport(htmlLanguage, [css, javascript])
-        },
-      }),
-    ]
+      return new LanguageSupport(htmlLanguage, [css, javascript])
+    },
+  }),
+]
 
-    const markdownLanguage = markdown({
-      codeLanguages: [
-        ...codeLanguages,
-        LanguageDescription.of({
-          name: "markdown",
-          alias: ["md", "mkd"],
-          async load() {
-            return markdown({
-              codeLanguages: [
-                ...codeLanguages,
-                LanguageDescription.of({
-                  name: "markdown",
-                  alias: ["md", "mkd"],
-                  async load() {
-                    return markdown({
-                      codeLanguages: [
-                        ...codeLanguages,
-                        LanguageDescription.of({
-                          name: "markdown",
-                          alias: ["md", "mkd"],
-                          async load() {
-                            return markdown({
-                              codeLanguages,
-                            })
-                          },
-                        }),
-                      ],
-                    })
-                  },
-                }),
-              ],
-            })
-          },
-        }),
-      ],
-    })
-
-    const styleCompartment = new Compartment()
-
-    const root = ref()
-    let editor: EditorView
-
-    // TODO: use reactive
-    const darkStyleExtension: readonly Extension[] = [syntaxHighlighting(darkHighlightStyle), darkTheme]
-    const lightStyleExtension: readonly Extension[] = [syntaxHighlighting(lightHighlightStyle), lightTheme]
-    const getStyleExtension = () => {
-      return isDark.value ? darkStyleExtension : lightStyleExtension
-    }
-    let styleExtension = getStyleExtension()
-
-    const extensions = [
-      highlightSpecialChars(),
-      history(),
-      foldGutter(),
-      drawSelection(),
-      EditorState.allowMultipleSelections.of(true),
-      indentOnInput(),
-      bracketMatching(),
-      closeBrackets(),
-      autocompletion({ activateOnTyping: false }),
-      rectangularSelection(),
-      highlightSelectionMatches(),
-      keymap.of([
-        ...closeBracketsKeymap,
-        ...defaultKeymap,
-        ...searchKeymap,
-        ...historyKeymap,
-        ...foldKeymap,
-        ...completionKeymap,
-        ...lintKeymap,
-      ]),
-      markdownLanguage,
-      styleCompartment.of(styleExtension),
-      EditorView.lineWrapping,
-      EditorView.updateListener.of((v) => {
-        if (v.docChanged) {
-          ctx.emit("change", editor.state.doc)
-        }
-      }),
-    ]
-
-    watch(isDark, () => {
-      const newStyleExtension = getStyleExtension()
-      if (newStyleExtension !== styleExtension) {
-        styleExtension = newStyleExtension
-        editor.dispatch({ effects: styleCompartment.reconfigure(newStyleExtension) })
-      }
-    })
-
-    watch(props.page, () => {
-      const tr = editor.state.update({
-        changes: {
-          from: 0,
-          to: editor.state.doc.length,
-          insert: props.page.body,
-        },
-      })
-      editor.dispatch(tr)
-    })
-
-    onMounted(() => {
-      editor = new EditorView({
-        state: EditorState.create({
-          doc: props.page.body,
-          extensions,
-        }),
-        parent: root.value,
-      })
-    })
-
-    const handleFocus = () => {
-      if (editor) {
-        editor.focus()
-      }
-    }
-
-    return {
-      root,
-      handleFocus,
-    }
-  },
+const markdownLanguage = markdown({
+  codeLanguages: [
+    ...codeLanguages,
+    LanguageDescription.of({
+      name: "markdown",
+      alias: ["md", "mkd"],
+      async load() {
+        return markdown({
+          codeLanguages: [
+            ...codeLanguages,
+            LanguageDescription.of({
+              name: "markdown",
+              alias: ["md", "mkd"],
+              async load() {
+                return markdown({
+                  codeLanguages: [
+                    ...codeLanguages,
+                    LanguageDescription.of({
+                      name: "markdown",
+                      alias: ["md", "mkd"],
+                      async load() {
+                        return markdown({
+                          codeLanguages,
+                        })
+                      },
+                    }),
+                  ],
+                })
+              },
+            }),
+          ],
+        })
+      },
+    }),
+  ],
 })
+
+const styleCompartment = new Compartment()
+
+const root = ref()
+let editor: EditorView
+
+// TODO: use reactive
+const darkStyleExtension: readonly Extension[] = [syntaxHighlighting(darkHighlightStyle), darkTheme]
+const lightStyleExtension: readonly Extension[] = [syntaxHighlighting(lightHighlightStyle), lightTheme]
+const getStyleExtension = () => {
+  return isDark.value ? darkStyleExtension : lightStyleExtension
+}
+let styleExtension = getStyleExtension()
+
+const extensions = [
+  highlightSpecialChars(),
+  history(),
+  foldGutter(),
+  drawSelection(),
+  EditorState.allowMultipleSelections.of(true),
+  indentOnInput(),
+  bracketMatching(),
+  closeBrackets(),
+  autocompletion({ activateOnTyping: false }),
+  rectangularSelection(),
+  highlightSelectionMatches(),
+  keymap.of([
+    ...closeBracketsKeymap,
+    ...defaultKeymap,
+    ...searchKeymap,
+    ...historyKeymap,
+    ...foldKeymap,
+    ...completionKeymap,
+    ...lintKeymap,
+  ]),
+  markdownLanguage,
+  styleCompartment.of(styleExtension),
+  EditorView.lineWrapping,
+  EditorView.updateListener.of((v) => {
+    if (v.docChanged) {
+      emit("change", editor.state.doc)
+    }
+  }),
+]
+
+watch(isDark, () => {
+  const newStyleExtension = getStyleExtension()
+  if (newStyleExtension !== styleExtension) {
+    styleExtension = newStyleExtension
+    editor.dispatch({ effects: styleCompartment.reconfigure(newStyleExtension) })
+  }
+})
+
+onMounted(() => {
+  editor = new EditorView({
+    state: EditorState.create({
+      doc: props.page.body,
+      extensions,
+    }),
+    parent: root.value,
+  })
+})
+
+watch(props.page, () => {
+  const pos = editor.state.selection.main.anchor
+  const line = editor.state.doc.lineAt(pos)
+  const newText = editor.state.toText(props.page.body)
+  let N = newText.length
+  try {
+    const newLine = newText.line(line.number)
+    if (newLine.text === line.text) {
+      N = newLine.from + (pos - line.from)
+    } else {
+      N = newLine.to
+    }
+  } catch (err) {}
+  const tr = editor.state.update({
+    changes: {
+      from: 0,
+      to: editor.state.doc.length,
+      insert: newText,
+    },
+  })
+  editor.dispatch(tr)
+  editor.dispatch({selection: {anchor: N, head: N}})
+})
+
+const handleFocus = () => {
+  if (editor) {
+    editor.focus()
+  }
+}
 </script>
 
 <template>

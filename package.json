@@ -2,7 +2,7 @@
   "name": "@resources/notebook",
   "scripts": {
     "build": "vue-tsc --noEmit && NODE_ENV=production vite build",
-    "dev": "vite --port 3333 --open",
+    "dev": "vite --port 3333",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run"
@@ -24,6 +24,8 @@
     "@codemirror/view": "^6.4.0",
     "@vueuse/core": "^9.4.0",
     "@vueuse/head": "^0.9.8",
+    "fflate": "^0.7.4",
+    "file-saver": "^2.0.5",
     "highlight.js": "^11.6.0",
     "lodash": "^4.17.21",
     "markdown-it": "^13.0.1",
@@ -34,6 +36,7 @@
     "vue-router": "^4.1.6"
   },
   "devDependencies": {
+    "@types/file-saver": "^2.0.5",
     "@types/lodash": "^4.14.187",
     "@types/markdown-it": "^12.2.3",
     "@types/markdown-it-highlightjs": "^3.3.1",

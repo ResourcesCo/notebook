@@ -1,18 +1,68 @@
-.prose pre code.hljs {
-  font-size: 14px;
+.prze {
+  @apply zinc-900;
 }
 
-.prose ul {
-  margin-top: 1em;
-  margin-bottom: 1em;
+html.dark .prze {
+  @apply text-zinc-300;
 }
 
-.prose li {
-  margin-top: 0;
-  margin-bottom: 0;
+html.dark .prze a {
+  @apply text-teal-300;
 }
 
-html:not(.dark) .prose pre {
+html.dark .prze a:hover {
+  @apply text-teal-400;
+}
+
+html.dark .prze a:active {
+  @apply text-teal-500;
+}
+
+html.dark .prze a:visited {
+  @apply text-teal-500;
+}
+
+html.dark .prze h1 {
+  @apply text-3xl font-bold;
+}
+
+html.dark .prze h2 {
+  @apply text-2xl font-bold;
+}
+
+html.dark .prze h3 {
+  @apply text-xl font-bold;
+}
+
+html.dark .prze h4 {
+  @apply text-xl font-normal;
+}
+
+html.dark .prze h5 {
+  @apply text-l font-semibold;
+}
+
+.prze pre code.hljs {
+  @apply text-md;
+}
+
+.prze ul {
+  @apply my-0 py-0;
+}
+
+.prze li {
+  @apply my-0 py-0;
+}
+
+.prze li > p {
+  @apply my-1 py-0;
+}
+
+pre:has(.hljs) {
+  @apply px-7 py-3;
+}
+
+html:not(.dark) .prze pre {
   @apply bg-zinc-100;
 }
 
@@ -22,7 +72,7 @@ Original One Dark Syntax theme from https://github.com/atom/one-dark-syntax
 */
 html.dark .hljs {
   color: #abb2bf;
-  /*background: #282c34;*/
+  /* background: #282c34; */
 }
 html.dark .hljs-keyword, html.dark .hljs-operator {
   color: #F92672;
@@ -106,7 +156,7 @@ html:not(.dark) .hljs {
   /* var(--highlight-color) */
   color: #2f3337;
   /* var(--highlight-bg) */
-  /*background: #f6f6f6;*/
+  /* background: #f6f6f6; */
 }
 
 html:not(.dark) .hljs-subst {
@@ -206,15 +256,15 @@ html:not(.dark) .hljs-strong {
   font-weight: bold;
 }
 
-html:not(.dark) .hljs-formula,
+/* html:not(.dark) .hljs-formula,
 html:not(.dark) .hljs-operator,
 html:not(.dark) .hljs-params,
 html:not(.dark) .hljs-property,
 html:not(.dark) .hljs-punctuation,
 html:not(.dark) .hljs-tag {
-  /* purposely ignored */
-}
+  // purposely ignored
+} */
 
-.prose {
+.prze {
   margin-bottom: 2em;
 }

@@ -1,15 +1,7 @@
-<script lang="ts">
-import { defineComponent } from 'vue'
-import SplitView from '../components/layout/SplitView.vue'
-
-export default defineComponent({
-  components: {
-    SplitView,
-  },
-})
-
+<script lang="ts" setup>
+import Notebook from '../components/Notebook.vue'
 </script>
 
 <template>
-  <SplitView />
+  <Notebook />
 </template>

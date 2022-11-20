@@ -1,9 +1,9 @@
-import { resolve } from "path";
-import { defineConfig } from "vite";
-import Vue from "@vitejs/plugin-vue";
-import WindiCSS from "vite-plugin-windicss";
+import { resolve } from "path"
+import { defineConfig } from "vite"
+import Vue from "@vitejs/plugin-vue"
+import WindiCSS from "vite-plugin-windicss"
 
-const packageDir = './';
+const packageDir = './'
 
 export default defineConfig({
   resolve: {
@@ -15,13 +15,8 @@ export default defineConfig({
     Vue({
       include: [/\.vue$/],
     }),
-
-    // https://github.com/antfu/vite-plugin-windicss
-    WindiCSS({
-      safelist: "prose prose-sm m-auto text-left",
-    }),
+    WindiCSS({}),
   ],
-
   build: {
     rollupOptions: {
       input: {
@@ -40,13 +35,11 @@ export default defineConfig({
       }
     },
   },
-
   optimizeDeps: {
     include: ["vue", "vue-router", "@vueuse/core"],
     exclude: ["vue-demi"],
   },
-
   test: {
     environment: 'happy-dom'
   }
-});
+})

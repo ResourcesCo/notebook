@@ -10,11 +10,11 @@
       (function () {
         const prefersDark =
           window.matchMedia &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches;
-        const setting = localStorage.getItem("rco/settings/color-scheme") || "auto";
+          window.matchMedia("(prefers-color-scheme: dark)").matches
+        const setting = localStorage.getItem("rco/settings/color-scheme") || "auto"
         const dark = setting === 'auto' ? prefersDark : (setting === 'dark')
-        document.documentElement.classList[dark ? 'add' : 'remove']("dark");
-      })();
+        document.documentElement.classList[dark ? 'add' : 'remove']("dark")
+      })()
     </script>
     <script type="module" src="/src/app/main.ts"></script>
   </body>
