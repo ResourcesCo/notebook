@@ -113,7 +113,6 @@ export class Notebook {
 
   applyContentChanges({data, deletes}: {data: NotebookContentInfo, deletes: string[]}) {
     for (const del of deletes) {
-      delete this.content.files[del]
       for (const tabState of [this.view.left, this.view.right]) {
         if (tabState.tabs.includes(del)) {
           const tabs = tabState.tabs.filter(s => s != del)
@@ -129,13 +128,16 @@ export class Notebook {
           tabState.tabs = tabs
         }
       }
+      delete this.content.files[del]
       delete this.fileData[del]
       localStorage.removeItem(`${this.prefix}/${del}`)
     }
     for (const [name, file] of Object.entries(data.files)) {
       if (typeof file.rename === 'string') {
         const rename = file.rename
-        localStorage.setItem(`${this.prefix}/${file.rename}`, localStorage.getItem(`${this.prefix}/${name}`) || '')
+        const newFile = this.getFile(rename)
+        const oldFile = this.getFile(name)
+        newFile.value = oldFile.value
         this.content.files[file.rename] = {title: file.title, emoji: file.emoji}
         for (const tabState of [this.view.left, this.view.right]) {
           if (tabState.tabs.includes(name)) {
@@ -148,11 +150,13 @@ export class Notebook {
             }
           }
         }
+        delete this.content.files[name]
+        delete this.fileData[name]
         localStorage.removeItem(`${this.prefix}/${name}`)
       } else if (!file.delete && this.content.files[name]) {
         this.content.files[name].emoji = file.emoji
         this.content.files[name].title = file.title
-      } else {
+      } else if (!file.delete) {
         this.content.files[name] = {
           emoji: file.emoji,
           title: file.title,
