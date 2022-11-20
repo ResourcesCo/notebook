@@ -151,6 +151,7 @@ export class Notebook {
           }
         }
         delete this.content.files[name]
+        delete this.fileData[name]
         localStorage.removeItem(`${this.prefix}/${name}`)
       } else if (!file.delete && this.content.files[name]) {
         this.content.files[name].emoji = file.emoji
