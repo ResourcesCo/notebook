@@ -13,8 +13,13 @@ const status = computed<{messages: string[], deletes: string[]}>(() => {
     let messages: string[] = []
     const files = Object.entries(action.value.data.files).map(([k, v]) => ({...v, name: k}))
     for (const file of files) {
-      if (file.delete || file.rename && !(file.name in notebook.content.files)) {
-        `The file ${JSON.stringify(file.name)} does not exist and can't be ${file.delete ? 'deleted' : 'renamed'}.`
+      if (file.rename && file.rename === file.name) {
+        messages.push(`Cannot rename ${JSON.stringify(file.name)} to the same name.`)
+      }
+      if ((file.delete || file.rename) && !(file.name in notebook.content.files)) {
+        messages.push(
+          `The file ${JSON.stringify(file.name)} does not exist and can't be ${file.delete ? 'deleted' : 'renamed'}.`
+        )
       }
     }
     const deletes = files.filter(f => f.delete).map(f => f.name)
