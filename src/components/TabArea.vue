@@ -3,8 +3,8 @@ const { active } = defineProps({ active: Boolean })
 </script>
 
 <template>
-  <div class="flex flex-grow root" :class="active ? '' : 'inactive'">
-    <slot />
+  <div class="root pr-1" :class="active ? '' : 'inactive'">
+    <slot></slot>
   </div>
 </template>
 
@@ -15,5 +15,11 @@ const { active } = defineProps({ active: Boolean })
 
   div.root.inactive:hover {
     @apply opacity-100;
+  }
+
+  div.root {
+    flex-grow: 1;
+    display: flex;
+    overflow-x: auto;
   }
 </style>

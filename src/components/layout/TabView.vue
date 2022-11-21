@@ -109,26 +109,24 @@ export default defineComponent({
 </script>
 
 <template>
-  <div :class="['header', side]">
-    <Nav class="nav">
-      <TabArea :active="mode === 'edit'">
-        <Tab
-          v-for="tab in tabState.tabs"
-          :selected="tab === tabState.selected"
-          @click="() => { tabState.selected = tab; tabState.show = 'self'; }"
-        >
-          {{ notebook.content.files[tab].emoji }} {{ notebook.content.files[tab].title }}
-        </Tab>
-      </TabArea>
+  <div class="flex py-1 border-collapse" :class="['header', side]">
+    <TabArea :active="mode === 'edit'">
       <Tab
-        class="right"
-        :selected="tabState.show === 'other' || otherTabState.show === 'other'"
-        @click="() => toggleMode()"
-      ><span v-if="tabState.show === 'other'">Preview </span>👁</Tab>
-      <TabViewButton v-if="side === 'right'" @click="() => toggleSettings()">⚙️</TabViewButton>
-      <DisplayButton v-if="side === 'right'" />
-      <div class="spacer" v-if="side === 'left'"></div>
-    </Nav>
+        v-for="tab in tabState.tabs"
+        :selected="tab === tabState.selected"
+        @click="() => { tabState.selected = tab; tabState.show = 'self'; }"
+      >
+        {{ notebook.content.files[tab].emoji }} {{ notebook.content.files[tab].title }}
+      </Tab>
+    </TabArea>
+    <Tab
+      class="right"
+      :selected="tabState.show === 'other' || otherTabState.show === 'other'"
+      @click="() => toggleMode()"
+    ><span v-if="tabState.show === 'other'">Preview </span>👁</Tab>
+    <TabViewButton v-if="side === 'right'" @click="() => toggleSettings()">⚙️</TabViewButton>
+    <DisplayButton v-if="side === 'right'" />
+    <div class="spacer" v-if="side === 'left'"></div>
   </div>
   <div :class="['overflow-auto', 'content', 'relative', side]" v-if="page">
     <PageView :notebook="notebook" :key="pageKey" :page="page" :mode="mode" />
@@ -138,7 +136,6 @@ export default defineComponent({
 <style scoped>
 .header {
   grid-row: 1;
-  overflow-x: auto;
 }
 
 .content {

@@ -6,6 +6,7 @@ import Nav from '../Nav.vue'
 import TabArea from '../TabArea.vue'
 import Tab from '../Tab.vue'
 import TabView from './TabView.vue'
+import { useWindowSize } from '@vueuse/core'
 
 export default defineComponent({
   components: {
@@ -13,9 +14,10 @@ export default defineComponent({
     TabArea,
     Tab,
     TabView,
-},
+  },
   setup(props, _ctx) {
     const split = ref()
+    const {width} = useWindowSize()
 
     onMounted(() => {
       Split({
@@ -25,7 +27,8 @@ export default defineComponent({
             element: split.value,
           },
         ],
-        columnMinSizes: { [1]: 0 },
+        columnMinSizes: { [0]: Math.floor(width.value / 4), [2]: Math.floor(width.value / 4) },
+        snapOffset: 0,
       })
     })
 
