@@ -6,6 +6,7 @@ import Nav from '../Nav.vue'
 import TabArea from '../TabArea.vue'
 import Tab from '../Tab.vue'
 import TabView from './TabView.vue'
+import { useWindowSize } from '@vueuse/core'
 
 export default defineComponent({
   components: {
@@ -13,9 +14,10 @@ export default defineComponent({
     TabArea,
     Tab,
     TabView,
-},
+  },
   setup(props, _ctx) {
     const split = ref()
+    const {width} = useWindowSize()
 
     onMounted(() => {
       Split({
@@ -25,7 +27,8 @@ export default defineComponent({
             element: split.value,
           },
         ],
-        columnMinSizes: { [1]: 0 },
+        columnMinSizes: { [0]: Math.floor(width.value / 5), [2]: Math.floor(width.value / 5) },
+        snapOffset: 0,
       })
     })
 
@@ -42,8 +45,8 @@ export default defineComponent({
     <TabView :notebook="notebook" :tabState="notebook.view.left" :otherTabState="notebook.view.right" side="left" />
     <TabView :notebook="notebook" :tabState="notebook.view.right" :otherTabState="notebook.view.left" side="right" />
     <div ref="split" class="view-split">
-      <div class="view-split-bar h-full" />
-      <div class="view-split-handle p-1">↔</div>
+      <div class="view-split-bar h-full"></div>
+      <div class="view-split-handle p-1 <sm:opacity-0">↔</div>
     </div>
   </div>
 </template>
@@ -80,11 +83,11 @@ export default defineComponent({
 .view-split-handle {
   cursor: ew-resize;
   position: absolute;
-  left: -30px;
+  left: -25px;
   width: 25px;
   top: 4px;
   text-align: center;
-  @apply bg-zinc-300 text-zinc-400 dark:bg-zinc-700 dark:text-zinc-500 rounded-md;
+  @apply bg-zinc-300 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500 rounded-md;
 }
 
 .view-split:hover .view-split-handle,
