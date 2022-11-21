@@ -120,12 +120,12 @@ export default defineComponent({
       </Tab>
     </TabArea>
     <Tab
-      class="right"
+      class="right flex-shrink-0 utility"
       :selected="tabState.show === 'other' || otherTabState.show === 'other'"
       @click="() => toggleMode()"
-    ><span v-if="tabState.show === 'other'">Preview </span>👁</Tab>
-    <TabViewButton v-if="side === 'right'" @click="() => toggleSettings()">⚙️</TabViewButton>
-    <DisplayButton v-if="side === 'right'" />
+    ><span class="<sm:hidden" v-if="tabState.show === 'other'">Preview </span>👁</Tab>
+    <TabViewButton class="flex-shrink-0" v-if="side === 'right'" @click="() => toggleSettings()">⚙️</TabViewButton>
+    <DisplayButton class="flex-shrink-0" v-if="side === 'right'" />
     <div class="spacer" v-if="side === 'left'"></div>
   </div>
   <div :class="['overflow-auto', 'content', 'relative', side]" v-if="page">
@@ -144,13 +144,15 @@ export default defineComponent({
 
 .left {
   grid-column: 1;
+  min-width: 0;
 }
 
 .right {
   grid-column: 3;
+  min-width: 0;
 }
 
 .spacer {
-  width: 30px;
+  width: 25px;
 }
 </style>

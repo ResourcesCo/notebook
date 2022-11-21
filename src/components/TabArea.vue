@@ -3,7 +3,7 @@ const { active } = defineProps({ active: Boolean })
 </script>
 
 <template>
-  <div class="root pr-1" :class="active ? '' : 'inactive'">
+  <div class="root mr-1" :class="active ? '' : 'inactive'">
     <slot></slot>
   </div>
 </template>
@@ -21,5 +21,10 @@ const { active } = defineProps({ active: Boolean })
     flex-grow: 1;
     display: flex;
     overflow-x: auto;
+    scrollbar-width: 3px;
+  }
+
+  div.root::-webkit-scrollbar {
+    display: none;
   }
 </style>
