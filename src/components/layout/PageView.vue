@@ -24,7 +24,7 @@ export default defineComponent({
   components: {Settings},
   setup: ({notebook, page, mode: _mode}, _ctx) => {
     const frame = ref<HTMLIFrameElement | undefined>(undefined)
-    const lastBodyUpdate = ref<string | undefined>(undefined)
+    const lastBodyUpdates = ref<[string, number][]>([])
     const loadedCount = ref(0)
     const prepareSettingsComplete = ref(false)
     const initialColorScheme = ref('dark')
@@ -40,7 +40,8 @@ export default defineComponent({
       ) {
         if (e.data[0] === "md" && e.data.length === 2) {
           page.body.value = e.data[1]
-          lastBodyUpdate.value = e.data[1]
+          lastBodyUpdates.value.unshift([e.data[1], Date.now()])
+          lastBodyUpdates.value.splice(5)
         } else if (page.isSettings) {
           handleSettingsMessage(e.data, notebook)
         }
@@ -53,10 +54,16 @@ export default defineComponent({
       const frameValue = frame.value
       if (loadedCount.value > 0 && frameValue) {
         const contentWindow = frameValue.contentWindow
-        if (contentWindow && (mode.value === 'view' || (lastBodyUpdate.value !== page.body.value))) {
+        if (
+          contentWindow &&
+          (
+            mode.value === 'view' ||
+            !lastBodyUpdates.value.find(([s, t]) => t > (Date.now() - 1000) && s === page.body.value)
+          )
+        ) {
           contentWindow.postMessage(['md', page.body.value], '*')
         }
-        if (mode.value === 'edit' && !prepareSettingsComplete.value) {
+        if (page.isSettings && mode.value === 'edit' && !prepareSettingsComplete.value) {
           prepareSettingsComplete.value = true
           const self = this
           setTimeout(() => {
