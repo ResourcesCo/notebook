@@ -41,7 +41,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="view-container text-zinc-700 dark:text-zinc-200">
+  <div class="view-container text-zinc-700 dark:text-zinc-200 side-left">
     <TabView :notebook="notebook" :tabState="notebook.view.left" :otherTabState="notebook.view.right" side="left" />
     <TabView :notebook="notebook" :tabState="notebook.view.right" :otherTabState="notebook.view.left" side="right" />
     <div ref="split" class="view-split">
@@ -52,11 +52,12 @@ export default defineComponent({
 </template>
 
 <style type="text/css">
+
 .view-container {
   display: grid;
-  grid-template-columns: 1fr 0px 1fr;
-  grid-template-rows: auto 1fr;
   height: 100%;
+  grid-template-columns: 1fr 0 1fr;
+  grid-template-rows: auto 1fr;
 }
 
 .view-split {
@@ -78,7 +79,6 @@ export default defineComponent({
   right: -1px;
   @apply bg-zinc-400 dark:bg-zinc-700;
 }
-
 
 .view-split-handle {
   cursor: ew-resize;
@@ -102,5 +102,14 @@ export default defineComponent({
   height: 10px;
   margin: 0;
   padding: 0;
+}
+
+@media (max-width: 639.9px) {
+  .view-container.side-left {
+    width: 200vw;
+  }
+  .view-split {
+    display: none;
+  }
 }
 </style>
