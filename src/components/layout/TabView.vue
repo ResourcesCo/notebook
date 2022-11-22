@@ -126,7 +126,7 @@ export default defineComponent({
     ><span class="<sm:hidden" v-if="tabState.show === 'other'">Preview </span>👁</Tab>
     <TabViewButton class="flex-shrink-0" v-if="side === 'right'" @click="() => toggleSettings()">⚙️</TabViewButton>
     <DisplayButton class="flex-shrink-0" v-if="side === 'right'" />
-    <div class="spacer" v-if="side === 'left'"></div>
+    <div class="spacer <sm:hidden" v-if="side === 'left'"></div>
   </div>
   <div :class="['overflow-auto', 'content', 'relative', side]" v-if="page">
     <PageView :notebook="notebook" :key="pageKey" :page="page" :mode="mode" />
