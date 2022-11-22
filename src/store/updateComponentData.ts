@@ -1,6 +1,6 @@
 export default function updateComponentData(input: string, name: string, data: any): string {
   const fencedData = "```json\n" + JSON.stringify(data, null, 2) + "\n```\n\n"
-  const url = `https://machiatto.dev/component/#${name}`
+  const url = `https://macchiato.dev/component/#${name}`
   const pastUrlIndex = input.indexOf(url) + url.length
   const pastUrl = input.substring(pastUrlIndex)
   const openFenceMatch = /^(`{3,}).*\n/m.exec(pastUrl)
@@ -20,5 +20,5 @@ export default function updateComponentData(input: string, name: string, data: a
       return beforeFence + fencedData + afterFence
     }
   }
-  return input + `\n\n[![](https://img.shields.io/badge/%E2%98%95%EF%B8%8F-${name}-blue)](https://machiatto.dev/component/#${name})\n\n${fencedData}\n\n`
+  return input + `\n\n[![](https://img.shields.io/badge/%E2%98%95%EF%B8%8F-${name}-blue)](https://macchiato.dev/component/#${name})\n\n${fencedData}\n\n`
 }

@@ -108,7 +108,7 @@ export class Notebook {
     if (view) {
       data = updateComponentData(data, 'NotebookView', this.view)
     }
-    settingsRef.value = data
+    settingsRef.value = data.replace('machiatto', 'macchiato')
   }
 
   applyContentChanges({data, deletes}: {data: NotebookContentInfo, deletes: string[]}) {
