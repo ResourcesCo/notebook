@@ -22,23 +22,23 @@ html.dark .prze a:visited {
   @apply text-teal-500;
 }
 
-html.dark .prze h1 {
+html .prze h1 {
   @apply text-3xl font-bold;
 }
 
-html.dark .prze h2 {
+html .prze h2 {
   @apply text-2xl font-bold;
 }
 
-html.dark .prze h3 {
+html .prze h3 {
   @apply text-xl font-bold;
 }
 
-html.dark .prze h4 {
+html .prze h4 {
   @apply text-xl font-normal;
 }
 
-html.dark .prze h5 {
+html .prze h5 {
   @apply text-l font-semibold;
 }
 
@@ -264,7 +264,3 @@ html:not(.dark) .hljs-punctuation,
 html:not(.dark) .hljs-tag {
   // purposely ignored
 } */
-
-.prze {
-  margin-bottom: 2em;
-}

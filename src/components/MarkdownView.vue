@@ -84,12 +84,20 @@ watch(value, () => {
 </script>
 
 <template>
-  <div class="prze p-2" v-for="block in blocks">
-    <div v-if="'html' in block" v-html="block.html"></div>
-    <div v-else-if="'tag' in block && block.tag === 'NotebookContent'"><NotebookContent :data="block.data" :settings="block.settings" /></div>
-    <div v-else-if="'tag' in block && block.tag === 'NotebookView'"><NotebookView :data="block.data" :settings="block.settings" /></div>
-    <div v-else-if="'tag' in block && block.tag === 'LocalStorageTools'"><LocalStorageTools :settings="block.settings" /></div>
-    <div v-else-if="'tag' in block && block.tag === 'Sandbox'"><Sandbox :data="block.data" :info="block.info" /></div>
-    <div v-else-if="'error' in block" style="color: red">{{block.error}}</div>
+  <div>
+    <template v-for="block in blocks">
+      <div class="prze px-2" v-if="'html' in block" v-html="block.html"></div>
+      <template v-else-if="'tag' in block && block.tag === 'NotebookContent'"><NotebookContent :data="block.data" :settings="block.settings" /></template>
+      <template v-else-if="'tag' in block && block.tag === 'NotebookView'"><NotebookView :data="block.data" :settings="block.settings" /></template>
+      <template v-else-if="'tag' in block && block.tag === 'LocalStorageTools'"><LocalStorageTools :settings="block.settings" /></template>
+      <template v-else-if="'tag' in block && block.tag === 'Sandbox'"><Sandbox :data="block.data" :info="block.info" /></template>
+      <div class="prze my-2" v-else-if="'error' in block" style="color: red">{{block.error}}</div>
+    </template>
   </div>
 </template>
+
+<style>
+  p:has(a.macchiato-link) {
+    display: none;
+  }
+</style>

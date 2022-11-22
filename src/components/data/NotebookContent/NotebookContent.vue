@@ -18,7 +18,7 @@ const {data, settings} = defineProps({
 </script>
 
 <template>
-  <div>
+  <div class="mx-5 my-7">
     <div v-for="[name, file] in Object.entries(data['files'])" class="my-2">
       <span class="emoji">{{ file.emoji }}</span>
       <span class="title">{{ file.title }}</span>
@@ -26,7 +26,7 @@ const {data, settings} = defineProps({
       <span class="delete" v-if="file.delete">delete</span>
       <span class="rename" v-if="file.rename">→ {{file.rename}}</span>
     </div>
-    <div class="pt-5">
+    <div class="pt-3">
       <Button @click="() => settings.applyContentChanges(data)">Apply</Button>
       <Button @click="() => settings.resetContentChanges()">Reset</Button>
     </div>
