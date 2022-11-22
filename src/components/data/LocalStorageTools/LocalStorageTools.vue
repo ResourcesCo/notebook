@@ -13,7 +13,7 @@ const {settings} = defineProps({
 </script>
 
 <template>
-  <div>
+  <div class="mx-5 my-7">
     <Button @click="() => settings.importLocalStorage()">Import</Button>
     <Button @click="() => settings.exportLocalStorage()">Export</Button>
     <Button @click="() => settings.clearLocalStorage()">Clear</Button>

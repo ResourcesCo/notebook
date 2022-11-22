@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { computed } from '@vue/reactivity'
 import { watchEffect } from 'vue'
 
 const props = defineProps({
@@ -19,8 +20,16 @@ watchEffect(() => {
     s.parentNode?.insertBefore(g, s)
   }
 })
+
+const html = computed<string | undefined>(() => {
+  if (props.info === 'html') {
+    return props.data
+  } else if (props.info === 'css') {
+    return `<style>${props.data.replace('</style>', '')}</style>`
+  }
+})
 </script>
 
 <template>
-  <div></div>
+  <div v-if="html !== undefined" v-html="html"></div>
 </template>

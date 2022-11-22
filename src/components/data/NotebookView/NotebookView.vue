@@ -19,7 +19,7 @@ const sides = ['left', 'right'] as const
 </script>
 
 <template>
-  <div>
+  <div class="mx-5 my-7">
     <div v-for="side in sides">
       <div>
         <span class="name">{{side}}</span>
@@ -31,7 +31,7 @@ const sides = ['left', 'right'] as const
         <span v-if="tab == data[side].lastSelected" class="tag">last selected</span>
       </div>
     </div>
-    <div class="pt-5">
+    <div class="pt-3">
       <Button @click="() => settings.applyViewChanges(data)">Apply</Button>
       <Button @click="() => settings.resetViewChanges()">Reset</Button>
     </div>

@@ -34,6 +34,7 @@ export default class ComponentManager {
                   const tag = url.split('#', 2)[1]
                   if (tag.length > 0) {
                     firstChild.attrJoin('style', 'display: none;')
+                    firstChild.attrJoin('class', 'macchiato-link')
                     componentTag = {tag}
                   }
                 }

@@ -18,7 +18,7 @@ window.addEventListener('message', e => {
 
 <template>
   <div class="text-zinc-700 dark:text-zinc-200 flex flex-col h-full">
-    <main class="m-1">
+    <main>
       <MarkdownView :value="value" :settings="settings" />
     </main>
   </div>
