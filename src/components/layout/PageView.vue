@@ -48,8 +48,10 @@ export default defineComponent({
       }
     })
     const mode = computed(() => _mode === 'edit' ? 'edit' : 'view')
-    const src = computed(() => '/app/' + mode.value + '/?color-scheme=' + initialColorScheme.value)
     const isSettingsView = computed(() => page.isSettings && mode.value === 'view')
+    const src = computed(() => (
+      '/app/' + mode.value + '/?color-scheme=' + initialColorScheme.value + (page.isSettings ? '&role=settings' : '')
+    ))
     watch([page.body, frame, loadedCount, mode], () => {
       const frameValue = frame.value
       if (loadedCount.value > 0 && frameValue) {
@@ -91,6 +93,6 @@ export default defineComponent({
 
 <template>
   <iframe ref="frame" class="h-full w-full" :src="src" :style="loadedCount === 0 ? 'visibility: hidden' : ''"
-    sandbox="allow-scripts allow-popups allow-downloads" @load="onLoad"></iframe>
+    sandbox="allow-scripts allow-popups" @load="onLoad"></iframe>
   <Settings v-if="isSettingsView"></Settings>
 </template>
