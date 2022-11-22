@@ -3,8 +3,11 @@ import { ref } from 'vue'
 import MarkdownView from '../../components/MarkdownView.vue'
 import SettingsClient from '~/store/SettingsClient';
 
+const params = new URLSearchParams(window.location.search)
+const role = params.get("role") || undefined
+
 const value = ref('')
-const settings = new SettingsClient()
+const settings = role === 'settings' ? new SettingsClient() : undefined
 
 window.addEventListener('message', e => {
   if (e.isTrusted && e.source === parent && Array.isArray(e.data) && e.data.length === 2 && e.data[0] === 'md') {

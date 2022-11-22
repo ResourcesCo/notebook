@@ -5,6 +5,7 @@ interface ComponentInfo {
   id: number
   tag: string
   data: string
+  info?: string
 }
 
 export default class ComponentManager {
@@ -43,7 +44,8 @@ export default class ComponentManager {
           const component = {
             id: counter,
             tag: componentTag.tag,
-            data: token.content
+            data: token.content,
+            info: token.info,
           }
           self.components.push(component)
           token.attrSet('componentTag', `${component.id}`)
