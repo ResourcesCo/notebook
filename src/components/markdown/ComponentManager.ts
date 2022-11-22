@@ -30,7 +30,7 @@ export default class ComponentManager {
             if (firstChild.type === 'link_open') {
               const url = firstChild.attrGet('href')
               if (typeof url === 'string') {
-                if (url.startsWith('https://machiatto.dev/component/#')) {
+                if (url.startsWith('https://macchiato.dev/component/#')) {
                   const tag = url.split('#', 2)[1]
                   if (tag.length > 0) {
                     firstChild.attrJoin('style', 'display: none;')

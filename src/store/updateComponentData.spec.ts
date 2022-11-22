@@ -7,7 +7,7 @@ describe('simple', () => {
     const input = (
 `# Testing
 
-[![](https://img.shields.io/badge/%E2%98%95%EF%B8%8F-NotebookView-blue)](https://machiatto.dev/component/#NotebookContent)
+[![](https://img.shields.io/badge/%E2%98%95%EF%B8%8F-NotebookView-blue)](https://macchiato.dev/component/#NotebookContent)
 
 ${bq}json
 {
@@ -21,7 +21,7 @@ Test
     const expected = (
 `# Testing
 
-[![](https://img.shields.io/badge/%E2%98%95%EF%B8%8F-NotebookView-blue)](https://machiatto.dev/component/#NotebookContent)
+[![](https://img.shields.io/badge/%E2%98%95%EF%B8%8F-NotebookView-blue)](https://macchiato.dev/component/#NotebookContent)
 
 ${bq}json
 {
