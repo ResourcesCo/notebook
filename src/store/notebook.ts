@@ -23,6 +23,7 @@ export interface TabState {
 export interface NotebookFileInfo {
   title: string
   emoji: string
+  primaryComponent?: "view" | "edit"
 }
 
 export interface NotebookContent {
@@ -142,7 +143,7 @@ export class Notebook {
         const newFile = this.getFile(rename)
         const oldFile = this.getFile(name)
         newFile.value = oldFile.value
-        this.content.files[file.rename] = {title: file.title, emoji: file.emoji}
+        this.content.files[file.rename] = {title: file.title, emoji: file.emoji, primaryComponent: file.primaryComponent}
         for (const tabState of [this.view.left, this.view.right]) {
           if (tabState.tabs.includes(name)) {
             tabState.tabs = tabState.tabs.map(v => v === name ? rename : v)
@@ -160,10 +161,12 @@ export class Notebook {
       } else if (!file.delete && this.content.files[name]) {
         this.content.files[name].emoji = file.emoji
         this.content.files[name].title = file.title
+        this.content.files[name].primaryComponent = file.primaryComponent
       } else if (!file.delete) {
         this.content.files[name] = {
           emoji: file.emoji,
           title: file.title,
+          primaryComponent: file.primaryComponent,
         }
       }
     }

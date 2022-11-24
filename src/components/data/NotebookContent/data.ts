@@ -1,6 +1,10 @@
 import { isPlainObject, isString } from "lodash"
 
-export type FileInfo = {emoji: string, title: string, role?: 'settings', rename?: string, delete?: true}
+import type { NotebookFileInfo } from "~/store/notebook"
+export interface FileInfo extends NotebookFileInfo {
+  rename?: string,
+  delete?: true
+}
 export type NotebookContentInfo = {files: {[key: string]: FileInfo}}
 
 const specialFiles = ["_newtab.md", "_welcome.md", "_settings.md"]
@@ -12,7 +16,7 @@ function validateFile(entry: [string, any]): boolean {
       name.endsWith('.md') &&
       isString(file.emoji) &&
       isString(file.title) &&
-      (!('role' in file) || file.role === 'Settings') &&
+      (!('primaryComponent' in file) || ['edit', 'view'].includes(file.primaryComponent)) &&
       ('delete' in file ? (!specialFiles.includes(name) && file.delete === true && !('rename' in file)) : true) &&
       ('rename' in file ? (!specialFiles.includes(name) && typeof file.rename === 'string') : true)
     )

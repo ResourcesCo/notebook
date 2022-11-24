@@ -4,7 +4,7 @@ import type { NotebookContentInfo } from './data'
 import SettingsClient from '~/store/SettingsClient'
 import Button from '~/components/settings/Button.vue'
 
-const {data, settings} = defineProps({
+const { data, settings } = defineProps({
   data: {
     type: Object as PropType<NotebookContentInfo>,
     required: true
@@ -23,8 +23,9 @@ const {data, settings} = defineProps({
       <span class="emoji">{{ file.emoji }}</span>
       <span class="title">{{ file.title }}</span>
       <span class="name">{{ name }}</span>
+      <span class="primary-component" v-if="file.primaryComponent">{{ file.primaryComponent }}</span>
       <span class="delete" v-if="file.delete">delete</span>
-      <span class="rename" v-if="file.rename">→ {{file.rename}}</span>
+      <span class="rename" v-if="file.rename">→ {{ file.rename }}</span>
     </div>
     <div class="pt-3">
       <Button @click="() => settings.applyContentChanges(data)">Apply</Button>
@@ -34,22 +35,26 @@ const {data, settings} = defineProps({
 </template>
 
 <style scoped>
-  span {
-    background-color: #555;
-    padding: 3px;
-    border-radius: 3px;
-    @apply px-2 focus:outline-gray-800 mx-1 slate-800 bg-slate-200 dark:slate-50 dark:bg-slate-800;
-  }
+span {
+  background-color: #555;
+  padding: 3px;
+  border-radius: 3px;
+  @apply px-2 focus: outline-gray-800 mx-1 slate-800 bg-slate-200 dark:slate-50 dark:bg-slate-800;
+}
 
-  span.name {
-    @apply text-xs;
-  }
+span.name {
+  @apply text-xs;
+}
 
-  span.delete {
-    @apply text-xs bg-red-400 dark:bg-red-600;
-  }
+span.delete {
+  @apply text-xs bg-red-400 dark: bg-red-600;
+}
 
-  span.rename {
-    @apply text-xs bg-orange-500 text-slate-900 dark:bg-orange-500 dark:text-slate-900;
-  }
+span.rename {
+  @apply text-xs bg-orange-500 text-slate-900 dark: bg-orange-500 dark:text-slate-900;
+}
+
+span.primary-component {
+  @apply text-xs bg-teal-900;
+}
 </style>
