@@ -4,6 +4,8 @@ import updateComponentData from './updateComponentData'
 import defaultNewTab from './content/_newtab.md?raw'
 import defaultWelcome from './content/_welcome.md?raw'
 import defaultSettings from './content/_settings.md?raw'
+import sandboxExample from './content/sandbox-example.md?raw'
+import notesExample from './content/notes-example.md?raw'
 import { NotebookContentInfo } from '~/components/data/NotebookContent'
 import { sortBy } from 'lodash'
 
@@ -11,6 +13,8 @@ const defaultFileData: {[key: string]: string} = {
   '_newtab.md': defaultNewTab,
   '_welcome.md': defaultWelcome,
   '_settings.md': defaultSettings,
+  'sandbox-example.md': sandboxExample,
+  'notes-example.md': notesExample,
 }
 
 export interface TabState {
@@ -48,20 +52,30 @@ export class Notebook {
         "_newtab.md": {
           "emoji": "🗂",
           "title": "New Tab",
+          "primaryComponent": "view",
         },
         "_welcome.md": {
           "emoji": "👋",
           "title": "Welcome",
+          "primaryComponent": "view",
         },
         "_settings.md": {
           "emoji": "⚙️",
           "title": "Settings",
         },
+        "notes-example.md": {
+          "emoji": "🗒",
+          "title": "Notes Example",
+        },
+        "sandbox-example.md": {
+          "emoji": "🏝",
+          "title": "Sandbox Example",
+        },
       }
     }
     const defaultView: NotebookView = {
       "left": {
-        "tabs": ["_newtab.md"],
+        "tabs": ["_newtab.md", "sandbox-example.md", "notes-example.md"],
         "selected": "_newtab.md",
         "lastSelected": null,
         "show": "self",

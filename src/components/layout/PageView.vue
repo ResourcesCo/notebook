@@ -39,7 +39,7 @@ export default defineComponent({
         e.data.length >= 1
       ) {
         if (e.data[0] === "md" && e.data.length === 2) {
-          page.body.value = e.data[1]
+          page.body.value = e.data[1].length >= 50000 ? e.data[1].substring(0, 50000) : e.data[1]
           lastBodyUpdates.value.unshift([e.data[1], Date.now()])
           lastBodyUpdates.value.splice(5)
         } else if (page.isSettings) {

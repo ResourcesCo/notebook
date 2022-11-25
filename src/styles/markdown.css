@@ -2,6 +2,10 @@
   @apply zinc-900;
 }
 
+.prze p {
+  @apply my-4;
+}
+
 html.dark .prze {
   @apply text-zinc-300;
 }
