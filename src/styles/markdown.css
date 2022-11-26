@@ -2,7 +2,7 @@
   @apply zinc-900;
 }
 
-.prze p {
+.prze p, html .prze > ul {
   @apply my-4;
 }
 
