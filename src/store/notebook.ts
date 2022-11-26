@@ -49,6 +49,10 @@ export class Notebook {
   constructor(prefix: string | undefined = undefined) {
     const defaultContent: NotebookContent = {
       files: {
+        "_newtab.md": {
+          "emoji": "🗂",
+          "title": "New Tab",
+        },
         "_welcome.md": {
           "emoji": "👋",
           "title": "Welcome",
@@ -71,8 +75,8 @@ export class Notebook {
     }
     const defaultView: NotebookView = {
       "left": {
-        "tabs": ["_newtab.md", "sandbox-example.md", "notes-example.md"],
-        "selected": "_newtab.md",
+        "tabs": ["notes-example.md", "sandbox-example.md"],
+        "selected": "notes-example.md",
         "lastSelected": null,
         "show": "self",
       },
