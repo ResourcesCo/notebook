@@ -4,6 +4,8 @@ import updateComponentData from './updateComponentData'
 import defaultNewTab from './content/_newtab.md?raw'
 import defaultWelcome from './content/_welcome.md?raw'
 import defaultSettings from './content/_settings.md?raw'
+import sandboxExample from './content/sandbox-example.md?raw'
+import notesExample from './content/notes-example.md?raw'
 import { NotebookContentInfo } from '~/components/data/NotebookContent'
 import { sortBy } from 'lodash'
 
@@ -11,6 +13,8 @@ const defaultFileData: {[key: string]: string} = {
   '_newtab.md': defaultNewTab,
   '_welcome.md': defaultWelcome,
   '_settings.md': defaultSettings,
+  'sandbox-example.md': sandboxExample,
+  'notes-example.md': notesExample,
 }
 
 export interface TabState {
@@ -23,6 +27,7 @@ export interface TabState {
 export interface NotebookFileInfo {
   title: string
   emoji: string
+  primaryComponent?: "view" | "edit"
 }
 
 export interface NotebookContent {
@@ -56,12 +61,22 @@ export class Notebook {
           "emoji": "⚙️",
           "title": "Settings",
         },
+        "notes-example.md": {
+          "emoji": "🗒",
+          "title": "Notes Example",
+          "primaryComponent": "edit",
+        },
+        "sandbox-example.md": {
+          "emoji": "🏝",
+          "title": "Sandbox Example",
+          "primaryComponent": "edit",
+        },
       }
     }
     const defaultView: NotebookView = {
       "left": {
-        "tabs": ["_newtab.md"],
-        "selected": "_newtab.md",
+        "tabs": ["notes-example.md", "sandbox-example.md"],
+        "selected": "notes-example.md",
         "lastSelected": null,
         "show": "self",
       },
@@ -142,7 +157,7 @@ export class Notebook {
         const newFile = this.getFile(rename)
         const oldFile = this.getFile(name)
         newFile.value = oldFile.value
-        this.content.files[file.rename] = {title: file.title, emoji: file.emoji}
+        this.content.files[file.rename] = {title: file.title, emoji: file.emoji, primaryComponent: file.primaryComponent}
         for (const tabState of [this.view.left, this.view.right]) {
           if (tabState.tabs.includes(name)) {
             tabState.tabs = tabState.tabs.map(v => v === name ? rename : v)
@@ -160,10 +175,12 @@ export class Notebook {
       } else if (!file.delete && this.content.files[name]) {
         this.content.files[name].emoji = file.emoji
         this.content.files[name].title = file.title
+        this.content.files[name].primaryComponent = file.primaryComponent
       } else if (!file.delete) {
         this.content.files[name] = {
           emoji: file.emoji,
           title: file.title,
+          primaryComponent: file.primaryComponent,
         }
       }
     }

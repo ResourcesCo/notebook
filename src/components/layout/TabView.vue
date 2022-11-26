@@ -16,7 +16,7 @@ export default defineComponent({
     PageView,
     DisplayButton,
     TabViewButton
-},
+  },
   props: {
     notebook: {
       type: Object as PropType<Notebook>,
@@ -45,45 +45,54 @@ export default defineComponent({
     }
 
     const toggleSettings = () => {
-      const i = props.otherTabState.tabs.findIndex(s => s === "_settings.md")
+      const i = props.tabState.tabs.findIndex(s => s === "_settings.md")
       if (i === -1) {
-        props.otherTabState.tabs.push("_settings.md")
-        props.otherTabState.selected = "_settings.md"
-        props.otherTabState.show = "self"
-        props.tabState.show = "other"
-        props.otherTabState.lastSelected = props.otherTabState.selected
+        props.tabState.tabs.push("_settings.md")
+        props.tabState.selected = "_settings.md"
+        props.tabState.show = "self"
+        props.otherTabState.show = "other"
+        props.tabState.lastSelected = props.tabState.selected
       } else if (
-        props.otherTabState.selected === '_settings.md' &&
-        props.otherTabState.show === 'self' &&
-        props.tabState.show === 'other'
+        props.tabState.selected === '_settings.md' &&
+        props.tabState.show === 'self' &&
+        props.otherTabState.show === 'other'
       ) {
-        props.otherTabState.tabs.splice(i, 1)
-        if (props.otherTabState.lastSelected !== null && props.otherTabState.tabs.includes(props.otherTabState.lastSelected)) {
-          props.otherTabState.selected = props.otherTabState.lastSelected
-        } else if (props.otherTabState.tabs.length > 0) {
-          props.otherTabState.selected = props.otherTabState.tabs[0]
+        props.tabState.tabs.splice(i, 1)
+        if (props.tabState.lastSelected !== null && props.tabState.tabs.includes(props.tabState.lastSelected)) {
+          props.tabState.selected = props.tabState.lastSelected
+        } else if (props.tabState.tabs.length > 0) {
+          props.tabState.selected = props.tabState.tabs[0]
         }
-        props.otherTabState.show = 'self'
-        props.tabState.show = 'other'
-        props.otherTabState.lastSelected = null
+        props.tabState.show = 'self'
+        props.otherTabState.show = 'other'
+        props.tabState.lastSelected = null
       } else {
-        props.otherTabState.selected = '_settings.md'
-        props.otherTabState.show = 'self'
-        props.tabState.show = 'other'
+        props.tabState.selected = '_settings.md'
+        props.tabState.show = 'self'
+        props.otherTabState.show = 'other'
       }
     }
 
     const filename = computed(() => (
       props.tabState.show === 'self' ? props.tabState.selected : props.otherTabState.selected
     ))
-    const mode = computed(() => props.tabState.show === 'self' ? 'edit' : 'view')
+    const primaryComponent = computed(() => (
+      props.notebook.content.files[
+        props[props.tabState.show === 'other' ? 'otherTabState' : 'tabState'].selected || ''
+      ]?.primaryComponent === 'edit' ? 'edit' : 'view'
+    ))
+    const mode = computed<'view' | 'edit'>(() => (
+      props.tabState.show === 'self' ?
+        (primaryComponent.value === 'view' ? 'view' : 'edit') :
+        (primaryComponent.value === 'view' ? 'edit' : 'view')
+    ))
     const pageKey = computed(() => `${filename.value}---${mode.value}`)
     const page = computed(() => {
       const isSettings = filename.value === '_settings.md'
       const body = (
         (typeof filename.value === 'string') ?
-        props.notebook.getFile(filename.value) :
-        null
+          props.notebook.getFile(filename.value) :
+          null
       )
       if (body) {
         return {
@@ -103,6 +112,7 @@ export default defineComponent({
       page,
       toggleMode,
       toggleSettings,
+      primaryComponent,
     }
   },
 })
@@ -110,20 +120,19 @@ export default defineComponent({
 
 <template>
   <div class="flex py-1 border-collapse" :class="['header', side]">
-    <TabArea :active="mode === 'edit'">
-      <Tab
-        v-for="tab in tabState.tabs"
-        :selected="tab === tabState.selected"
-        @click="() => { tabState.selected = tab; tabState.show = 'self'; }"
-      >
+    <TabArea :active="mode === (primaryComponent === 'view' ? 'view' : 'edit')">
+      <Tab v-for="tab in tabState.tabs" :selected="tab === tabState.selected"
+        @click="() => { tabState.selected = tab; tabState.show = 'self' }">
         {{ notebook.content.files[tab].emoji }} {{ notebook.content.files[tab].title }}
       </Tab>
     </TabArea>
-    <Tab
-      class="right flex-shrink-0 utility"
-      :selected="tabState.show === 'other' || otherTabState.show === 'other'"
-      @click="() => toggleMode()"
-    ><span class="<sm:hidden" v-if="tabState.show === 'other'">Preview </span>👁</Tab>
+    <Tab class="right flex-shrink-0 utility" :selected="tabState.show === 'other' || otherTabState.show === 'other'"
+      @click="() => toggleMode()"><span class="<sm:hidden" v-if="tabState.show === 'other'">{{ primaryComponent ===
+          'view' ? 'Edit ' : 'Preview '
+      }} </span>{{
+    primaryComponent === 'view' ? '📝' : '👁'
+}}
+    </Tab>
     <TabViewButton class="flex-shrink-0" v-if="side === 'right'" @click="() => toggleSettings()">⚙️</TabViewButton>
     <DisplayButton class="flex-shrink-0" v-if="side === 'right'" />
     <div class="spacer <sm:hidden" v-if="side === 'left'"></div>
