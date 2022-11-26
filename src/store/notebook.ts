@@ -52,12 +52,10 @@ export class Notebook {
         "_newtab.md": {
           "emoji": "🗂",
           "title": "New Tab",
-          "primaryComponent": "view",
         },
         "_welcome.md": {
           "emoji": "👋",
           "title": "Welcome",
-          "primaryComponent": "view",
         },
         "_settings.md": {
           "emoji": "⚙️",
@@ -66,10 +64,12 @@ export class Notebook {
         "notes-example.md": {
           "emoji": "🗒",
           "title": "Notes Example",
+          "primaryComponent": "edit",
         },
         "sandbox-example.md": {
           "emoji": "🏝",
           "title": "Sandbox Example",
+          "primaryComponent": "edit",
         },
       }
     }

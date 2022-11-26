@@ -45,31 +45,31 @@ export default defineComponent({
     }
 
     const toggleSettings = () => {
-      const i = props.otherTabState.tabs.findIndex(s => s === "_settings.md")
+      const i = props.tabState.tabs.findIndex(s => s === "_settings.md")
       if (i === -1) {
-        props.otherTabState.tabs.push("_settings.md")
-        props.otherTabState.selected = "_settings.md"
-        props.otherTabState.show = "self"
-        props.tabState.show = "other"
-        props.otherTabState.lastSelected = props.otherTabState.selected
+        props.tabState.tabs.push("_settings.md")
+        props.tabState.selected = "_settings.md"
+        props.tabState.show = "self"
+        props.otherTabState.show = "other"
+        props.tabState.lastSelected = props.tabState.selected
       } else if (
-        props.otherTabState.selected === '_settings.md' &&
-        props.otherTabState.show === 'self' &&
-        props.tabState.show === 'other'
+        props.tabState.selected === '_settings.md' &&
+        props.tabState.show === 'self' &&
+        props.otherTabState.show === 'other'
       ) {
-        props.otherTabState.tabs.splice(i, 1)
-        if (props.otherTabState.lastSelected !== null && props.otherTabState.tabs.includes(props.otherTabState.lastSelected)) {
-          props.otherTabState.selected = props.otherTabState.lastSelected
-        } else if (props.otherTabState.tabs.length > 0) {
-          props.otherTabState.selected = props.otherTabState.tabs[0]
+        props.tabState.tabs.splice(i, 1)
+        if (props.tabState.lastSelected !== null && props.tabState.tabs.includes(props.tabState.lastSelected)) {
+          props.tabState.selected = props.tabState.lastSelected
+        } else if (props.tabState.tabs.length > 0) {
+          props.tabState.selected = props.tabState.tabs[0]
         }
-        props.otherTabState.show = 'self'
-        props.tabState.show = 'other'
-        props.otherTabState.lastSelected = null
+        props.tabState.show = 'self'
+        props.otherTabState.show = 'other'
+        props.tabState.lastSelected = null
       } else {
-        props.otherTabState.selected = '_settings.md'
-        props.otherTabState.show = 'self'
-        props.tabState.show = 'other'
+        props.tabState.selected = '_settings.md'
+        props.tabState.show = 'self'
+        props.otherTabState.show = 'other'
       }
     }
 
@@ -79,7 +79,7 @@ export default defineComponent({
     const primaryComponent = computed(() => (
       props.notebook.content.files[
         props[props.tabState.show === 'other' ? 'otherTabState' : 'tabState'].selected || ''
-      ]?.primaryComponent
+      ]?.primaryComponent === 'edit' ? 'edit' : 'view'
     ))
     const mode = computed<'view' | 'edit'>(() => (
       props.tabState.show === 'self' ?
