@@ -24,7 +24,6 @@ export default defineConfig({
         app: resolve(packageDir, "app/index.html"),
         "app/edit": resolve(packageDir, "app/edit/index.html"),
         "app/view": resolve(packageDir, "app/view/index.html"),
-        "app/sandbox": resolve(packageDir, "app/sandbox/index.html"),
       },
       output: {
         manualChunks: {
