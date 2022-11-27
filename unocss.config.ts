@@ -1,6 +1,7 @@
 import {
   defineConfig,
   presetAttributify,
+  presetTypography,
   presetUno,
   transformerDirectives,
   transformerVariantGroup,
@@ -14,6 +15,7 @@ export default defineConfig({
   presets: [
     presetUno(),
     presetAttributify(),
+    presetTypography(),
   ],
   transformers: [
     transformerDirectives(),

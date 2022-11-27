@@ -86,12 +86,12 @@ watch(value, () => {
 <template>
   <div class="mb-2">
     <template v-for="block in blocks">
-      <div class="prze px-2" v-if="'html' in block" v-html="block.html"></div>
+      <div class="prose px-2" v-if="'html' in block" v-html="block.html"></div>
       <template v-else-if="'tag' in block && block.tag === 'NotebookContent'"><NotebookContent :data="block.data" :settings="block.settings" /></template>
       <template v-else-if="'tag' in block && block.tag === 'NotebookView'"><NotebookView :data="block.data" :settings="block.settings" /></template>
       <template v-else-if="'tag' in block && block.tag === 'LocalStorageTools'"><LocalStorageTools :settings="block.settings" /></template>
       <template v-else-if="'tag' in block && block.tag === 'Sandbox'"><Sandbox :data="block.data" :info="block.info" /></template>
-      <div class="prze my-2" v-else-if="'error' in block" style="color: red">{{block.error}}</div>
+      <div class="prose my-2" v-else-if="'error' in block" style="color: red">{{block.error}}</div>
     </template>
   </div>
 </template>

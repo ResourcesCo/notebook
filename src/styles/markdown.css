@@ -1,64 +1,68 @@
-.prze {
+.prose {
   @apply zinc-900;
 }
 
-.prze p, html .prze > ul {
+html .prose h1, html .prose h2 {
+  @apply mt-4;
+}
+
+.prose p, html .prose > ul {
   @apply my-4;
 }
 
-html.dark .prze {
+html.dark .prose {
   @apply text-zinc-300;
 }
 
-html.dark .prze a {
+html.dark .prose a {
   @apply text-teal-300;
 }
 
-html.dark .prze a:hover {
+html.dark .prose a:hover {
   @apply text-teal-400;
 }
 
-html.dark .prze a:active {
+html.dark .prose a:active {
   @apply text-teal-500;
 }
 
-html.dark .prze a:visited {
+html.dark .prose a:visited {
   @apply text-teal-500;
 }
 
-html .prze h1 {
+html .prose h1 {
   @apply text-3xl font-bold;
 }
 
-html .prze h2 {
+html .prose h2 {
   @apply text-2xl font-bold;
 }
 
-html .prze h3 {
+html .prose h3 {
   @apply text-xl font-bold;
 }
 
-html .prze h4 {
+html .prose h4 {
   @apply text-xl font-normal;
 }
 
-html .prze h5 {
+html .prose h5 {
   @apply text-l font-semibold;
 }
 
-.prze pre code.hljs {
+.prose pre code.hljs {
   @apply text-md;
 }
 
-.prze ul {
+.prose ul {
   @apply my-0 py-0;
 }
 
-.prze li {
+.prose li {
   @apply my-0 py-0;
 }
 
-.prze li > p {
+.prose li > p {
   @apply my-1 py-0;
 }
 
@@ -66,7 +70,7 @@ pre:has(.hljs) {
   @apply px-7 py-3;
 }
 
-html:not(.dark) .prze pre {
+html:not(.dark) .prose pre {
   @apply bg-zinc-100;
 }
 
