@@ -17,6 +17,8 @@ import parseJson from '../utils/parseJson'
 import SettingsClient from '../store/SettingsClient'
 // @ts-ignore
 import highlight from "markdown-it-highlightjs/core"
+// @ts-ignore
+import taskLists from 'markdown-it-task-list-plus'
 
 hljs.registerLanguage("xml", xml)
 hljs.registerLanguage("css", css)
@@ -51,7 +53,7 @@ const blocks = ref<Block[]>([])
 watch(value, () => {
   const source = value.value
   const componentManager = new ComponentManager({source})
-  const md = MarkdownIt({html: true, linkify: true}).use(highlight, { hljs }).use(componentManager.plugin)
+  const md = MarkdownIt({html: true, linkify: true}).use(highlight, { hljs }).use(taskLists).use(componentManager.plugin)
   const html = md.render(source)
   blocks.value = html.split(/(\{\{[^}]+\}\})/).map(token => {
     if (token.startsWith('{{') && token.endsWith('}}')) {
