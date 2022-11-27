@@ -1,7 +1,9 @@
 import { resolve } from "path"
 import { defineConfig } from "vite"
 import Vue from "@vitejs/plugin-vue"
-import WindiCSS from "vite-plugin-windicss"
+import Unocss from 'unocss/vite'
+import { presetAttributify, presetWind } from 'unocss'
+import { presetTypography } from '@unocss/preset-typography'
 
 const packageDir = './'
 
@@ -15,7 +17,7 @@ export default defineConfig({
     Vue({
       include: [/\.vue$/],
     }),
-    WindiCSS({}),
+    Unocss(),
   ],
   build: {
     rollupOptions: {

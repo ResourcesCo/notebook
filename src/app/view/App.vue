@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
+import { useEventListener } from '@vueuse/core';
 import MarkdownView from '../../components/MarkdownView.vue'
 import SettingsClient from '~/store/SettingsClient';
 
@@ -9,11 +10,20 @@ const role = params.get("role") || undefined
 const value = ref('')
 const settings = role === 'settings' ? new SettingsClient() : undefined
 
-window.addEventListener('message', e => {
+function handleMessage(e: MessageEvent) {
   if (e.isTrusted && e.source === parent && Array.isArray(e.data) && e.data.length === 2 && e.data[0] === 'md') {
     value.value = e.data[1]
   }
-})
+}
+
+const {firstMessageEvent} = window as any
+if (firstMessageEvent.event !== null) {
+  setTimeout(() => {
+    handleMessage(firstMessageEvent.event)
+    delete (window as any)['firstMessageEvent']
+  }, 0)
+}
+useEventListener('message', handleMessage)
 </script>
 
 <template>

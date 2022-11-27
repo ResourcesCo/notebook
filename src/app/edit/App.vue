@@ -10,12 +10,21 @@ const handleChange = debounce((value) => {
   parent.postMessage(['md', String(value)], '*')
 }, 10, { leading: true })
 
-useEventListener('message', e => {
+function handleMessage(e: MessageEvent) {
   if (e.isTrusted && e.source === parent && Array.isArray(e.data) && e.data.length === 2 && e.data[0] === 'md') {
     page.body = e.data[1]
     page.counter += 1 // This is how resetting works
   }
-})
+}
+
+const {firstMessageEvent} = window as any
+if (firstMessageEvent.event !== null) {
+  setTimeout(() => {
+    handleMessage(firstMessageEvent.event)
+    delete (window as any)['firstMessageEvent']
+  }, 0)
+}
+useEventListener('message', handleMessage)
 </script>
 
 <template>

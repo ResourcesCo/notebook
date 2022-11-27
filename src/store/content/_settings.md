@@ -6,8 +6,7 @@ Add new files, rename, and delete them here.
 - To rename, add a `"rename": "new-name.md"` property to a file in the editor.
 - To apply the changes, click the Apply button on the viewer.
 - To reset the JSON data to what it was before, click Reset on the viewer.
-- Filenames must end with `.md` and `_newtab.md`, `_settings.md`, and
-  `_welcome.md` cannot be deleted or renamed.
+- Filenames must end with `.md` and `_newtab.md`, `_settings.md`, and `_welcome.md` cannot be deleted or renamed.
 - A property `primaryComponent` may be added to a file and set to `edit` or `view`
 
 [![](https://img.shields.io/badge/%E2%98%95%EF%B8%8F-NotebookView-blue)](https://macchiato.dev/component/#NotebookContent)
