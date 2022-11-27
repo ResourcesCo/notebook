@@ -2,7 +2,7 @@
   @apply zinc-900;
 }
 
-html .prose h1, html .prose h2 {
+html .prose h1, html .prose h2, html .prose h3, html .prose h4 {
   @apply mt-4;
 }
 
