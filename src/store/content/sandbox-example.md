@@ -23,6 +23,7 @@ With a postMessage, it can update its own text, but is limited to 50K characters
 }
 button#toggle-hello {
   background-color: green;
+  color: goldenrod;
   border-radius: 3px;
   padding: 5px 20px;
 }

@@ -16,7 +16,7 @@ watchEffect(() => {
   if (props.info === 'js') {
     const g = document.createElement('script')
     const s = document.getElementsByTagName('script')[0]
-    g.text = props.data
+    g.text = `(() => { ${props.data} })()`
     s.parentNode?.insertBefore(g, s)
   }
 })
