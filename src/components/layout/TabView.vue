@@ -94,9 +94,15 @@ export default defineComponent({
           props.notebook.getFile(filename.value) :
           null
       )
-      if (body) {
+      const yDoc = (
+        (typeof filename.value === 'string') ?
+          props.notebook.getYDoc(filename.value) :
+          null
+      )
+      if (body && yDoc) {
         return {
           body,
+          yDoc,
           isSettings,
         }
       }

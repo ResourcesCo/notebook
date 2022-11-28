@@ -1,8 +1,14 @@
 <script lang="ts" setup>
 import { defineComponent, onMounted, reactive, ref } from 'vue'
 import debounce from 'lodash/debounce'
-import MarkdownEdit from '../../components/MarkdownEdit.vue'
-import { useEventListener } from '@vueuse/core';
+import MarkdownEdit from '../../components/markdown/MarkdownEdit'
+import { useEventListener } from '@vueuse/core'
+import * as Y from 'yjs'
+
+const ready = ref(false)
+const yDoc = new Y.Doc()
+const yText = yDoc.getText('text')
+const undoManager = new Y.UndoManager(yText)
 
 const page = reactive({body: '', counter: 0})
 
@@ -11,9 +17,10 @@ const handleChange = debounce((value) => {
 }, 10, { leading: true })
 
 function handleMessage(e: MessageEvent) {
-  if (e.isTrusted && e.source === parent && Array.isArray(e.data) && e.data.length === 2 && e.data[0] === 'md') {
-    page.body = e.data[1]
-    page.counter += 1 // This is how resetting works
+  if (e.isTrusted && e.source === parent && Array.isArray(e.data) && e.data.length === 2 && e.data[0] === 'md-doc') {
+    const update = e.data[1] as Uint8Array
+    Y.applyUpdate(yDoc, update)
+    ready.value = true
   }
 }
 
@@ -29,7 +36,7 @@ useEventListener('message', handleMessage)
 
 <template>
   <main class="p-1 flex flex-col flex-grow">
-    <MarkdownEdit :page="page" @change="handleChange" />
+    <MarkdownEdit v-if="ready" :page="page" :yText="yText" :undoManager="undoManager" @change="handleChange" />
   </main>
 </template>
 

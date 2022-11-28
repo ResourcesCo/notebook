@@ -1,6 +1,7 @@
 <script lang="ts">
 import { useEventListener } from '@vueuse/core'
 import { defineComponent, PropType, Ref, ref, computed, watch, onMounted, onBeforeUnmount, onBeforeMount } from 'vue'
+import * as Y from 'yjs'
 import { Notebook } from '~/store/notebook'
 import { colorScheme } from '../../store'
 import { handleMessage as handleSettingsMessage } from '../../store/settings'
@@ -13,7 +14,7 @@ export default defineComponent({
       required: true,
     },
     page: {
-      type: Object as PropType<{body: Ref<string>, isSettings: boolean}>,
+      type: Object as PropType<{body: Ref<string>, isSettings: boolean, yDoc: Y.Doc}>,
       required: true,
     },
     mode: {
@@ -52,28 +53,6 @@ export default defineComponent({
     const src = computed(() => (
       '/app/' + mode.value + '/?color-scheme=' + initialColorScheme.value + (page.isSettings ? '&role=settings' : '')
     ))
-    watch([page.body, frame, loadedCount, mode], () => {
-      const frameValue = frame.value
-      if (loadedCount.value > 0 && frameValue) {
-        const contentWindow = frameValue.contentWindow
-        if (
-          contentWindow &&
-          (
-            mode.value === 'view' ||
-            !lastBodyUpdates.value.find(([s, t]) => t > (Date.now() - 1000) && s === page.body.value)
-          )
-        ) {
-          contentWindow.postMessage(['md', page.body.value], '*')
-        }
-        if (page.isSettings && mode.value === 'edit' && !prepareSettingsComplete.value) {
-          prepareSettingsComplete.value = true
-          const self = this
-          setTimeout(() => {
-            notebook.resetSettings()
-          }, 50)
-        }
-      }
-    })
     watch(colorScheme, () => {
       const contentWindow = frame.value?.contentWindow
       if (contentWindow) {
@@ -83,8 +62,12 @@ export default defineComponent({
         )
       }
     })
-
-    const onLoad = () => { loadedCount.value += 1 }
+    const onLoad = () => {
+      const contentWindow = frame.value?.contentWindow
+      if (contentWindow) {
+        contentWindow.postMessage(['md-doc', Y.encodeStateAsUpdate(page.yDoc)], '*')
+      }
+    }
     return { frame, src, onLoad, loadedCount, isSettingsView }
   }
 })

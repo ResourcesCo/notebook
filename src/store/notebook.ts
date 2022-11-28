@@ -1,5 +1,8 @@
-import { reactive, toRef, Ref } from 'vue'
+import { reactive, toRef, Ref, watch } from 'vue'
 import { useStorage, toReactive, watchDebounced } from '@vueuse/core'
+import { sortBy } from 'lodash'
+import * as Y from 'yjs'
+
 import updateComponentData from './updateComponentData'
 import defaultNewTab from './content/_newtab.md?raw'
 import defaultWelcome from './content/_welcome.md?raw'
@@ -7,7 +10,6 @@ import defaultSettings from './content/_settings.md?raw'
 import sandboxExample from './content/sandbox-example.md?raw'
 import notesExample from './content/notes-example.md?raw'
 import { NotebookContentInfo } from '~/components/data/NotebookContent'
-import { sortBy } from 'lodash'
 
 const defaultFileData: {[key: string]: string} = {
   '_newtab.md': defaultNewTab,
@@ -42,6 +44,7 @@ export interface NotebookView {
 export class Notebook {
   prefix: string
   fileData: {[key: string]: Ref<string>} = {}
+  yDocs: {[key: string]: Y.Doc} = {}
   content: NotebookContent
   savedView: Ref<NotebookView>
   view: NotebookView
@@ -110,6 +113,16 @@ export class Notebook {
       )
     }
     return this.fileData[name]
+  }
+
+  getYDoc(name: string): Y.Doc {
+    const content = this.getFile(name)
+    if (!(name in this.yDocs)) {
+      this.yDocs[name] = new Y.Doc()
+      const text = this.yDocs[name].getText('text')
+      text.insert(0, content.value)
+    }
+    return this.yDocs[name]
   }
 
   resetSettings({content, view}: {content?: true, view?: true} = {content: true, view: true}) {

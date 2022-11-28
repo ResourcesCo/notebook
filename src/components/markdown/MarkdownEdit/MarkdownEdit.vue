@@ -30,18 +30,28 @@ import {
 } from "@codemirror/autocomplete"
 import { lintKeymap } from "@codemirror/lint"
 import { markdown as originalMarkdown } from "@codemirror/lang-markdown"
+import { yCollab } from 'y-codemirror.next'
 import {
   lightHighlightStyle,
   darkHighlightStyle,
   lightTheme,
   darkTheme,
-} from "../styles/editor"
-import { isDark } from "../store"
-import { insertNewlineContinueMarkup, deleteMarkupBackward } from '../vendor/commands'
+} from "../../../styles/editor"
+import { isDark } from "../../../store"
+import { insertNewlineContinueMarkup, deleteMarkupBackward } from '../../../vendor/commands'
+import * as Y from 'yjs'
 
 const props = defineProps({
   page: {
     type: Object as PropType<{body: string}>,
+    required: true,
+  },
+  yText: {
+    type: Object as PropType<Y.Text>,
+    required: true,
+  },
+  undoManager: {
+    type: Object as PropType<Y.UndoManager>,
     required: true,
   },
 })
@@ -171,37 +181,6 @@ const getStyleExtension = () => {
 }
 let styleExtension = getStyleExtension()
 
-const extensions = [
-  highlightSpecialChars(),
-  history(),
-  foldGutter(),
-  drawSelection(),
-  EditorState.allowMultipleSelections.of(true),
-  indentOnInput(),
-  bracketMatching(),
-  closeBrackets(),
-  autocompletion({ activateOnTyping: false }),
-  rectangularSelection(),
-  highlightSelectionMatches(),
-  keymap.of([
-    ...closeBracketsKeymap,
-    ...defaultKeymap,
-    ...searchKeymap,
-    ...historyKeymap,
-    ...foldKeymap,
-    ...completionKeymap,
-    ...lintKeymap,
-  ]),
-  markdownLanguage,
-  styleCompartment.of(styleExtension),
-  EditorView.lineWrapping,
-  EditorView.updateListener.of((v) => {
-    if (v.docChanged) {
-      emit("change", editor.state.doc)
-    }
-  }),
-]
-
 watch(isDark, () => {
   const newStyleExtension = getStyleExtension()
   if (newStyleExtension !== styleExtension) {
@@ -211,37 +190,46 @@ watch(isDark, () => {
 })
 
 onMounted(() => {
+  const extensions = [
+    highlightSpecialChars(),
+    history(),
+    foldGutter(),
+    drawSelection(),
+    EditorState.allowMultipleSelections.of(true),
+    indentOnInput(),
+    bracketMatching(),
+    closeBrackets(),
+    autocompletion({ activateOnTyping: false }),
+    rectangularSelection(),
+    highlightSelectionMatches(),
+    keymap.of([
+      ...closeBracketsKeymap,
+      ...defaultKeymap,
+      ...searchKeymap,
+      ...historyKeymap,
+      ...foldKeymap,
+      ...completionKeymap,
+      ...lintKeymap,
+    ]),
+    markdownLanguage,
+    styleCompartment.of(styleExtension),
+    EditorView.lineWrapping,
+    EditorView.updateListener.of((v) => {
+      if (v.docChanged) {
+        emit("change", editor.state.doc)
+      }
+    }),
+    yCollab(props.yText, undefined, { undoManager: props.undoManager })
+  ]
+
   editor = new EditorView({
     state: EditorState.create({
-      doc: props.page.body,
+      doc: props.yText.toString(),
       extensions,
     }),
     parent: root.value,
   })
-})
-
-watch(props.page, () => {
-  const pos = editor.state.selection.main.anchor
-  const line = editor.state.doc.lineAt(pos)
-  const newText = editor.state.toText(props.page.body)
-  let N = newText.length
-  try {
-    const newLine = newText.line(line.number)
-    if (newLine.text === line.text) {
-      N = newLine.from + (pos - line.from)
-    } else {
-      N = newLine.to
-    }
-  } catch (err) {}
-  const tr = editor.state.update({
-    changes: {
-      from: 0,
-      to: editor.state.doc.length,
-      insert: newText,
-    },
-  })
-  editor.dispatch(tr)
-  editor.dispatch({selection: {anchor: N, head: N}})
+  console.log(String(editor.state.doc))
 })
 
 const handleFocus = () => {
