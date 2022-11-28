@@ -1,8 +1,12 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { useEventListener } from '@vueuse/core';
+import { useEventListener } from '@vueuse/core'
+import * as Y from 'yjs'
 import MarkdownView from '../../components/MarkdownView.vue'
-import SettingsClient from '~/store/SettingsClient';
+import SettingsClient from '~/store/SettingsClient'
+
+const yDoc = new Y.Doc()
+const yText = yDoc.getText('text')
 
 const params = new URLSearchParams(window.location.search)
 const role = params.get("role") || undefined
@@ -11,10 +15,16 @@ const value = ref('')
 const settings = role === 'settings' ? new SettingsClient() : undefined
 
 function handleMessage(e: MessageEvent) {
-  if (e.isTrusted && e.source === parent && Array.isArray(e.data) && e.data.length === 2 && e.data[0] === 'md') {
-    value.value = e.data[1]
+  if (e.isTrusted && e.source === parent && Array.isArray(e.data) && e.data.length === 2 && e.data[0] === 'md-doc') {
+    const update = e.data[1] as Uint8Array
+    Y.applyUpdate(yDoc, update)
+    value.value = yDoc.getText('text').toString()
   }
 }
+
+yDoc.on('update', () => {
+  value.value = yDoc.getText('text').toString()
+})
 
 const {firstMessageEvent} = window as any
 if (firstMessageEvent.event !== null) {

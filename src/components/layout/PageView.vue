@@ -67,6 +67,7 @@ export default defineComponent({
       if (contentWindow) {
         contentWindow.postMessage(['md-doc', Y.encodeStateAsUpdate(page.yDoc)], '*')
       }
+      loadedCount.value += 1
     }
     return { frame, src, onLoad, loadedCount, isSettingsView }
   }
