@@ -1,6 +1,6 @@
 <script lang="ts">
 import { useEventListener } from '@vueuse/core'
-import { defineComponent, PropType, Ref, ref, computed, watch, onMounted, onBeforeUnmount, onBeforeMount } from 'vue'
+import { defineComponent, PropType, Ref, ref, computed, watch, onMounted, onBeforeUnmount, onBeforeMount, onUnmounted } from 'vue'
 import * as Y from 'yjs'
 import { Notebook } from '~/store/notebook'
 import { colorScheme } from '../../store'
@@ -39,7 +39,8 @@ export default defineComponent({
         Array.isArray(e.data) &&
         e.data.length >= 1
       ) {
-        if (e.data[0] === "md" && e.data.length === 2) {
+        if (e.data[0] === "md-update" && e.data.length === 2) {
+          Y.applyUpdate(page.yDoc, e.data[1])
           page.body.value = e.data[1].length >= 50000 ? e.data[1].substring(0, 50000) : e.data[1]
           lastBodyUpdates.value.unshift([e.data[1], Date.now()])
           lastBodyUpdates.value.splice(5)
@@ -69,6 +70,18 @@ export default defineComponent({
       }
       loadedCount.value += 1
     }
+    const handleUpdate = (update: Uint8Array) => {
+      const contentWindow = frame.value?.contentWindow
+      if (contentWindow) {
+        contentWindow.postMessage(['md-update', update], '*')
+      }
+    }
+    onMounted(() => {
+      page.yDoc.on('update', handleUpdate)
+    })
+    onUnmounted(() => {
+      page.yDoc.off('update', handleUpdate)
+    })
     return { frame, src, onLoad, loadedCount, isSettingsView }
   }
 })

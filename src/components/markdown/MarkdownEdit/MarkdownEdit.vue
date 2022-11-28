@@ -229,7 +229,6 @@ onMounted(() => {
     }),
     parent: root.value,
   })
-  console.log(String(editor.state.doc))
 })
 
 const handleFocus = () => {

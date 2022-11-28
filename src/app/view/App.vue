@@ -15,7 +15,13 @@ const value = ref('')
 const settings = role === 'settings' ? new SettingsClient() : undefined
 
 function handleMessage(e: MessageEvent) {
-  if (e.isTrusted && e.source === parent && Array.isArray(e.data) && e.data.length === 2 && e.data[0] === 'md-doc') {
+  if (
+    e.isTrusted &&
+    e.source === parent &&
+    Array.isArray(e.data) &&
+    e.data.length === 2 &&
+    ['md-doc', 'md-update'].includes(e.data[0])
+  ) {
     const update = e.data[1] as Uint8Array
     Y.applyUpdate(yDoc, update)
     value.value = yDoc.getText('text').toString()

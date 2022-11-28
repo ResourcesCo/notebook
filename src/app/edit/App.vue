@@ -24,6 +24,10 @@ function handleMessage(e: MessageEvent) {
   }
 }
 
+yDoc.on('update', update => {
+  parent.postMessage(['md-update', update], '*')
+})
+
 const {firstMessageEvent} = window as any
 if (firstMessageEvent.event !== null) {
   setTimeout(() => {
