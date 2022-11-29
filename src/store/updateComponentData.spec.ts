@@ -40,3 +40,28 @@ Test
     expect(String(text)).toEqual(expected)
   })
 })
+
+describe('no-op', () => {
+  it('passes', () => {
+    const bq = '```'
+    const input = (
+`# Testing
+
+[![](https://img.shields.io/badge/%E2%98%95%EF%B8%8F-NotebookView-blue)](https://macchiato.dev/component/#NotebookContent)
+
+${bq}json
+{
+  "hello": "world"
+}
+${bq}
+
+Test
+`
+    )
+    const doc = new Y.Doc()
+    const text = doc.getText('text')
+    text.insert(0, input)
+    updateComponentData(text, 'NotebookContent', {hello: 'world'})
+    expect(String(text)).toEqual(input)
+  })
+})

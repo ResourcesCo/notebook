@@ -7,7 +7,6 @@ export default function updateComponentData(yText: Y.Text, name: string, data: a
   const pastUrlIndex = input.indexOf(url) + url.length
   const pastUrl = input.substring(pastUrlIndex)
   const openFenceMatch = /^(`{3,}).*\n/m.exec(pastUrl)
-  console.log('updating')
   if (openFenceMatch) {
     const openFenceStart = pastUrlIndex + openFenceMatch.index
     const openFenceBlock = openFenceMatch[0]
@@ -24,5 +23,5 @@ export default function updateComponentData(yText: Y.Text, name: string, data: a
       return
     }
   }
-  yText.insert(input.length, `\n\n[![](https://img.shields.io/badge/%E2%98%95%EF%B8%8F-${name}-blue)](https://macchiato.dev/component/#${name})\n\n${fencedData}\n\n`)
+  yText.insert(input.length, `\n\n[${name}](https://macchiato.dev/component/#${name})\n\n${fencedData}\n\n`)
 }

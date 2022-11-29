@@ -133,7 +133,6 @@ export class Notebook {
       const sortedFiles = sortBy(Object.entries(c.files), ([k, v]) => ([k.startsWith('_') ? 0 : 1, v.title]))
       const content = {...c, files: Object.fromEntries(sortedFiles)}
       updateComponentData(settingsText, 'NotebookContent', content)
-      console.log({content})
     }
     if (view) {
       updateComponentData(settingsText, 'NotebookView', this.view)

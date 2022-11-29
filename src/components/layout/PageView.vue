@@ -39,7 +39,6 @@ export default defineComponent({
       ) {
         if (e.data[0] === "md-update" && e.data.length === 2) {
           const update = e.data[1] as Uint8Array
-          console.log({update})
           Y.applyUpdate(page.yDoc, update)
           const text = page.yDoc.getText('text').toString()
           page.body.value = text.length >= 50000 ? text.substring(0, 50000) : text
