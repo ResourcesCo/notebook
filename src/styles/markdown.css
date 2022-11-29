@@ -272,3 +272,7 @@ html:not(.dark) .hljs-punctuation,
 html:not(.dark) .hljs-tag {
   // purposely ignored
 } */
+
+html .contains-task-list li.task-list-item {
+  list-style-type: none;
+}

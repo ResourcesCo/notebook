@@ -28,7 +28,8 @@ function handleMessage(e: MessageEvent) {
   }
 }
 
-yDoc.on('update', () => {
+yDoc.on('update', update => {
+  parent.postMessage(['md-update', update], '*')
   value.value = yDoc.getText('text').toString()
 })
 
@@ -45,7 +46,7 @@ useEventListener('message', handleMessage)
 <template>
   <div class="text-zinc-700 dark:text-zinc-200 flex flex-col h-full">
     <main>
-      <MarkdownView :value="value" :settings="settings" />
+      <MarkdownView :value="value" :yText="yText" :settings="settings" />
     </main>
   </div>
 </template>
