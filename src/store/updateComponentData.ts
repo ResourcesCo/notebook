@@ -21,7 +21,6 @@ export default function updateComponentData(yText: Y.Text, name: string, data: a
       const closeFenceEnd = closeFenceStart + closeFenceMatch[0].length
       yText.delete(openFenceStart, closeFenceEnd - openFenceStart)
       yText.insert(openFenceStart, fencedData)
-      console.log('performing change')
       return
     }
   }
