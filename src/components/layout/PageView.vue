@@ -25,9 +25,7 @@ export default defineComponent({
   components: {Settings},
   setup: ({notebook, page, mode: _mode}, _ctx) => {
     const frame = ref<HTMLIFrameElement | undefined>(undefined)
-    const lastBodyUpdates = ref<[string, number][]>([])
     const loadedCount = ref(0)
-    const prepareSettingsComplete = ref(false)
     const initialColorScheme = ref('dark')
     onBeforeMount(() => {
       initialColorScheme.value = colorScheme.value
@@ -40,10 +38,11 @@ export default defineComponent({
         e.data.length >= 1
       ) {
         if (e.data[0] === "md-update" && e.data.length === 2) {
-          Y.applyUpdate(page.yDoc, e.data[1])
-          page.body.value = e.data[1].length >= 50000 ? e.data[1].substring(0, 50000) : e.data[1]
-          lastBodyUpdates.value.unshift([e.data[1], Date.now()])
-          lastBodyUpdates.value.splice(5)
+          const update = e.data[1] as Uint8Array
+          console.log({update})
+          Y.applyUpdate(page.yDoc, update)
+          const text = page.yDoc.getText('text').toString()
+          page.body.value = text.length >= 50000 ? text.substring(0, 50000) : text
         } else if (page.isSettings) {
           handleSettingsMessage(e.data, notebook)
         }
@@ -78,6 +77,9 @@ export default defineComponent({
     }
     onMounted(() => {
       page.yDoc.on('update', handleUpdate)
+      if (page.isSettings) {
+        notebook.resetSettings()
+      }
     })
     onUnmounted(() => {
       page.yDoc.off('update', handleUpdate)

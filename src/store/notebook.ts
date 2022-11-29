@@ -126,17 +126,19 @@ export class Notebook {
   }
 
   resetSettings({content, view}: {content?: true, view?: true} = {content: true, view: true}) {
-    const settingsRef = this.getFile('_settings.md')
-    let data = settingsRef.value
+    const settingsDoc = this.getYDoc('_settings.md')
+    const settingsText = settingsDoc.getText('text')
     if (content) {
       const c = JSON.parse(JSON.stringify(this.content)) as NotebookContent
       const sortedFiles = sortBy(Object.entries(c.files), ([k, v]) => ([k.startsWith('_') ? 0 : 1, v.title]))
-      data = updateComponentData(data, 'NotebookContent', {...c, files: Object.fromEntries(sortedFiles)})
+      const content = {...c, files: Object.fromEntries(sortedFiles)}
+      updateComponentData(settingsText, 'NotebookContent', content)
+      console.log({content})
     }
     if (view) {
-      data = updateComponentData(data, 'NotebookView', this.view)
+      updateComponentData(settingsText, 'NotebookView', this.view)
     }
-    settingsRef.value = data.replace('machiatto', 'macchiato')
+    // settingsRef.value = data.replace('machiatto', 'macchiato')
   }
 
   applyContentChanges({data, deletes}: {data: NotebookContentInfo, deletes: string[]}) {

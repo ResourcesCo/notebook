@@ -1,9 +1,13 @@
-export default function updateComponentData(input: string, name: string, data: any): string {
+import * as Y from 'yjs'
+
+export default function updateComponentData(yText: Y.Text, name: string, data: any): void {
+  const input = yText.toString()
   const fencedData = "```json\n" + JSON.stringify(data, null, 2) + "\n```\n\n"
   const url = `https://macchiato.dev/component/#${name}`
   const pastUrlIndex = input.indexOf(url) + url.length
   const pastUrl = input.substring(pastUrlIndex)
   const openFenceMatch = /^(`{3,}).*\n/m.exec(pastUrl)
+  console.log('updating')
   if (openFenceMatch) {
     const openFenceStart = pastUrlIndex + openFenceMatch.index
     const openFenceBlock = openFenceMatch[0]
@@ -15,10 +19,11 @@ export default function updateComponentData(input: string, name: string, data: a
     if (closeFenceMatch) {
       const closeFenceStart = openFenceEnd + closeFenceMatch.index
       const closeFenceEnd = closeFenceStart + closeFenceMatch[0].length
-      const beforeFence = input.substring(0, openFenceStart)
-      const afterFence = input.substring(closeFenceEnd)
-      return beforeFence + fencedData + afterFence
+      yText.delete(openFenceStart, closeFenceEnd - openFenceStart)
+      yText.insert(openFenceStart, fencedData)
+      console.log('performing change')
+      return
     }
   }
-  return input + `\n\n[![](https://img.shields.io/badge/%E2%98%95%EF%B8%8F-${name}-blue)](https://macchiato.dev/component/#${name})\n\n${fencedData}\n\n`
+  yText.insert(input.length, `\n\n[![](https://img.shields.io/badge/%E2%98%95%EF%B8%8F-${name}-blue)](https://macchiato.dev/component/#${name})\n\n${fencedData}\n\n`)
 }

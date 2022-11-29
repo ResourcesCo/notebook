@@ -12,13 +12,10 @@ const undoManager = new Y.UndoManager(yText)
 
 const page = reactive({body: '', counter: 0})
 
-const handleChange = debounce((value) => {
-  parent.postMessage(['md', String(value)], '*')
-}, 10, { leading: true })
-
 function handleMessage(e: MessageEvent) {
-  if (e.isTrusted && e.source === parent && Array.isArray(e.data) && e.data.length === 2 && e.data[0] === 'md-doc') {
+  if (e.isTrusted && e.source === parent && Array.isArray(e.data) && e.data.length === 2 && ['md-doc', 'md-update'].includes(e.data[0])) {
     const update = e.data[1] as Uint8Array
+    console.log({update})
     Y.applyUpdate(yDoc, update)
     ready.value = true
   }
@@ -29,7 +26,7 @@ yDoc.on('update', update => {
 })
 
 const {firstMessageEvent} = window as any
-if (firstMessageEvent.event !== null) {
+if (firstMessageEvent?.event !== null) {
   setTimeout(() => {
     handleMessage(firstMessageEvent.event)
     delete (window as any)['firstMessageEvent']
@@ -40,7 +37,7 @@ useEventListener('message', handleMessage)
 
 <template>
   <main class="p-1 flex flex-col flex-grow">
-    <MarkdownEdit v-if="ready" :page="page" :yText="yText" :undoManager="undoManager" @change="handleChange" />
+    <MarkdownEdit v-if="ready" :page="page" :yText="yText" :undoManager="undoManager" />
   </main>
 </template>
 
