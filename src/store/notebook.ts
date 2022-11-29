@@ -4,6 +4,7 @@ import { sortBy } from 'lodash'
 import * as Y from 'yjs'
 
 import updateComponentData from './updateComponentData'
+import fixSpelling from './fixSpelling'
 import defaultNewTab from './content/_newtab.md?raw'
 import defaultWelcome from './content/_welcome.md?raw'
 import defaultSettings from './content/_settings.md?raw'
@@ -137,7 +138,7 @@ export class Notebook {
     if (view) {
       updateComponentData(settingsText, 'NotebookView', this.view)
     }
-    // settingsRef.value = data.replace('machiatto', 'macchiato')
+    fixSpelling(settingsText)
   }
 
   applyContentChanges({data, deletes}: {data: NotebookContentInfo, deletes: string[]}) {
