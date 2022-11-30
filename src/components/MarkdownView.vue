@@ -35,6 +35,10 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  yDoc: {
+    type: Object as PropType<Y.Doc>,
+    required: true,
+  },
   yText: {
     type: Object as PropType<Y.Text>,
     required: true,
@@ -105,12 +109,13 @@ useEventListener('change', (e) => {
     if (attrValue) {
       const index = Number(attrValue)
       const source = value.value
-      const yText = props.yText
       const check = source.substring(index, index + 3)
       const newCheck = {'[ ]': '[x]', '[x]': '[ ]', '[X]': '[ ]'}[check]
       if (newCheck) {
-        yText.delete(index, 3)
-        yText.insert(index, newCheck)
+        props.yDoc.transact(() => {
+          props.yText.delete(index, 3)
+          props.yText.insert(index, newCheck)
+        }, 'view')
       }
     }
   }

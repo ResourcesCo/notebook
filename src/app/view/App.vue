@@ -28,9 +28,12 @@ function handleMessage(e: MessageEvent) {
   }
 }
 
-yDoc.on('update', update => {
-  parent.postMessage(['md-update', update], '*')
-  value.value = yDoc.getText('text').toString()
+yDoc.on('update', (update, origin) => {
+  if (origin === 'view') {
+    parent.postMessage(['md-update', update], '*')
+  } else {
+    value.value = yDoc.getText('text').toString()
+  }
 })
 
 const {firstMessageEvent} = window as any
@@ -46,7 +49,7 @@ useEventListener('message', handleMessage)
 <template>
   <div class="text-zinc-700 dark:text-zinc-200 flex flex-col h-full">
     <main>
-      <MarkdownView :value="value" :yText="yText" :settings="settings" />
+      <MarkdownView :value="value" :yDoc="yDoc" :yText="yText" :settings="settings" />
     </main>
   </div>
 </template>

@@ -30,6 +30,7 @@ export default defineComponent({
     onBeforeMount(() => {
       initialColorScheme.value = colorScheme.value
     })
+    const mode = computed(() => _mode === 'edit' ? 'edit' : 'view')
     useEventListener('message', (e: MessageEvent) => {
       if (
         e.isTrusted &&
@@ -39,7 +40,7 @@ export default defineComponent({
       ) {
         if (e.data[0] === "md-update" && e.data.length === 2) {
           const update = e.data[1] as Uint8Array
-          Y.applyUpdate(page.yDoc, update)
+          Y.applyUpdate(page.yDoc, update, mode.value)
           const text = page.yDoc.getText('text').toString()
           page.body.value = text.length >= 50000 ? text.substring(0, 50000) : text
         } else if (page.isSettings) {
@@ -47,7 +48,6 @@ export default defineComponent({
         }
       }
     })
-    const mode = computed(() => _mode === 'edit' ? 'edit' : 'view')
     const isSettingsView = computed(() => page.isSettings && mode.value === 'view')
     const src = computed(() => (
       '/app/' + mode.value + '/?color-scheme=' + initialColorScheme.value + (page.isSettings ? '&role=settings' : '')
