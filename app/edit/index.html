@@ -18,7 +18,7 @@
 
         window.firstMessageEvent = {event: null}
         function listener(e) {
-          if (window.firstMessageEvent && e.data.length > 0 && e.data[0] === 'md') {
+          if (window.firstMessageEvent && e.data.length > 0 && e.data[0] === 'md-doc') {
             window.firstMessageEvent.event = e
           } else {
             window.removeEventListener('message', listener)

@@ -1,7 +1,8 @@
 <script lang="ts">
 import { useEventListener } from '@vueuse/core'
-import { defineComponent, PropType, Ref, ref, computed, watch, onMounted, onBeforeUnmount, onBeforeMount } from 'vue'
-import { Notebook } from '~/store/notebook'
+import { defineComponent, PropType, Ref, ref, computed, watch, onMounted, onBeforeUnmount, onBeforeMount, onUnmounted } from 'vue'
+import * as Y from 'yjs'
+import { FileData, Notebook } from '~/store/notebook'
 import { colorScheme } from '../../store'
 import { handleMessage as handleSettingsMessage } from '../../store/settings'
 import Settings from '../settings/Settings.vue'
@@ -13,7 +14,11 @@ export default defineComponent({
       required: true,
     },
     page: {
-      type: Object as PropType<{body: Ref<string>, isSettings: boolean}>,
+      type: Object as PropType<{isSettings: boolean}>,
+      required: true,
+    },
+    file: {
+      type: Object as PropType<FileData>,
       required: true,
     },
     mode: {
@@ -22,15 +27,14 @@ export default defineComponent({
     },
   },
   components: {Settings},
-  setup: ({notebook, page, mode: _mode}, _ctx) => {
+  setup: ({notebook, page, file, mode: _mode}, _ctx) => {
     const frame = ref<HTMLIFrameElement | undefined>(undefined)
-    const lastBodyUpdates = ref<[string, number][]>([])
     const loadedCount = ref(0)
-    const prepareSettingsComplete = ref(false)
     const initialColorScheme = ref('dark')
     onBeforeMount(() => {
       initialColorScheme.value = colorScheme.value
     })
+    const mode = computed(() => _mode === 'edit' ? 'edit' : 'view')
     useEventListener('message', (e: MessageEvent) => {
       if (
         e.isTrusted &&
@@ -38,42 +42,20 @@ export default defineComponent({
         Array.isArray(e.data) &&
         e.data.length >= 1
       ) {
-        if (e.data[0] === "md" && e.data.length === 2) {
-          page.body.value = e.data[1].length >= 50000 ? e.data[1].substring(0, 50000) : e.data[1]
-          lastBodyUpdates.value.unshift([e.data[1], Date.now()])
-          lastBodyUpdates.value.splice(5)
+        if (e.data[0] === "md-update" && e.data.length === 2) {
+          const update = e.data[1] as Uint8Array
+          Y.applyUpdate(file.ydoc, update, mode.value)
+          const text = file.ydoc.getText('text').toString()
+          file.body = text.length >= 50000 ? text.substring(0, 50000) : text
         } else if (page.isSettings) {
           handleSettingsMessage(e.data, notebook)
         }
       }
     })
-    const mode = computed(() => _mode === 'edit' ? 'edit' : 'view')
     const isSettingsView = computed(() => page.isSettings && mode.value === 'view')
     const src = computed(() => (
       '/app/' + mode.value + '/?color-scheme=' + initialColorScheme.value + (page.isSettings ? '&role=settings' : '')
     ))
-    watch([page.body, frame, loadedCount, mode], () => {
-      const frameValue = frame.value
-      if (loadedCount.value > 0 && frameValue) {
-        const contentWindow = frameValue.contentWindow
-        if (
-          contentWindow &&
-          (
-            mode.value === 'view' ||
-            !lastBodyUpdates.value.find(([s, t]) => t > (Date.now() - 1000) && s === page.body.value)
-          )
-        ) {
-          contentWindow.postMessage(['md', page.body.value], '*')
-        }
-        if (page.isSettings && mode.value === 'edit' && !prepareSettingsComplete.value) {
-          prepareSettingsComplete.value = true
-          const self = this
-          setTimeout(() => {
-            notebook.resetSettings()
-          }, 50)
-        }
-      }
-    })
     watch(colorScheme, () => {
       const contentWindow = frame.value?.contentWindow
       if (contentWindow) {
@@ -83,8 +65,28 @@ export default defineComponent({
         )
       }
     })
-
-    const onLoad = () => { loadedCount.value += 1 }
+    const onLoad = () => {
+      const contentWindow = frame.value?.contentWindow
+      if (contentWindow) {
+        contentWindow.postMessage(['md-doc', Y.encodeStateAsUpdate(file.ydoc)], '*')
+      }
+      loadedCount.value += 1
+    }
+    const handleUpdate = (update: Uint8Array, origin: string | null) => {
+      const contentWindow = frame.value?.contentWindow
+      if (contentWindow) {
+        contentWindow.postMessage(['md-update', update], '*')
+      }
+    }
+    onMounted(() => {
+      file.ydoc.on('update', handleUpdate)
+      if (page.isSettings) {
+        notebook.resetSettings()
+      }
+    })
+    onUnmounted(() => {
+      file.ydoc.off('update', handleUpdate)
+    })
     return { frame, src, onLoad, loadedCount, isSettingsView }
   }
 })

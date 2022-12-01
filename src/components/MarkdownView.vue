@@ -9,6 +9,7 @@ import javascript from "highlight.js/lib/languages/javascript"
 import typescript from "highlight.js/lib/languages/typescript"
 import json from "highlight.js/lib/languages/json"
 import ComponentManager from "./markdown/ComponentManager"
+import LiveCheckboxes from "./markdown/LiveCheckboxes"
 import LocalStorageTools from "./data/LocalStorageTools"
 import NotebookContent, { NotebookContentInfo, validate as validateNotebookContent } from './data/NotebookContent'
 import NotebookView, { NotebookViewType, validate as validateNotebookView } from './data/NotebookView'
@@ -17,6 +18,10 @@ import parseJson from '../utils/parseJson'
 import SettingsClient from '../store/SettingsClient'
 // @ts-ignore
 import highlight from "markdown-it-highlightjs/core"
+// @ts-ignore
+import taskLists from 'markdown-it-task-list-plus'
+import { useEventListener } from "@vueuse/core"
+import * as Y from 'yjs'
 
 hljs.registerLanguage("xml", xml)
 hljs.registerLanguage("css", css)
@@ -30,9 +35,17 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  yDoc: {
+    type: Object as PropType<Y.Doc>,
+    required: true,
+  },
+  yText: {
+    type: Object as PropType<Y.Text>,
+    required: true,
+  },
   settings: {
     type: Object as PropType<SettingsClient>,
-  }
+  },
 })
 
 const components = {NotebookContent, NotebookView, LocalStorageTools, Sandbox} as const
@@ -51,7 +64,14 @@ const blocks = ref<Block[]>([])
 watch(value, () => {
   const source = value.value
   const componentManager = new ComponentManager({source})
-  const md = MarkdownIt({html: true, linkify: true}).use(highlight, { hljs }).use(componentManager.plugin)
+  const liveCheckboxes = new LiveCheckboxes({source})
+  const md = (
+    MarkdownIt({html: true, linkify: true})
+    .use(highlight, { hljs })
+    .use(taskLists)
+    .use(liveCheckboxes.plugin)
+    .use(componentManager.plugin)
+  )
   const html = md.render(source)
   blocks.value = html.split(/(\{\{[^}]+\}\})/).map(token => {
     if (token.startsWith('{{') && token.endsWith('}}')) {
@@ -80,6 +100,25 @@ watch(value, () => {
       html: token
     }
   })
+})
+
+useEventListener('change', (e) => {
+  const target = e.target
+  if (e.target instanceof HTMLElement) {
+    const attrValue = e.target.getAttribute('data-task-list-index')
+    if (attrValue) {
+      const index = Number(attrValue)
+      const source = value.value
+      const check = source.substring(index, index + 3)
+      const newCheck = {'[ ]': '[x]', '[x]': '[ ]', '[X]': '[ ]'}[check]
+      if (newCheck) {
+        props.yDoc.transact(() => {
+          props.yText.delete(index, 3)
+          props.yText.insert(index, newCheck)
+        }, 'view')
+      }
+    }
+  }
 })
 </script>
 
