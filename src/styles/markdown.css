@@ -276,3 +276,7 @@ html:not(.dark) .hljs-tag {
 html .contains-task-list li.task-list-item {
   list-style-type: none;
 }
+
+html .contains-task-list li.task-list-item input[type=checkbox][data-task-list-index] {
+  margin-right: 0.2em;
+}
