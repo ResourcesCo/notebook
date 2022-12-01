@@ -21,7 +21,7 @@ function handleMessage(e: MessageEvent) {
 }
 
 yDoc.on('update', (update: Uint8Array, origin) => {
-  if (typeof origin !== 'string' || !origin.match(/^(local|client)\b/)) {
+  if (typeof origin !== 'string' || !origin.match(/^(local|client|view)\b/)) {
     parent.postMessage(['md-update', update], '*')
   }
 })

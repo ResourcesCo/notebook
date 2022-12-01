@@ -23,7 +23,7 @@ function handleMessage(e: MessageEvent) {
     ['md-doc', 'md-update'].includes(e.data[0])
   ) {
     const update = e.data[1] as Uint8Array
-    Y.applyUpdate(yDoc, update)
+    Y.applyUpdate(yDoc, update, 'local')
     value.value = yDoc.getText('text').toString()
   }
 }
