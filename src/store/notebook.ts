@@ -171,18 +171,16 @@ export class Notebook {
       const file = this.getFile(name)
       if (file !== undefined && clientId !== this.clientId && (file.ydocCreated === undefined || created > file.ydocCreated)) {
         const ydoc = new Y.Doc()
-        if (file !== undefined) {
-          Y.applyUpdate(ydoc, update)
-          file.ydoc.destroy()
-          file.ydoc = ydoc
-          file.ydocCreated = created
-          file.clients[this.clientId].ydocCreated = created
-          file.ydoc.on('update', (update: Uint8Array, origin: string | null) => {
-            if (!origin?.startsWith('client:')) {
-              this.channel.postMessage(['update', {name, update, clientId: this.clientId, created: file.ydocCreated}])
-            }
-          })
-        }
+        Y.applyUpdate(ydoc, update, `client:${clientId}`)
+        file.ydoc.destroy()
+        file.ydoc = ydoc
+        file.ydocCreated = created
+        file.clients[this.clientId].ydocCreated = created
+        file.ydoc.on('update', (update: Uint8Array, origin: string | null) => {
+          if (!origin?.startsWith('client:')) {
+            this.channel.postMessage(['update', {name, update, clientId: this.clientId, created: file.ydocCreated}])
+          }
+        })
       }
     } else if (messageType === 'update') {
       const {name, created, clientId, update} = message
