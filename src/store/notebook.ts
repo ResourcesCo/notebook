@@ -195,6 +195,11 @@ export class Notebook {
       if (clientId !== this.clientId) {
         this.closeFile(name)
       }
+    } else if (messageType === 'file-renamed') {
+      const {name, rename, clientId} = message
+      if (clientId !== this.clientId) {
+        this.renameFileInView(name, rename)
+      }
     }
   }
 
@@ -264,6 +269,25 @@ export class Notebook {
     }
   }
 
+  renameFile(name: string, rename: string) {
+    this.channel.postMessage(['file-renamed', {clientId: this.clientId, name, rename}])
+    this.renameFileInView(name, rename)
+  }
+
+  renameFileInView(name: string, rename: string) {
+    for (const tabState of [this.view.left, this.view.right]) {
+      if (tabState.tabs.includes(name)) {
+        tabState.tabs = tabState.tabs.map(v => v === name ? rename : v)
+        if (tabState.selected === name) {
+          tabState.selected = rename
+        }
+        if (tabState.lastSelected === name) {
+          tabState.lastSelected = rename
+        }
+      }
+    }
+  }
+
   resetSettings({content, view}: {content?: true, view?: true} = {content: true, view: true}) {
     const settingsDoc = this.getFile('_settings.md').ydoc
     const settingsText = settingsDoc.getText('text')
@@ -298,18 +322,8 @@ export class Notebook {
         const newFile = this.getFile(rename)
         const oldFile = this.getFile(name)
         newFile.body = oldFile.body
-        this.content.files[file.rename] = {title: file.title, emoji: file.emoji, primaryComponent: file.primaryComponent}
-        for (const tabState of [this.view.left, this.view.right]) {
-          if (tabState.tabs.includes(name)) {
-            tabState.tabs = tabState.tabs.map(v => v === name ? rename : v)
-            if (tabState.selected === name) {
-              tabState.selected = rename
-            }
-            if (tabState.lastSelected === name) {
-              tabState.lastSelected = rename
-            }
-          }
-        }
+        this.content.files[rename] = {title: file.title, emoji: file.emoji, primaryComponent: file.primaryComponent}
+        this.renameFile(name, rename)
         delete this.content.files[name]
         this.deleteFile(name)
       } else if (!file.delete && this.content.files[name]) {
