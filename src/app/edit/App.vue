@@ -15,13 +15,15 @@ const page = reactive({body: '', counter: 0})
 function handleMessage(e: MessageEvent) {
   if (e.isTrusted && e.source === parent && Array.isArray(e.data) && e.data.length === 2 && ['md-doc', 'md-update'].includes(e.data[0])) {
     const update = e.data[1] as Uint8Array
-    Y.applyUpdate(yDoc, update)
+    Y.applyUpdate(yDoc, update, 'local')
     ready.value = true
   }
 }
 
-yDoc.on('update', update => {
-  parent.postMessage(['md-update', update], '*')
+yDoc.on('update', (update: Uint8Array, origin) => {
+  if (typeof origin !== 'string' || !origin.match(/^(local|client)\b/)) {
+    parent.postMessage(['md-update', update], '*')
+  }
 })
 
 const {firstMessageEvent} = window as any
