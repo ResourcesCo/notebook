@@ -1,42 +1,31 @@
-<script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue'
+<script lang="ts" setup>
+import { ref, onMounted, PropType } from 'vue'
 import Split from 'split-grid'
-import { notebook } from '../../store/notebook'
-import Nav from '../Nav.vue'
-import TabArea from '../TabArea.vue'
-import Tab from '../Tab.vue'
+import { Notebook } from '../../store/notebook'
 import TabView from './TabView.vue'
 import { useWindowSize } from '@vueuse/core'
 
-export default defineComponent({
-  components: {
-    Nav,
-    TabArea,
-    Tab,
-    TabView,
+const {notebook} = defineProps({
+  notebook: {
+    type: Object as PropType<Notebook>,
+    required: true,
   },
-  setup(props, _ctx) {
-    const split = ref()
-    const {width} = useWindowSize()
+})
 
-    onMounted(() => {
-      Split({
-        columnGutters: [
-          {
-            track: 1,
-            element: split.value,
-          },
-        ],
-        columnMinSizes: { [0]: Math.floor(width.value / 5), [2]: Math.floor(width.value / 5) },
-        snapOffset: 0,
-      })
-    })
+const split = ref()
+const {width} = useWindowSize()
 
-    return {
-      split,
-      notebook,
-    }
-  },
+onMounted(() => {
+  Split({
+    columnGutters: [
+      {
+        track: 1,
+        element: split.value,
+      },
+    ],
+    columnMinSizes: { [0]: Math.floor(width.value / 5), [2]: Math.floor(width.value / 5) },
+    snapOffset: 0,
+  })
 })
 </script>
 

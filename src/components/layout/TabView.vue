@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang="ts" setup>
 import { defineComponent, computed, toRef, reactive, PropType } from "vue"
 import Nav from "../Nav.vue"
 import TabArea from "../TabArea.vue"
@@ -9,111 +9,86 @@ import type { FileData, Notebook, TabState } from "../../store/notebook"
 import TabViewButton from "../TabViewButton.vue"
 import { useAsyncState } from "@vueuse/core"
 
-export default defineComponent({
-  components: {
-    Nav,
-    TabArea,
-    Tab,
-    PageView,
-    DisplayButton,
-    TabViewButton
+const props = defineProps({
+  notebook: {
+    type: Object as PropType<Notebook>,
+    required: true,
   },
-  props: {
-    notebook: {
-      type: Object as PropType<Notebook>,
-      required: true,
-    },
-    side: {
-      type: String as PropType<"left" | "right">,
-      required: true,
-    },
-    tabState: {
-      type: Object as PropType<TabState>,
-      required: true,
-    },
-    otherTabState: {
-      type: Object as PropType<TabState>,
-      required: true,
-    },
+  side: {
+    type: String as PropType<"left" | "right">,
+    required: true,
   },
-  setup(props, ctx) {
-    const toggleMode = () => {
-      if (props.tabState.show === 'self') {
-        props.otherTabState.show = props.otherTabState.show === 'self' ? 'other' : 'self'
-      } else {
-        props.tabState.show = 'self'
-      }
-    }
-
-    const toggleSettings = () => {
-      const i = props.tabState.tabs.findIndex(s => s === "_settings.md")
-      if (i === -1) {
-        props.tabState.tabs.push("_settings.md")
-        props.tabState.selected = "_settings.md"
-        props.tabState.show = "self"
-        props.otherTabState.show = "other"
-        props.tabState.lastSelected = props.tabState.selected
-      } else if (
-        props.tabState.selected === '_settings.md' &&
-        props.tabState.show === 'self' &&
-        props.otherTabState.show === 'other'
-      ) {
-        props.tabState.tabs.splice(i, 1)
-        if (props.tabState.lastSelected !== null && props.tabState.tabs.includes(props.tabState.lastSelected)) {
-          props.tabState.selected = props.tabState.lastSelected
-        } else if (props.tabState.tabs.length > 0) {
-          props.tabState.selected = props.tabState.tabs[0]
-        }
-        props.tabState.show = 'self'
-        props.otherTabState.show = 'other'
-        props.tabState.lastSelected = null
-      } else {
-        props.tabState.selected = '_settings.md'
-        props.tabState.show = 'self'
-        props.otherTabState.show = 'other'
-      }
-    }
-
-    const filename = computed(() => (
-      props.tabState.show === 'self' ? props.tabState.selected : props.otherTabState.selected
-    ))
-    const primaryComponent = computed(() => (
-      props.notebook.content.files[
-        props[props.tabState.show === 'other' ? 'otherTabState' : 'tabState'].selected || ''
-      ]?.primaryComponent === 'edit' ? 'edit' : 'view'
-    ))
-    const mode = computed<'view' | 'edit'>(() => (
-      props.tabState.show === 'self' ?
-        (primaryComponent.value === 'view' ? 'view' : 'edit') :
-        (primaryComponent.value === 'view' ? 'edit' : 'view')
-    ))
-    const page = computed(() => {
-      const isSettings = filename.value === '_settings.md'
-      return {isSettings}
-    })
-    const file = computed<FileData | undefined>(() => {
-      if (filename.value) {
-        return props.notebook.getFile(filename.value)
-      }
-      return undefined
-    })
-    const pageKey = computed(() => `${filename.value}---${mode.value}---${file.value?.ydocCreated}`)
-
-    return {
-      notebook: props.notebook,
-      tabState: props.tabState,
-      side: props.side,
-      filename,
-      mode,
-      pageKey,
-      page,
-      file,
-      toggleMode,
-      toggleSettings,
-      primaryComponent,
-    }
+  tabState: {
+    type: Object as PropType<TabState>,
+    required: true,
+  },
+  otherTabState: {
+    type: Object as PropType<TabState>,
+    required: true,
   },
 })
+
+const toggleMode = () => {
+  if (props.tabState.show === 'self') {
+    props.otherTabState.show = props.otherTabState.show === 'self' ? 'other' : 'self'
+  } else {
+    props.tabState.show = 'self'
+  }
+}
+
+const toggleSettings = () => {
+  const i = props.tabState.tabs.findIndex(s => s === "_settings.md")
+  if (i === -1) {
+    props.tabState.tabs.push("_settings.md")
+    props.tabState.selected = "_settings.md"
+    props.tabState.show = "self"
+    props.otherTabState.show = "other"
+    props.tabState.lastSelected = props.tabState.selected
+  } else if (
+    props.tabState.selected === '_settings.md' &&
+    props.tabState.show === 'self' &&
+    props.otherTabState.show === 'other'
+  ) {
+    props.tabState.tabs.splice(i, 1)
+    if (props.tabState.lastSelected !== null && props.tabState.tabs.includes(props.tabState.lastSelected)) {
+      props.tabState.selected = props.tabState.lastSelected
+    } else if (props.tabState.tabs.length > 0) {
+      props.tabState.selected = props.tabState.tabs[0]
+    }
+    props.tabState.show = 'self'
+    props.otherTabState.show = 'other'
+    props.tabState.lastSelected = null
+  } else {
+    props.tabState.selected = '_settings.md'
+    props.tabState.show = 'self'
+    props.otherTabState.show = 'other'
+  }
+}
+
+const filename = computed(() => (
+  props.tabState.show === 'self' ? props.tabState.selected : props.otherTabState.selected
+))
+const primaryComponent = computed(() => (
+  props.notebook.content.files[
+    props[props.tabState.show === 'other' ? 'otherTabState' : 'tabState'].selected || ''
+  ]?.primaryComponent === 'edit' ? 'edit' : 'view'
+))
+const mode = computed<'view' | 'edit'>(() => (
+  props.tabState.show === 'self' ?
+    (primaryComponent.value === 'view' ? 'view' : 'edit') :
+    (primaryComponent.value === 'view' ? 'edit' : 'view')
+))
+const page = computed(() => {
+  const isSettings = filename.value === '_settings.md'
+  return {isSettings}
+})
+const file = computed<FileData | undefined>(() => {
+  if (filename.value) {
+    return props.notebook.getFile(filename.value)
+  }
+  return undefined
+})
+const pageKey = computed(() => `${filename.value}---${mode.value}---${file.value?.ydocCreated}`)
 </script>
 
 <template>
