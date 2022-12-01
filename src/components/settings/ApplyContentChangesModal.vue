@@ -56,22 +56,22 @@ const status = computed<{messages: string[], deletes: string[]}>(() => {
   return {messages: [], deletes: []}
 })
 
-function dismiss() {
+function close() {
   settingsAction.value = undefined
 }
 
-function click() {
+async function apply() {
   const data = action.value?.data
   if (data) {
-    notebook.applyContentChanges({data, deletes: status.value.deletes})
+    await notebook.applyContentChanges({data, deletes: status.value.deletes})
     notebook.resetSettings()
   }
-  dismiss()
+  close()
 }
 </script>
 
 <template>
-  <Modal v-if="action !== undefined" title="Apply Content Changes" @close="dismiss">
+  <Modal v-if="action !== undefined" title="Apply Content Changes" @close="close">
     <div class="flex flex-col text-sm">
       <div v-for="message of status.messages">
         {{message}}
@@ -89,8 +89,8 @@ function click() {
       </div>
     </div>
     <div class="pt-5 text-center">
-      <Button :disabled="status.messages.length !== 0" @click="click">Apply</Button>
-      <Button @click="dismiss" class="ml-2">Cancel</Button>
+      <Button :disabled="status.messages.length !== 0" @click="apply">Apply</Button>
+      <Button @click="close" class="ml-2">Cancel</Button>
     </div>
   </Modal>
 </template>

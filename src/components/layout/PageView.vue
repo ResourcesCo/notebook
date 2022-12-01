@@ -2,7 +2,7 @@
 import { useEventListener } from '@vueuse/core'
 import { defineComponent, PropType, Ref, ref, computed, watch, onMounted, onBeforeUnmount, onBeforeMount, onUnmounted } from 'vue'
 import * as Y from 'yjs'
-import { Notebook } from '~/store/notebook'
+import { FileData, Notebook } from '~/store/notebook'
 import { colorScheme } from '../../store'
 import { handleMessage as handleSettingsMessage } from '../../store/settings'
 import Settings from '../settings/Settings.vue'
@@ -14,7 +14,11 @@ export default defineComponent({
       required: true,
     },
     page: {
-      type: Object as PropType<{body: Ref<string>, isSettings: boolean, yDoc: Y.Doc}>,
+      type: Object as PropType<{isSettings: boolean}>,
+      required: true,
+    },
+    file: {
+      type: Object as PropType<FileData>,
       required: true,
     },
     mode: {
@@ -23,7 +27,7 @@ export default defineComponent({
     },
   },
   components: {Settings},
-  setup: ({notebook, page, mode: _mode}, _ctx) => {
+  setup: ({notebook, page, file, mode: _mode}, _ctx) => {
     const frame = ref<HTMLIFrameElement | undefined>(undefined)
     const loadedCount = ref(0)
     const initialColorScheme = ref('dark')
@@ -40,9 +44,9 @@ export default defineComponent({
       ) {
         if (e.data[0] === "md-update" && e.data.length === 2) {
           const update = e.data[1] as Uint8Array
-          Y.applyUpdate(page.yDoc, update, mode.value)
-          const text = page.yDoc.getText('text').toString()
-          page.body.value = text.length >= 50000 ? text.substring(0, 50000) : text
+          Y.applyUpdate(file.ydoc, update, mode.value)
+          const text = file.ydoc.getText('text').toString()
+          file.body = text.length >= 50000 ? text.substring(0, 50000) : text
         } else if (page.isSettings) {
           handleSettingsMessage(e.data, notebook)
         }
@@ -64,24 +68,24 @@ export default defineComponent({
     const onLoad = () => {
       const contentWindow = frame.value?.contentWindow
       if (contentWindow) {
-        contentWindow.postMessage(['md-doc', Y.encodeStateAsUpdate(page.yDoc)], '*')
+        contentWindow.postMessage(['md-doc', Y.encodeStateAsUpdate(file.ydoc)], '*')
       }
       loadedCount.value += 1
     }
-    const handleUpdate = (update: Uint8Array) => {
+    const handleUpdate = (update: Uint8Array, origin: string | null) => {
       const contentWindow = frame.value?.contentWindow
       if (contentWindow) {
         contentWindow.postMessage(['md-update', update], '*')
       }
     }
     onMounted(() => {
-      page.yDoc.on('update', handleUpdate)
+      file.ydoc.on('update', handleUpdate)
       if (page.isSettings) {
         notebook.resetSettings()
       }
     })
     onUnmounted(() => {
-      page.yDoc.off('update', handleUpdate)
+      file.ydoc.off('update', handleUpdate)
     })
     return { frame, src, onLoad, loadedCount, isSettingsView }
   }

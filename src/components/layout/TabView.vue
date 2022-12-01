@@ -5,8 +5,9 @@ import TabArea from "../TabArea.vue"
 import Tab from "../Tab.vue"
 import PageView from "./PageView.vue"
 import DisplayButton from "../DisplayButton.vue"
-import type { Notebook, TabState } from "../../store/notebook"
+import type { FileData, Notebook, TabState } from "../../store/notebook"
 import TabViewButton from "../TabViewButton.vue"
+import { useAsyncState } from "@vueuse/core"
 
 export default defineComponent({
   components: {
@@ -86,27 +87,17 @@ export default defineComponent({
         (primaryComponent.value === 'view' ? 'view' : 'edit') :
         (primaryComponent.value === 'view' ? 'edit' : 'view')
     ))
-    const pageKey = computed(() => `${filename.value}---${mode.value}`)
     const page = computed(() => {
       const isSettings = filename.value === '_settings.md'
-      const body = (
-        (typeof filename.value === 'string') ?
-          props.notebook.getFile(filename.value) :
-          null
-      )
-      const yDoc = (
-        (typeof filename.value === 'string') ?
-          props.notebook.getYDoc(filename.value) :
-          null
-      )
-      if (body && yDoc) {
-        return {
-          body,
-          yDoc,
-          isSettings,
-        }
-      }
+      return {isSettings}
     })
+    const file = computed<FileData | undefined>(() => {
+      if (filename.value) {
+        return props.notebook.getFile(filename.value)
+      }
+      return undefined
+    })
+    const pageKey = computed(() => `${filename.value}---${mode.value}---${file.value?.ydocCreated}`)
 
     return {
       notebook: props.notebook,
@@ -116,6 +107,7 @@ export default defineComponent({
       mode,
       pageKey,
       page,
+      file,
       toggleMode,
       toggleSettings,
       primaryComponent,
@@ -143,8 +135,8 @@ export default defineComponent({
     <DisplayButton class="flex-shrink-0" v-if="side === 'right'" />
     <div class="spacer <sm:hidden" v-if="side === 'left'"></div>
   </div>
-  <div :class="['overflow-auto', 'content', 'relative', side]" v-if="page">
-    <PageView :notebook="notebook" :key="pageKey" :page="page" :mode="mode" />
+  <div :class="['overflow-auto', 'content', 'relative', side]" v-if="page && file?.ydocCreated">
+    <PageView :notebook="notebook" :key="pageKey" :page="page" :file="file" :mode="mode" />
   </div>
 </template>
 
