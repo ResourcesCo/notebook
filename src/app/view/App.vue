@@ -4,6 +4,7 @@ import { useEventListener } from '@vueuse/core'
 import * as Y from 'yjs'
 import MarkdownView from '../../components/MarkdownView.vue'
 import SettingsClient from '~/store/SettingsClient'
+import RequestClient from '~/components/data/Request/RequestClient'
 
 const yDoc = new Y.Doc()
 const yText = yDoc.getText('text')
@@ -13,6 +14,7 @@ const role = params.get("role") || undefined
 
 const value = ref('')
 const settings = role === 'settings' ? new SettingsClient() : undefined
+const client = new RequestClient()
 
 function handleMessage(e: MessageEvent) {
   if (
@@ -49,7 +51,7 @@ useEventListener('message', handleMessage)
 <template>
   <div class="text-zinc-700 dark:text-zinc-200 flex flex-col h-full">
     <main>
-      <MarkdownView :value="value" :yDoc="yDoc" :yText="yText" :settings="settings" />
+      <MarkdownView :value="value" :yDoc="yDoc" :yText="yText" :settings="settings" :client="client" />
     </main>
   </div>
 </template>

@@ -280,3 +280,7 @@ html .contains-task-list li.task-list-item {
 html .contains-task-list li.task-list-item input[type=checkbox][data-task-list-index] {
   margin-right: 0.2em;
 }
+
+html .macchiato-link {
+  display: none;
+}

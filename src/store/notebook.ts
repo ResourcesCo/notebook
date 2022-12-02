@@ -11,6 +11,7 @@ import defaultWelcome from './content/_welcome.md?raw'
 import defaultSettings from './content/_settings.md?raw'
 import sandboxExample from './content/sandbox-example.md?raw'
 import notesExample from './content/notes-example.md?raw'
+import requestExample from './content/request-example.md?raw'
 import { NotebookContentInfo } from '~/components/data/NotebookContent'
 
 function randomClientId() {
@@ -25,6 +26,7 @@ const defaultFileData: {[key: string]: string} = {
   '_settings.md': defaultSettings,
   'sandbox-example.md': sandboxExample,
   'notes-example.md': notesExample,
+  'request-example.md': requestExample,
 }
 
 export interface TabState {
@@ -118,11 +120,16 @@ export class Notebook {
           "title": "Sandbox Example",
           "primaryComponent": "edit",
         },
+        "request-example.md": {
+          "emoji": "🏝",
+          "title": "Request Example",
+          "primaryComponent": "edit",
+        },
       }
     }
     const defaultView: NotebookView = {
       "left": {
-        "tabs": ["notes-example.md", "sandbox-example.md"],
+        "tabs": ["notes-example.md", "sandbox-example.md", "request-example.md"],
         "selected": "notes-example.md",
         "lastSelected": null,
         "show": "self",

@@ -30,13 +30,15 @@ export default class ComponentManager {
             if (firstChild.type === 'link_open') {
               const url = firstChild.attrGet('href')
               if (typeof url === 'string') {
-                if (url.startsWith('https://macchiato.dev/component/#')) {
+                if (url.match('https:\/\/macchiato.dev\/component\/?#')) {
                   const tag = url.split('#', 2)[1]
                   if (tag.length > 0) {
-                    firstChild.attrJoin('style', 'display: none;')
                     firstChild.attrJoin('class', 'macchiato-link')
                     componentTag = {tag}
                   }
+                } else if (url.match(/^https:\/\/macchiato.dev\/request\/?([#?].*)?$/)) {
+                  firstChild.attrJoin('class', 'macchiato-link')
+                  componentTag = {tag: 'Request'}
                 }
               }
             }

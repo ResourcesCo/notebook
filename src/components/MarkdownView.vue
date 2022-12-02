@@ -22,6 +22,8 @@ import highlight from "markdown-it-highlightjs/core"
 import taskLists from 'markdown-it-task-list-plus'
 import { useEventListener } from "@vueuse/core"
 import * as Y from 'yjs'
+import Request from './data/Request'
+import RequestClient from "./data/Request/RequestClient"
 
 hljs.registerLanguage("xml", xml)
 hljs.registerLanguage("css", css)
@@ -46,9 +48,13 @@ const props = defineProps({
   settings: {
     type: Object as PropType<SettingsClient>,
   },
+  client: {
+    type: Object as PropType<RequestClient>,
+    required: true,
+  },
 })
 
-const components = {NotebookContent, NotebookView, LocalStorageTools, Sandbox} as const
+const components = {NotebookContent, NotebookView, LocalStorageTools, Sandbox, Request} as const
 
 type Block =
   {html: string} |
@@ -56,6 +62,7 @@ type Block =
   {tag: 'NotebookView', data: NotebookViewType, settings: SettingsClient } |
   {tag: 'LocalStorageTools', settings: SettingsClient} |
   {tag: 'Sandbox', data: string, info?: string} |
+  {tag: 'Request', data: string, client: RequestClient} |
   { error: string }
 
 const value = toRef(props, 'value')
@@ -92,6 +99,8 @@ watch(value, () => {
           return {tag, settings}
         } else if (!settings && tag === 'Sandbox') {
           return {tag, data: component.data, info: component.info}
+        } else if (tag === 'Request') {
+          return {tag, data: component.data, client: props.client}
         }
       }
       return { error: `Missing or invalid component: {tag: ${tag}, id: ${id}}` }
@@ -130,6 +139,7 @@ useEventListener('change', (e) => {
       <template v-else-if="'tag' in block && block.tag === 'NotebookView'"><NotebookView :data="block.data" :settings="block.settings" /></template>
       <template v-else-if="'tag' in block && block.tag === 'LocalStorageTools'"><LocalStorageTools :settings="block.settings" /></template>
       <template v-else-if="'tag' in block && block.tag === 'Sandbox'"><Sandbox :data="block.data" :info="block.info" /></template>
+      <template v-else-if="'tag' in block && block.tag === 'Request'"><Request :data="block.data" :client="block.client" /></template>
       <div class="prose my-2" v-else-if="'error' in block" style="color: red">{{block.error}}</div>
     </template>
   </div>
