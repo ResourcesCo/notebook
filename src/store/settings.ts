@@ -4,6 +4,7 @@ import type { Notebook, NotebookView } from './notebook'
 
 import { ref } from 'vue'
 import { NotebookContentInfo } from '~/components/data/NotebookContent'
+import { RequestModel } from '~/components/data/Request'
 
 export type Action =
   {action: 'exportLocalStorage', name: string, data: Blob} |
@@ -11,6 +12,7 @@ export type Action =
   {action: 'clearLocalStorage'} |
   {action: 'applyContentChanges', data: NotebookContentInfo} |
   {action: 'applyViewChanges', data: NotebookView} |
+  {action: 'sendRequest', data: RequestModel} |
   undefined
 
 export const action = ref<Action>(undefined)

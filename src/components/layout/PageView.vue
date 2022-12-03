@@ -5,6 +5,8 @@ import * as Y from 'yjs'
 import { FileData, Notebook } from '~/store/notebook'
 import { colorScheme } from '../../store'
 import { handleMessage as handleSettingsMessage } from '../../store/settings'
+import { RequestModel } from '../data/Request'
+import SendRequestModal from '../settings/SendRequestModal.vue'
 import Settings from '../settings/Settings.vue'
 
 const props = defineProps({
@@ -29,6 +31,7 @@ const props = defineProps({
 const frame = ref<HTMLIFrameElement | undefined>(undefined)
 const loadedCount = ref(0)
 const initialColorScheme = ref('dark')
+const requestModel = ref<RequestModel>()
 onBeforeMount(() => {
   initialColorScheme.value = colorScheme.value
 })
@@ -45,6 +48,8 @@ useEventListener('message', (e: MessageEvent) => {
       Y.applyUpdate(props.file.ydoc, update, mode.value)
       const text = props.file.ydoc.getText('text').toString()
       props.file.body = text.length >= 50000 ? text.substring(0, 50000) : text
+    } else if (e.data[0] === 'request' && e.data.length === 2) {
+      requestModel.value = JSON.parse(e.data[1]) as RequestModel
     } else if (props.page.isSettings) {
       handleSettingsMessage(e.data, props.notebook)
     }
@@ -92,4 +97,5 @@ onUnmounted(() => {
   <iframe ref="frame" class="h-full w-full" :src="src" :style="loadedCount === 0 ? 'visibility: hidden' : ''"
     sandbox="allow-scripts allow-popups" @load="onLoad"></iframe>
   <Settings v-if="isSettingsView"></Settings>
+  <SendRequestModal v-if="requestModel" @close="() => requestModel = undefined"></SendRequestModal>
 </template>

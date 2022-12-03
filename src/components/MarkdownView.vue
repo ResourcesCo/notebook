@@ -23,6 +23,7 @@ import taskLists from 'markdown-it-task-list-plus'
 import { useEventListener } from "@vueuse/core"
 import * as Y from 'yjs'
 import Request from './data/Request'
+import Data from './data/Data'
 import RequestClient from "./data/Request/RequestClient"
 
 hljs.registerLanguage("xml", xml)
@@ -54,7 +55,7 @@ const props = defineProps({
   },
 })
 
-const components = {NotebookContent, NotebookView, LocalStorageTools, Sandbox, Request} as const
+const components = {NotebookContent, NotebookView, LocalStorageTools, Sandbox, request: Request, data: Data} as const
 
 type Block =
   {html: string} |
@@ -62,7 +63,8 @@ type Block =
   {tag: 'NotebookView', data: NotebookViewType, settings: SettingsClient } |
   {tag: 'LocalStorageTools', settings: SettingsClient} |
   {tag: 'Sandbox', data: string, info?: string} |
-  {tag: 'Request', data: string, client: RequestClient} |
+  {tag: 'request', data: string, client: RequestClient} |
+  {tag: 'data', data: string, info?: string, name: string} |
   { error: string }
 
 const value = toRef(props, 'value')
@@ -99,8 +101,10 @@ watch(value, () => {
           return {tag, settings}
         } else if (!settings && tag === 'Sandbox') {
           return {tag, data: component.data, info: component.info}
-        } else if (tag === 'Request') {
+        } else if (tag === 'request') {
           return {tag, data: component.data, client: props.client}
+        } else if (tag === 'data' && component.name !== undefined) {
+          return {tag, data: component.data, name: component.name, info: component.info}
         }
       }
       return { error: `Missing or invalid component: {tag: ${tag}, id: ${id}}` }
@@ -135,11 +139,26 @@ useEventListener('change', (e) => {
   <div class="mb-2">
     <template v-for="block in blocks">
       <div class="prose px-2" v-if="'html' in block" v-html="block.html"></div>
-      <template v-else-if="'tag' in block && block.tag === 'NotebookContent'"><NotebookContent :data="block.data" :settings="block.settings" /></template>
-      <template v-else-if="'tag' in block && block.tag === 'NotebookView'"><NotebookView :data="block.data" :settings="block.settings" /></template>
-      <template v-else-if="'tag' in block && block.tag === 'LocalStorageTools'"><LocalStorageTools :settings="block.settings" /></template>
-      <template v-else-if="'tag' in block && block.tag === 'Sandbox'"><Sandbox :data="block.data" :info="block.info" /></template>
-      <template v-else-if="'tag' in block && block.tag === 'Request'"><Request :data="block.data" :client="block.client" /></template>
+      <template v-else-if="'tag' in block">
+        <template v-if="block.tag === 'NotebookContent'">
+          <NotebookContent :data="block.data" :settings="block.settings" />
+        </template>
+        <template v-if="block.tag === 'NotebookView'">
+          <NotebookView :data="block.data" :settings="block.settings" />
+        </template>
+        <template v-if="block.tag === 'LocalStorageTools'">
+          <LocalStorageTools :settings="block.settings" />
+        </template>
+        <template v-if="block.tag === 'Sandbox'">
+          <Sandbox :data="block.data" :info="block.info" />
+        </template>
+        <template v-if="block.tag === 'request'">
+          <Request :data="block.data" :client="block.client" />
+        </template>
+        <template v-if="block.tag === 'data'">
+          <Data :data="block.data" :name="block.name" :info="block.info" />
+        </template>
+      </template>
       <div class="prose my-2" v-else-if="'error' in block" style="color: red">{{block.error}}</div>
     </template>
   </div>

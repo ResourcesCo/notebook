@@ -55,8 +55,8 @@ const toggleSettings = () => {
     } else if (props.tabState.tabs.length > 0) {
       props.tabState.selected = props.tabState.tabs[0]
     }
-    props.tabState.show = 'self'
-    props.otherTabState.show = 'other'
+    props.tabState.show = 'other'
+    props.otherTabState.show = 'self'
     props.tabState.lastSelected = null
   } else {
     props.tabState.selected = '_settings.md'
