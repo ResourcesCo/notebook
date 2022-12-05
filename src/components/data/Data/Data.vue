@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, PropType } from 'vue'
-import Button from '~/components/settings/Button.vue'
+import Button from '@/components/form/Button.vue'
 
 const props = defineProps({
   data: {

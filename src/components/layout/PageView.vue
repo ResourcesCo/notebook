@@ -2,11 +2,11 @@
 import { useEventListener } from '@vueuse/core'
 import { defineComponent, PropType, Ref, ref, computed, watch, onMounted, onBeforeUnmount, onBeforeMount, onUnmounted } from 'vue'
 import * as Y from 'yjs'
-import { FileData, Notebook } from '~/store/notebook'
+import { FileData, Notebook } from '@/store/notebook'
 import { colorScheme } from '../../store'
 import { handleMessage as handleSettingsMessage } from '../../store/settings'
 import { RequestModel } from '../data/Request'
-import SendRequestModal from '../settings/SendRequestModal.vue'
+import SendRequestModal from '../data/Request/SendRequestModal.vue'
 import Settings from '../settings/Settings.vue'
 
 const props = defineProps({

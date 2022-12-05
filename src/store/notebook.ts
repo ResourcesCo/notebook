@@ -12,7 +12,7 @@ import defaultSettings from './content/_settings.md?raw'
 import sandboxExample from './content/sandbox-example.md?raw'
 import notesExample from './content/notes-example.md?raw'
 import requestExample from './content/request-example.md?raw'
-import { NotebookContentInfo } from '~/components/data/NotebookContent'
+import { NotebookContentInfo } from '@/components/data/NotebookContent'
 
 function randomClientId() {
   const array = new Uint32Array(2)

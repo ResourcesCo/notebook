@@ -3,8 +3,8 @@ import { ref } from 'vue'
 import { useEventListener } from '@vueuse/core'
 import * as Y from 'yjs'
 import MarkdownView from '../../components/MarkdownView.vue'
-import SettingsClient from '~/store/SettingsClient'
-import RequestClient from '~/components/data/Request/RequestClient'
+import SettingsClient from '@/store/SettingsClient'
+import RequestClient from '@/components/data/Request/RequestClient'
 
 const yDoc = new Y.Doc()
 const yText = yDoc.getText('text')

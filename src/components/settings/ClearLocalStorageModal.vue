@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import {ref, computed} from 'vue'
 import {action as settingsAction} from '../../store/settings'
-import Modal from './Modal.vue'
-import Button from './Button.vue'
+import Modal from '../layout/Modal.vue'
+import Button from '../form/Button.vue'
 
 const action = computed(() => settingsAction.value?.action === 'clearLocalStorage' ? settingsAction.value : undefined)
 

@@ -10,7 +10,7 @@ const packageDir = './'
 export default defineConfig({
   resolve: {
     alias: {
-      "~/": `${resolve(packageDir, "src")}/`,
+      "@/": `${resolve(packageDir, "src")}/`,
     },
   },
   plugins: [

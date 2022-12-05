@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { PropType, computed } from 'vue'
 import RequestClient from './RequestClient'
-import Button from '~/components/settings/Button.vue'
+import Button from '@/components/form/Button.vue'
 import { RequestModel } from './data'
 
 const props = defineProps({

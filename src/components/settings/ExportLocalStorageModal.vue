@@ -2,8 +2,8 @@
 import {ref, computed, watch} from 'vue'
 import {saveAs} from 'file-saver'
 import {action as settingsAction} from '../../store/settings'
-import Modal from './Modal.vue'
-import Button from './Button.vue'
+import Modal from '../layout/Modal.vue'
+import Button from '../form/Button.vue'
 
 const name = ref('')
 

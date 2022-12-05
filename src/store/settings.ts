@@ -3,8 +3,8 @@ import getLocalStorage from '../components/data/LocalStorageTools/getStorage'
 import type { Notebook, NotebookView } from './notebook'
 
 import { ref } from 'vue'
-import { NotebookContentInfo } from '~/components/data/NotebookContent'
-import { RequestModel } from '~/components/data/Request'
+import { NotebookContentInfo } from '@/components/data/NotebookContent'
+import { RequestModel } from '@/components/data/Request'
 
 export type Action =
   {action: 'exportLocalStorage', name: string, data: Blob} |

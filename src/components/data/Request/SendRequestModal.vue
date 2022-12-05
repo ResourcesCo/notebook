@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import {computed, defineProps, PropType} from 'vue'
-import { RequestModel } from '../data/Request'
-import {action as settingsAction} from '../../store/settings'
-import Modal from './Modal.vue'
-import Button from './Button.vue'
-import RequestDispatcher from '../data/Request/RequestDispatcher'
+import { RequestModel } from '.'
+import {action as settingsAction} from '../../../store/settings'
+import Modal from '../../layout/Modal.vue'
+import Button from '../../form/Button.vue'
+import RequestDispatcher from './RequestDispatcher'
 
 const props = defineProps({
   data: Object as PropType<RequestModel>,
