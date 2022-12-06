@@ -25,6 +25,7 @@
     "@unocss/reset": "^0.46.5",
     "@vueuse/core": "^9.6.0",
     "@vueuse/head": "^1.0.18",
+    "ajv": "^8.11.2",
     "fflate": "^0.7.4",
     "file-saver": "^2.0.5",
     "highlight.js": "^11.7.0",

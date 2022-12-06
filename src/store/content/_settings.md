@@ -18,16 +18,53 @@ Add new files, rename, and delete them here.
       "emoji": "🗂",
       "title": "New Tab"
     },
+    "_settings.md": {
+      "emoji": "⚙️",
+      "title": "Settings"
+    },
     "_welcome.md": {
       "emoji": "👋",
       "title": "Welcome"
     },
-    "_settings.md": {
-      "emoji": "⚙️",
-      "title": "Settings"
+    "notes-example.md": {
+      "emoji": "🗒",
+      "title": "Notes Example",
+      "primaryComponent": "edit"
+    },
+    "request-example.md": {
+      "emoji": "🏝",
+      "title": "Request Example",
+      "primaryComponent": "edit"
+    },
+    "sandbox-example.md": {
+      "emoji": "🏝",
+      "title": "Sandbox Example",
+      "primaryComponent": "edit"
     }
   }
 }
+```
+
+## Permissions
+
+[`permissions`](https://macchiato.dev/component/#Permissions)
+
+```json
+{
+  "url": "",
+}
+```
+
+## Environment
+
+Enter environment information, such as account IDs and API keys here.
+
+API keys and other secrets should not be stored in this document (on the editor side), but are instead stored in the session. If something is a secret, instead of including its value in this document, just include `null`. On the view side, you can enter it in and it will be stored in the session, until the tab is closed.
+
+[`environment`](https://macchiato.dev/component/#Environment)
+
+```json
+{}
 ```
 
 ## Notebook View
@@ -49,15 +86,22 @@ Edit the tabs here.
 ```json
 {
   "left": {
-    "tabs": ["_newtab.md"],
-    "selected": "_newtab.md",
+    "tabs": [
+      "notes-example.md",
+      "sandbox-example.md",
+      "request-example.md"
+    ],
+    "selected": "request-example.md",
     "lastSelected": null,
-    "show": "self"
+    "show": "other"
   },
   "right": {
-    "tabs": ["_welcome.md"],
-    "selected": "_welcome.md",
-    "lastSelected": null,
+    "tabs": [
+      "_welcome.md",
+      "_settings.md"
+    ],
+    "selected": "_settings.md",
+    "lastSelected": "_settings.md",
     "show": "self"
   }
 }

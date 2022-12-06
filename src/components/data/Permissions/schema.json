@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "required": ["permissions"],
+  "properties": {
+    "permissions": {
+      "items": {
+        "required": ["grantee", "requests"],
+        "properties": {
+          "grantee": {
+            "properties": {
+              "file": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "requests": {
+            "items": {
+              "required": ["urlPatterns"],
+              "properties": {
+                "authorizationEnv": {
+                  "anyOf": [
+                    {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ]
+                },
+                "urlPatterns": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}
