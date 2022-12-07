@@ -174,7 +174,7 @@ useEventListener('change', (e) => {
           <Data :data="block.data" :name="block.name" :info="block.info" />
         </template>
       </template>
-      <div class="prose my-2" v-else-if="'error' in block" style="color: red">{{block.error}}</div>
+      <div class="prose my-2 text-red" v-else-if="'error' in block">{{block.error}}</div>
     </template>
   </div>
 </template>

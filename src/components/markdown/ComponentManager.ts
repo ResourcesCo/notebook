@@ -15,6 +15,7 @@ interface ComponentInfo {
   data: string
   name?: string
   info?: string
+  map: [number, number]
 }
 
 export default class ComponentManager {
@@ -51,13 +52,14 @@ export default class ComponentManager {
               }
             }
           }
-        } else if (token.type === 'fence' && componentTag) {
+        } else if (token.type === 'fence' && componentTag && token.map) {
           const component = {
             id: counter,
             tag: componentTag.tag,
             data: token.content,
             info: token.info,
             name: componentTag.name,
+            map: token.map,
           }
           self.components.push(component)
           token.attrSet('componentTag', `${component.id}`)

@@ -1,8 +1,6 @@
 import Ajv from 'ajv'
 import schema from './schema.json'
 
-const ajv = new Ajv()
-
 export type Grantee = { file: string }
 
 export type RequestPermission = {
@@ -19,6 +17,17 @@ export type PermissionSpec = {
   permissions: Permission[]
 }
 
-export function validate(data: any): data is PermissionSpec {
-  return ajv.validate(schema, data)
+export function validate(data: any): {data: PermissionSpec} | {errors: NonNullable<Ajv['errors']>} {
+  const ajv = new Ajv()
+  if (ajv.validate(schema, data)) {
+    return {
+      data: data as PermissionSpec
+    }
+  } else {
+    if (ajv.errors) {
+      return {errors: ajv.errors}
+    } else {
+      throw new Error('invalid validation result')
+    }
+  }
 }
