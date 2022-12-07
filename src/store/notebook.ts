@@ -13,6 +13,7 @@ import sandboxExample from './content/sandbox-example.md?raw'
 import notesExample from './content/notes-example.md?raw'
 import requestExample from './content/request-example.md?raw'
 import { NotebookContentInfo } from '@/components/data/NotebookContent'
+import { PermissionSpec } from '@/components/data/Permissions'
 
 function randomClientId() {
   const array = new Uint32Array(2)
@@ -86,6 +87,7 @@ export class Notebook {
   content: NotebookContent
   savedView: Ref<NotebookView>
   view: NotebookView
+  permissions: Ref<PermissionSpec>
   channel: BroadcastChannel
   clientId: string
 
@@ -121,7 +123,7 @@ export class Notebook {
           "primaryComponent": "edit",
         },
         "request-example.md": {
-          "emoji": "🏝",
+          "emoji": "🌐",
           "title": "Request Example",
           "primaryComponent": "edit",
         },
@@ -141,6 +143,7 @@ export class Notebook {
         "show": "self",
       },
     }
+    const defaultPermissions = {permissions: []}
     if (this.prefix === notebookDefaults.prefix && (localStorage.getItem(`.notebook/_content.json`) || '').trim() === '') {
       const haveOldData = [1, 2, 3, 4, 5].some(i => (localStorage.getItem(`doc-${i}`) || '').trim().length > 0)
       if (haveOldData) {
@@ -150,6 +153,7 @@ export class Notebook {
     this.content = toReactive(useStorage(`${this.prefix}/_content.json`, defaultContent))
     this.savedView = useStorage(`${this.prefix}/_view.json`, defaultView)
     this.view = toReactive(useStorage(`${this.prefix}/_view.json`, this.savedView.value, sessionStorage))
+    this.permissions = useStorage(`${this.prefix}/_permissions.json`, defaultPermissions)
     watchDebounced(this.view, () => this.savedView.value = this.view, {debounce: 200, maxWait: 500})
     this.channel = new BroadcastChannel(this.prefix)
     this.channel.onmessage = this.handleMessage.bind(this)
@@ -293,7 +297,11 @@ export class Notebook {
     }
   }
 
-  resetSettings({content, view}: {content?: true, view?: true} = {content: true, view: true}) {
+  resetSettings(
+    {content, view, permissions}:
+    {content?: true, view?: true, permissions?: true}
+    = {content: true, view: true, permissions: true}
+  ) {
     const settingsDoc = this.getFile('_settings.md').ydoc
     const settingsText = settingsDoc.getText('text')
     if (content) {
@@ -304,6 +312,9 @@ export class Notebook {
     }
     if (view) {
       updateComponentData(settingsText, 'NotebookView', this.view)
+    }
+    if (permissions) {
+      updateComponentData(settingsText, 'Permissions', this.permissions.value)
     }
     fixSpelling(settingsText)
   }

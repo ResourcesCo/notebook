@@ -32,6 +32,7 @@ function toArray(input: string | string[] | undefined) {
     </ul>
   </template>
   <div class="mx-5 my-7" v-if="'data' in result">
+    <div v-if="result.data.permissions.length === 0">No permissions defined.</div>
     <div v-for="permission in result.data.permissions">
       <span class="py-1">Permission</span>
       <div class="pl-2 py-1">

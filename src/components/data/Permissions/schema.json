@@ -39,15 +39,18 @@
                   "type": "array"
                 }
               },
-              "type": "object"
+              "type": "object",
+              "additionalProperties": false
             },
             "type": "array"
           }
         },
-        "type": "object"
+        "type": "object",
+        "additionalProperties": false
       },
       "type": "array"
     }
   },
-  "type": "object"
+  "type": "object",
+  "additionalProperties": false
 }

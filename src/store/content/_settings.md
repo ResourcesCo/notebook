@@ -32,7 +32,7 @@ Add new files, rename, and delete them here.
       "primaryComponent": "edit"
     },
     "request-example.md": {
-      "emoji": "🏝",
+      "emoji": "🌐",
       "title": "Request Example",
       "primaryComponent": "edit"
     },
@@ -47,19 +47,58 @@ Add new files, rename, and delete them here.
 
 ## Permissions
 
+These are the permissions. Here is an example, that allows the `request-example.md` file to make HTTP requests to `https://httpbin.org/post` and send the environment variable `HTTPBIN_API_KEY` in `Authorization`. It can't directly access `HTTPBIN_API_KEY`. It is not scrubbed from the response, however, so because httpbin uses it, it can access it!
+
 [`permissions`](https://macchiato.dev/component/#Permissions)
 
 ```json
 {
-  "url": "",
+  "permissions": [
+    {
+      "grantee": {
+        "file": "request-example.md"
+      },
+      "requests": [
+        {
+          "urlPatterns": [
+            "https://httpbin.org/post"
+          ],
+          "authorizationEnv": "HTTPBIN_API_KEY"
+        }
+      ]
+    }
+  ]
 }
 ```
+
+<details>
+  <summary>Example</summary>
+
+```json
+{
+  "permissions": [
+    {
+      "grantee": {
+        "file": "request-example.md"
+      },
+      "requests": [
+        {
+          "urlPatterns": [
+            "https://httpbin.org/post"
+          ],
+          "authorizationEnv": "HTTPBIN_API_KEY"
+        }
+      ]
+    }
+  ]
+}
+```
+
+</details>
 
 ## Environment
 
 Enter environment information, such as account IDs and API keys here.
-
-API keys and other secrets should not be stored in this document (on the editor side), but are instead stored in the session. If something is a secret, instead of including its value in this document, just include `null`. On the view side, you can enter it in and it will be stored in the session, until the tab is closed.
 
 [`environment`](https://macchiato.dev/component/#Environment)
 
