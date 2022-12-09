@@ -3,6 +3,7 @@ import { computed, PropType } from 'vue'
 import { validate } from './data'
 import SettingsClient from '@/store/SettingsClient'
 import Button from '@/components/form/Button.vue'
+import ContentArea from './ContentArea.vue'
 
 const props = defineProps({
   data: {
@@ -33,12 +34,19 @@ function toArray(input: string | string[] | undefined) {
   <div class="mx-5 my-7" v-if="'data' in result">
     <div v-if="Object.keys(result.data.containers).length === 0">No containers defined.</div>
     <div v-for="container, name in result.data.containers">
-      <span class="py-1">Container</span>
-      <span class="value">{{name}}</span>
+      <span class="py-1">{{name}}</span>
+      <span class="tag">container</span>
+      <div class="pl-2 py-1">
+        <ContentArea
+          v-for="[contentAreaKey, contentArea] in Object.entries(container.content)"
+          :contentAreaKey="contentAreaKey"
+          :contentArea="contentArea"
+        />
+      </div>
     </div>
     <div class="pt-3">
-      <Button @click="() => settings.applyPermissionChanges(data)">Apply</Button>
-      <Button @click="() => settings.resetPermissionChanges()">Reset</Button>
+      <Button @click="() => settings.applyContainerChanges(data)">Apply</Button>
+      <Button @click="() => settings.resetContainerChanges()">Reset</Button>
     </div>
   </div>
 </template>

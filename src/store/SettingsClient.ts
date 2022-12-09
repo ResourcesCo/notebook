@@ -20,10 +20,10 @@ export default class Settings {
   resetViewChanges() {
     parent.postMessage(['resetViewChanges'], '*')
   }
-  applyPermissionChanges(data: any) {
-    parent.postMessage(['applyPermissionChanges', JSON.stringify(data)], '*')
+  applyContainerChanges(data: any) {
+    parent.postMessage(['applyContainerChanges', JSON.stringify(data)], '*')
   }
-  resetPermissionChanges() {
-    parent.postMessage(['resetPermissionChanges'], '*')
+  resetContainerChanges() {
+    parent.postMessage(['resetContainerChanges'], '*')
   }
 }

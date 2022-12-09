@@ -39,6 +39,8 @@ const mode = computed(() => props.mode === 'edit' ? 'edit' : 'view')
 useEventListener('message', (e: MessageEvent) => {
   if (
     e.isTrusted &&
+    // this only allows the source to be from the current frame
+    // - so a child iframe wouldn't be permitted to send this message
     e.source == frame.value?.contentWindow &&
     Array.isArray(e.data) &&
     e.data.length >= 1
