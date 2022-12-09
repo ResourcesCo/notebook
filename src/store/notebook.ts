@@ -13,7 +13,7 @@ import sandboxExample from './content/sandbox-example.md?raw'
 import notesExample from './content/notes-example.md?raw'
 import requestExample from './content/request-example.md?raw'
 import { NotebookContentInfo } from '@/components/data/NotebookContent'
-import { PermissionSpec } from '@/components/data/Permissions'
+import { PermissionSpec } from '@/components/data/Containers'
 
 function randomClientId() {
   const array = new Uint32Array(2)

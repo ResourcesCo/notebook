@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {computed, defineProps, PropType} from 'vue'
+import {computed, PropType} from 'vue'
 import { RequestModel } from '.'
 import {action as settingsAction} from '../../../store/settings'
 import Modal from '../../layout/Modal.vue'

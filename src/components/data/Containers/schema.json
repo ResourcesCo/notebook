@@ -1,0 +1,130 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "contentSource": {
+      "type": "object",
+      "required": ["paths"],
+      "properties": {
+        "paths": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      },
+      "additionalProperties": false
+    },
+    "env": {
+      "type": "object",
+      "additionalProperties": {
+        "anyOf": [
+          {"type": "string"},
+          {
+            "type": "object",
+            "required": ["$env"],
+            "properties": {
+              "$env": {"type": "string"}
+            },
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  },
+  "type": "object",
+  "required": ["containers"],
+  "properties": {
+    "containers": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "pages": {
+            "anyOf": [
+              {"type": "string"},
+              {
+                "type": "array",
+                "items": {"type": "string"}
+              }
+            ]
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "host": {"type": "string"},
+                "request": {
+                  "anyOf": [
+                    {
+                      "const": true
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "headers": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "anyOf": [
+                              {
+                                "required": ["env"],
+                                "properties": {
+                                  "env": {"$ref": "#/definitions/env"}
+                                }
+                              },
+                              {
+                                "required": ["value"],
+                                "properties": {
+                                  "value": {"type": "string"},
+                                  "env": {"$ref": "#/definitions/env"},
+                                  "sendByDefault": {"type": "boolean"},
+                                  "allowOmit": {"type": "boolean"},
+                                  "allowOverride": {"type": "boolean"}
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "connect": {
+                  "oneOf": [
+                    {"const": true},
+                    {"$ref": "#/definitions/contentSource"}
+                  ]
+                },
+                "script": {
+                  "oneOf": [
+                    {"const": true},
+                    {"$ref": "#/definitions/contentSource"}
+                  ]
+                },
+                "style": {
+                  "oneOf": [
+                    {"const": true},
+                    {"$ref": "#/definitions/contentSource"}
+                  ]
+                },
+                "media": {
+                  "oneOf": [
+                    {"const": true},
+                    {"$ref": "#/definitions/contentSource"}
+                  ]
+                },
+                "font": {
+                  "oneOf": [
+                    {"const": true},
+                    {"$ref": "#/definitions/contentSource"}
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

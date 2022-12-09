@@ -5,6 +5,7 @@ import type { Notebook, NotebookView } from './notebook'
 import { ref } from 'vue'
 import { NotebookContentInfo } from '@/components/data/NotebookContent'
 import { RequestModel } from '@/components/data/Request'
+import { PermissionSpec } from '@/components/data/Containers'
 
 export type Action =
   {action: 'exportLocalStorage', name: string, data: Blob} |
@@ -12,6 +13,7 @@ export type Action =
   {action: 'clearLocalStorage'} |
   {action: 'applyContentChanges', data: NotebookContentInfo} |
   {action: 'applyViewChanges', data: NotebookView} |
+  {action: 'applyPermissionChanges', data: PermissionSpec} |
   {action: 'sendRequest', data: RequestModel} |
   undefined
 
@@ -45,6 +47,13 @@ export function handleMessage(data: any[], notebook: Notebook) {
       data: JSON.parse(data[1]) as NotebookView,
     }
   } else if (data[0] === 'resetViewChanges') {
+    notebook.resetSettings({view: true})
+  } else if (data[0] === 'applyPermissionChanges') {
+    action.value = {
+      action: 'applyPermissionChanges',
+      data: JSON.parse(data[1]) as PermissionSpec,
+    }
+  } else if (data[0] === 'resetPermissionChanges') {
     notebook.resetSettings({view: true})
   }
 }

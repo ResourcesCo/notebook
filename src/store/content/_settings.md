@@ -45,52 +45,54 @@ Add new files, rename, and delete them here.
 }
 ```
 
-## Permissions
+## Containers
 
-These are the permissions. Here is an example, that allows the `request-example.md` file to make HTTP requests to `https://httpbin.org/post` and send the environment variable `HTTPBIN_API_KEY` in `Authorization`. It can't directly access `HTTPBIN_API_KEY`. It is not scrubbed from the response, however, so because httpbin uses it, it can access it!
+[`containers`](https://macchiato.dev/component/#Containers)
 
-[`permissions`](https://macchiato.dev/component/#Permissions)
+Containers give pages access to storage, environment variables, and the network through rules.
 
 ```json
 {
-  "permissions": [
-    {
-      "grantee": {
-        "file": "request-example.md"
-      },
-      "requests": [
-        {
-          "urlPatterns": [
-            "https://httpbin.org/post"
-          ],
-          "authorizationEnv": "HTTPBIN_API_KEY"
-        }
-      ]
-    }
-  ]
+  "permissions": []
 }
 ```
 
 <details>
   <summary>Example</summary>
 
+This allows the `request-example.md` file to make HTTP requests to `https://httpbin.org/post` and provides the environment variable `HTTPBIN_API_KEY` for use in `Authorization`. It can't directly access `HTTPBIN_API_KEY`. It is not scrubbed from the response, however, so because httpbin uses it, it can access it!
+
 ```json
 {
-  "permissions": [
-    {
-      "grantee": {
-        "file": "request-example.md"
-      },
-      "requests": [
-        {
-          "urlPatterns": [
-            "https://httpbin.org/post"
-          ],
-          "authorizationEnv": "HTTPBIN_API_KEY"
+  "containers": {
+    "requests": {
+      "pages": "request-example.md",
+      "contentSecurity": {
+        "httpbin.org": {
+          "connect": {
+            "headers": {
+              "Authorization": {
+                "env": {
+                  "API_KEY": "${env.HTTPBIN_API_KEY}"
+                }
+              }
+            },
+            "confirm": true
+          }
+        },
+        "jsonplaceholder.typicode.com": {
+          "connect": true
+        },
+        "jsdelivr.net": {
+          "script": true,
+          "font": true
+        },
+        "placekitten.com": {
+          "media": true
         }
-      ]
+      }
     }
-  ]
+  }
 }
 ```
 

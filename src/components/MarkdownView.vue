@@ -25,7 +25,7 @@ import * as Y from 'yjs'
 import Request from './data/Request'
 import Data from './data/Data'
 import RequestClient from "./data/Request/RequestClient"
-import { Permissions, PermissionSpec } from "./data/Permissions"
+import { Containers, ContainerConfig } from "./data/Containers"
 
 hljs.registerLanguage("xml", xml)
 hljs.registerLanguage("css", css)
@@ -59,7 +59,7 @@ const props = defineProps({
 const components = {
   NotebookContent,
   NotebookView,
-  Permissions,
+  Containers,
   LocalStorageTools,
   Sandbox,
   request: Request,
@@ -70,7 +70,7 @@ type Block =
   {html: string} |
   {tag: 'NotebookContent', data: NotebookContentInfo, settings: SettingsClient } |
   {tag: 'NotebookView', data: NotebookViewType, settings: SettingsClient } |
-  {tag: 'Permissions', data: PermissionSpec, settings: SettingsClient } |
+  {tag: 'Containers', data: ContainerConfig, settings: SettingsClient } |
   {tag: 'LocalStorageTools', settings: SettingsClient} |
   {tag: 'Sandbox', data: string, info?: string} |
   {tag: 'request', data: string, client: RequestClient} |
@@ -99,13 +99,13 @@ watch(value, () => {
       const component = componentManager.components.find(({id: _id}) => id === String(_id))
       const settings = props.settings
       if (component && Object.keys(components).includes(tag)) {
-        if (settings && (tag === 'NotebookContent' || tag === 'NotebookView' || tag === 'Permissions')) {
+        if (settings && (tag === 'NotebookContent' || tag === 'NotebookView' || tag === 'Containers')) {
           const data = parseJson(component.data)
           if (tag === 'NotebookContent' && validateNotebookContent(data)) {
             return {tag, data, settings}
           } else if (tag === 'NotebookView' && validateNotebookView(data)) {
             return {tag, data, settings}
-          } else if (tag === 'Permissions') {
+          } else if (tag === 'Containers') {
             return {tag, data, settings}
           }
           return { error: 'Schema mismatch' }
@@ -158,8 +158,8 @@ useEventListener('change', (e) => {
         <template v-if="block.tag === 'NotebookView'">
           <NotebookView :data="block.data" :settings="block.settings" />
         </template>
-        <template v-if="block.tag === 'Permissions'">
-          <Permissions :data="block.data" :settings="block.settings" />
+        <template v-if="block.tag === 'Containers'">
+          <Containers :data="block.data" :settings="block.settings" />
         </template>
         <template v-if="block.tag === 'LocalStorageTools'">
           <LocalStorageTools :settings="block.settings" />
