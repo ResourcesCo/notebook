@@ -53,23 +53,12 @@ Containers give pages access to storage, environment variables, and the network 
 
 ```json
 {
-  "permissions": []
-}
-```
-
-<details>
-  <summary>Example</summary>
-
-This allows the `request-example.md` file to make HTTP requests to `https://httpbin.org/post` and provides the environment variable `HTTPBIN_API_KEY` for use in `Authorization`. It can't directly access `HTTPBIN_API_KEY`. It is not scrubbed from the response, however, so because httpbin uses it, it can access it!
-
-```json
-{
   "containers": {
-    "requests": {
+    "request-example": {
       "pages": "request-example.md",
-      "contentSecurity": {
+      "content": {
         "httpbin.org": {
-          "connect": {
+          "request": {
             "headers": {
               "Authorization": {
                 "env": {
@@ -83,8 +72,55 @@ This allows the `request-example.md` file to make HTTP requests to `https://http
         "jsonplaceholder.typicode.com": {
           "connect": true
         },
-        "jsdelivr.net": {
+        "cdn.jsdelivr.net": {
           "script": true,
+          "style": true,
+          "media": true,
+          "font": true
+        },
+        "placekitten.com": {
+          "media": true
+        }
+      }
+    }
+  }
+}
+```
+
+<details>
+  <summary>Example</summary>
+
+This allows the `request-example.md` file to make HTTP requests to `https://httpbin.org/post` and provides the environment variable `HTTPBIN_API_KEY` for use in `Authorization`. It can't directly access `HTTPBIN_API_KEY`. It is not scrubbed from the response, however, so because httpbin uses it, it can access it!
+
+Note: if you allow any type of content, including images, on a server, data in a container could be encoded into the path or query string of a URL and sent to a server. So if you don't trust the server operator and any private data is stored or accessed in the container, don't run untrusted code in the container. As a quick example, if a page can access images on a server, code in the client could take the data in the page, base64 encode it, and create an image tag with the base64 encoded data in the querystring of the URL (`example.com/cat.png?SECRET_INFO`) and the server operator could go into the logs and get SECRET_INFO. So, rather than running untrusted code in a container that has access to servers you don't trust, review the code first before running it, or run it in a container that doesn't have access to any servers you don't trust. Also make sure the logs of the server that the notebook is running on are private and secure, whether self-hosting it or using someone else's service, because containers default to include the `self` source in the Content Security Policy.
+
+GitLab proxies external content through `user-content.gitlab-static.net`. This approach could be used to prevent HTTP requests that could contain data. URLs could be transformed while rendering the content and for any that are missed, a MutationObserver could be used to update URLs as they appear (loading them would still need to be blocked by a Content Security Policy because it may not be able to transform them before the browser tries to load them).
+
+```json
+{
+  "containers": {
+    "request-example": {
+      "pages": "request-example.md",
+      "content": {
+        "httpbin.org": {
+          "request": {
+            "headers": {
+              "Authorization": {
+                "env": {
+                  "API_KEY": "${env.HTTPBIN_API_KEY}"
+                }
+              }
+            },
+            "confirm": true
+          }
+        },
+        "jsonplaceholder.typicode.com": {
+          "connect": true
+        },
+        "cdn.jsdelivr.net": {
+          "script": true,
+          "style": true,
+          "media": true,
           "font": true
         },
         "placekitten.com": {

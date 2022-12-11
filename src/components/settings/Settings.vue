@@ -4,6 +4,7 @@ import ImportLocalStorageModal from './ImportLocalStorageModal.vue'
 import ClearLocalStorageModal from './ClearLocalStorageModal.vue'
 import ApplyContentChangesModal from './ApplyContentChangesModal.vue'
 import ApplyViewChangesModal from './ApplyViewChangesModal.vue'
+import ApplyContainerChangesModal from './ApplyContainerChangesModal.vue'
 </script>
 
 <template>
@@ -12,4 +13,5 @@ import ApplyViewChangesModal from './ApplyViewChangesModal.vue'
   <ClearLocalStorageModal></ClearLocalStorageModal>
   <ApplyContentChangesModal></ApplyContentChangesModal>
   <ApplyViewChangesModal></ApplyViewChangesModal>
+  <ApplyContainerChangesModal></ApplyContainerChangesModal>
 </template>

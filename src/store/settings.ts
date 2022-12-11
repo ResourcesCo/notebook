@@ -53,7 +53,7 @@ export function handleMessage(data: any[], notebook: Notebook) {
       action: 'applyContainerChanges',
       data: JSON.parse(data[1]) as ContainerConfig,
     }
-  } else if (data[0] === 'resetPermissionChanges') {
+  } else if (data[0] === 'resetContainerChanges') {
     notebook.resetSettings({containers: true})
   }
 }

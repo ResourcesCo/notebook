@@ -1,4 +1,4 @@
-import { reactive, toRef, Ref, watch } from 'vue'
+import { reactive, Ref } from 'vue'
 import { useStorage, toReactive, watchDebounced } from '@vueuse/core'
 import { sortBy, uniqBy } from 'lodash'
 import { wait } from 'lib0/promise'
@@ -365,6 +365,10 @@ export class Notebook {
     this.view.right.show = view.right.show
     this.view.left.lastSelected = view.left.lastSelected
     this.view.right.lastSelected = view.right.lastSelected
+  }
+
+  applyContainerChanges(containers: ContainerConfig) {
+    this.containers.value = containers
   }
 
   migrateOldData(content: NotebookContent, view: NotebookView) {
