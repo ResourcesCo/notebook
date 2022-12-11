@@ -1,9 +1,8 @@
 import { resolve } from "path"
+/// <reference types="vitest" />
 import { defineConfig } from "vite"
 import Vue from "@vitejs/plugin-vue"
 import Unocss from 'unocss/vite'
-import { presetAttributify, presetWind } from 'unocss'
-import { presetTypography } from '@unocss/preset-typography'
 
 const packageDir = './'
 
