@@ -138,11 +138,26 @@ GitLab proxies external content through `user-content.gitlab-static.net`. This a
 
 Enter environment information, such as account IDs and API keys here.
 
+This document is shared, and the environment variables are not, so the API keys are entered on the viewing side.
+
+On the editing side, just the names of the environment variables are entered, with true for the value (until validation is supported).
+
 [`environment`](https://macchiato.dev/component/#Environment)
 
 ```json
 {}
 ```
+
+<details>
+  <summary>Example</summary>
+
+```json
+{
+  "HTTPBIN_API_KEY": true
+}
+```
+
+</details>
 
 ## Notebook View
 
