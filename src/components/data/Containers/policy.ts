@@ -1,4 +1,4 @@
-import { Container, sources } from './data'
+import { ContainerContent, sources } from './data'
 
 // "cdn.jsdelivr.net": {
 //   "script": true,
@@ -10,8 +10,10 @@ import { Container, sources } from './data'
 // default-src 'self'; image-src 'self' cdn.jsdelivr.net; style-src 'self' cdn.jsdelivr.net;
 
 
+const removeTrailingSlash = (s: string) => (s.endsWith('/') ? s.substring(0, s.length - 1) : s)
 
-function generateSecurityPolicy(container: Container) {
+
+export function generateSecurityPolicy(containerContent: ContainerContent) {
   const policies: {[key: string]: string[]} = {
     'connect': [],
     'media': [],
@@ -19,7 +21,7 @@ function generateSecurityPolicy(container: Container) {
     'style': [],
     'font': [],
   }
-  for (const [contentAreaKey, contentArea] of Object.entries(container.content)) {
+  for (const [contentAreaKey, contentArea] of Object.entries(containerContent)) {
     const host = contentArea.host ?? contentAreaKey
     for (const source of sources) {
       const sourceValue = contentArea[source]
@@ -27,21 +29,23 @@ function generateSecurityPolicy(container: Container) {
         throw new Error('Host cannot include string for saving wildcard')
       }
       if (sourceValue === true) {
-        policies[source].push(new URL(`https://${host}`.replace('*', '___wildcard')).toString().replace('___wildcard', '*'))
+        policies[source].push(removeTrailingSlash(
+          new URL(`https://${host}`.replaceAll('*', '___wildcard')).toString().replaceAll('___wildcard', '*')
+        ))
       } else if (sourceValue !== undefined) {
         for (const path of sourceValue.paths) {
-          policies[source].push(new URL(path, `https://${host}`).toString().replace('___wildcard', '*'))
+          policies[source].push(new URL(path, `https://${host}`.replaceAll('*', '___wildcard')).toString().replaceAll('___wildcard', '*'))
         }
       }
     }
   }
   return [
     "default-src 'self';",
-    ['script-src', ...policies.script, "'unsafe-eval'", "'unsafe-inline'"].join(' '),
-    ['style-src', ...policies.script, "'unsafe-eval'", "'unsafe-inline'"].join(' '),
-    ...(policies.connect.length > 0 ? [['connect-src', ...policies.connect].join(' ')] : []),
-    ...(policies.media.length > 0 ? [['media-src', ...policies.media].join(' ')] : []),
-    ...(policies.font.length > 0 ? [['font-src', ...policies.font].join(' ')] : []),
+    ['script-src', "'self'", ...policies.script, "'unsafe-eval'", "'unsafe-inline'"].join(' ') + ';',
+    ['style-src', "'self'", ...policies.style, "'unsafe-eval'", "'unsafe-inline'"].join(' ') + ';',
+    ...(policies.connect.length > 0 ? [['connect-src', "'self'", ...policies.connect].join(' ') + ';'] : []),
+    ...(policies.media.length > 0 ? [['media-src', "'self'", ...policies.media].join(' ') + ';'] : []),
+    ...(policies.font.length > 0 ? [['font-src', "'self'", ...policies.font].join(' ') + ';'] : []),
     "object-src 'none';",
   ].join(' ')
 }

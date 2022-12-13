@@ -48,11 +48,13 @@ export type ContentArea = {
   font?: ContentSource | true
 }
 
+export type ContainerContent = {
+  [key: string]: ContentArea
+}
+
 export type Container = {
   pages: string | string[]
-  content: {
-    [key: string]: ContentArea
-  },
+  content: ContainerContent,
 }
 
 export type ContainerConfig = {

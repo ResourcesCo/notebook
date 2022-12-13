@@ -3,8 +3,8 @@
   "scripts": {
     "build": "vue-tsc --noEmit && NODE_ENV=production vite build",
     "dev": "vite --port 3333",
-    "test": "vitest",
-    "test:ui": "vitest --ui",
+    "test": "vitest --outputTruncateLength=500",
+    "test:ui": "vitest --ui --outputTruncateLength=500",
     "test:run": "vitest run"
   },
   "dependencies": {
@@ -52,7 +52,7 @@
     "@vue/compiler-sfc": "^3.2.45",
     "@vue/server-renderer": "^3.2.45",
     "@vue/test-utils": "^2.2.4",
-    "happy-dom": "^7.7.0",
+    "happy-dom": "^8.1.0",
     "typescript": "^4.9.3",
     "vite": "^3.2.5",
     "vitest": "^0.25.3",
