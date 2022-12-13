@@ -138,11 +138,13 @@ GitLab proxies external content through `user-content.gitlab-static.net`. This a
 
 Enter environment information, such as account IDs and API keys here.
 
-This document is shared, and the environment variables are not, so the API keys are entered on the viewing side.
+There are some in `vars` and some in secrets. API keys and other secrets should be in `secrets`. Non-secret environment variables are under `vars`.
 
-On the editing side, just the names of the environment variables are entered, with true for the value (until validation is supported).
+This document is shared, and the secrets are not, so the secrets are entered on the viewing side. On the editing side, just the names of the environment variables are entered, with true for the value (until validation is supported).
 
 [`environment`](https://macchiato.dev/component/#Environment)
+
+Only the secrets currently being used need to be added. They will be stored in LocalStorage but only for the current user. They should be backed up in a password manager or another secure location.
 
 ```json
 {}
@@ -153,7 +155,12 @@ On the editing side, just the names of the environment variables are entered, wi
 
 ```json
 {
-  "HTTPBIN_API_KEY": true
+  "env": {
+    "HTTPBIN_USERNAME": "testing"
+  },
+  "secrets": {
+    "HTTPBIN_API_KEY": true
+  }
 }
 ```
 

@@ -30,6 +30,14 @@ export type ContentSource = {
   paths: string[]
 }
 
+export const sources = [
+  'connect',
+  'media',
+  'script',
+  'style',
+  'font',
+] as const
+
 export type ContentArea = {
   host?: string  // if omitted, use the key
   request?: RequestSource | true
@@ -37,6 +45,7 @@ export type ContentArea = {
   media?: ContentSource | true
   script?: ContentSource | true
   style?: ContentSource | true
+  font?: ContentSource | true
 }
 
 export type Container = {
