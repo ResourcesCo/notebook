@@ -8,6 +8,8 @@ import { handleMessage as handleSettingsMessage } from '../../store/settings'
 import { RequestModel } from '../data/Request'
 import SendRequestModal from '../data/Request/SendRequestModal.vue'
 import Settings from '../settings/Settings.vue'
+import { Container } from '../data/Containers/data'
+import { generateSrcDoc } from './srcdoc'
 
 const props = defineProps({
   notebook: {
@@ -25,6 +27,10 @@ const props = defineProps({
   mode: {
     type: String,
     required: true
+  },
+  container: {
+    type: Object as PropType<Container>,
+    required: true,
   },
 })
 
@@ -58,9 +64,26 @@ useEventListener('message', (e: MessageEvent) => {
   }
 })
 const isSettingsView = computed(() => props.page.isSettings && mode.value === 'view')
-const src = computed(() => (
-  '/app/' + mode.value + '/?color-scheme=' + initialColorScheme.value + (props.page.isSettings ? '&role=settings' : '')
-))
+const srcdoc = computed(() => {
+  const colorScheme = initialColorScheme.value
+  const role = props.page.isSettings ? 'settings' : ''
+  const modeDir = mode.value
+  const scriptUrl = (
+    role === 'settings' ? (
+      mode.value === 'edit' ?
+      new URL("/src/app/edit/main.ts?role=settings", import.meta.url) :
+      new URL("/src/app/view/main.ts?role=settings", import.meta.url)
+    ) : (
+      mode.value === 'edit' ?
+      new URL("/src/app/edit/main.ts", import.meta.url) :
+      new URL("/src/app/view/main.ts", import.meta.url)
+    )
+  )
+  console.log({scriptUrl})
+  const result = generateSrcDoc({colorScheme, scriptUrl: scriptUrl.toString(), containerContent: props.container.content})
+  console.log(result)
+  return result
+})
 watch(colorScheme, () => {
   const contentWindow = frame.value?.contentWindow
   if (contentWindow) {
@@ -96,7 +119,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <iframe ref="frame" class="h-full w-full" :src="src" :style="loadedCount === 0 ? 'visibility: hidden' : ''"
+  <iframe ref="frame" class="h-full w-full" :srcdoc="srcdoc" :style="loadedCount === 0 ? 'visibility: hidden' : ''"
     sandbox="allow-scripts allow-popups" @load="onLoad"></iframe>
   <Settings v-if="isSettingsView"></Settings>
   <SendRequestModal v-if="requestModel" @close="() => requestModel = undefined"></SendRequestModal>

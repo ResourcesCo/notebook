@@ -87,12 +87,6 @@
                     }
                   ]
                 },
-                "connect": {
-                  "oneOf": [
-                    {"const": true},
-                    {"$ref": "#/definitions/contentSource"}
-                  ]
-                },
                 "script": {
                   "oneOf": [
                     {"const": true},
@@ -105,6 +99,12 @@
                     {"$ref": "#/definitions/contentSource"}
                   ]
                 },
+                "img": {
+                  "oneOf": [
+                    {"const": true},
+                    {"$ref": "#/definitions/contentSource"}
+                  ]
+                },
                 "media": {
                   "oneOf": [
                     {"const": true},
@@ -112,6 +112,12 @@
                   ]
                 },
                 "font": {
+                  "oneOf": [
+                    {"const": true},
+                    {"$ref": "#/definitions/contentSource"}
+                  ]
+                },
+                "connect": {
                   "oneOf": [
                     {"const": true},
                     {"$ref": "#/definitions/contentSource"}

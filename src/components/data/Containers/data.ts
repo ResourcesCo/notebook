@@ -31,21 +31,23 @@ export type ContentSource = {
 }
 
 export const sources = [
-  'connect',
-  'media',
   'script',
   'style',
+  'img',
+  'media',
   'font',
+  'connect',
 ] as const
 
 export type ContentArea = {
   host?: string  // if omitted, use the key
   request?: RequestSource | true
-  connect?: ContentSource | true
-  media?: ContentSource | true
   script?: ContentSource | true
   style?: ContentSource | true
+  img?: ContentSource | true
+  media?: ContentSource | true
   font?: ContentSource | true
+  connect?: ContentSource | true
 }
 
 export type ContainerContent = {

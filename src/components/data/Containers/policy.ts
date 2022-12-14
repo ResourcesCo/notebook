@@ -15,11 +15,12 @@ const removeTrailingSlash = (s: string) => (s.endsWith('/') ? s.substring(0, s.l
 
 export function generateSecurityPolicy(containerContent: ContainerContent) {
   const policies: {[key: string]: string[]} = {
-    'connect': [],
-    'media': [],
     'script': [],
     'style': [],
+    'img': [],
+    'media': [],
     'font': [],
+    'connect': [],
   }
   for (const [contentAreaKey, contentArea] of Object.entries(containerContent)) {
     const host = contentArea.host ?? contentAreaKey
@@ -43,9 +44,10 @@ export function generateSecurityPolicy(containerContent: ContainerContent) {
     "default-src 'self';",
     ['script-src', "'self'", ...policies.script, "'unsafe-eval'", "'unsafe-inline'"].join(' ') + ';',
     ['style-src', "'self'", ...policies.style, "'unsafe-eval'", "'unsafe-inline'"].join(' ') + ';',
-    ...(policies.connect.length > 0 ? [['connect-src', "'self'", ...policies.connect].join(' ') + ';'] : []),
     ...(policies.media.length > 0 ? [['media-src', "'self'", ...policies.media].join(' ') + ';'] : []),
+    ...(policies.img.length > 0 ? [['img-src', "'self'", ...policies.img].join(' ') + ';'] : []),
     ...(policies.font.length > 0 ? [['font-src', "'self'", ...policies.font].join(' ') + ';'] : []),
+    ...(policies.connect.length > 0 ? [['connect-src', "'self'", ...policies.connect].join(' ') + ';'] : []),
     "object-src 'none';",
   ].join(' ')
 }

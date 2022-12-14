@@ -8,6 +8,8 @@ import DisplayButton from "../DisplayButton.vue"
 import type { FileData, Notebook, TabState } from "../../store/notebook"
 import TabViewButton from "../TabViewButton.vue"
 import { useAsyncState } from "@vueuse/core"
+import { Container } from "../data/Containers/data"
+import { watch } from "fs"
 
 const props = defineProps({
   notebook: {
@@ -88,7 +90,10 @@ const file = computed<FileData | undefined>(() => {
   }
   return undefined
 })
-const pageKey = computed(() => `${filename.value}---${mode.value}---${file.value?.ydocCreated}`)
+const container = computed<Container>(() => {
+  return {pages: ['*'], content: {}}
+})
+const pageKey = computed(() => `${filename.value}---${mode.value}---${file.value?.ydocCreated}--${JSON.stringify(container.value)}`)
 </script>
 
 <template>
@@ -111,7 +116,14 @@ const pageKey = computed(() => `${filename.value}---${mode.value}---${file.value
     <div class="spacer <sm:hidden" v-if="side === 'left'"></div>
   </div>
   <div :class="['overflow-auto', 'content', 'relative', side]" v-if="page && file?.ydocCreated">
-    <PageView :notebook="notebook" :key="pageKey" :page="page" :file="file" :mode="mode" />
+    <PageView
+      :key="pageKey"
+      :notebook="notebook"
+      :page="page"
+      :file="file"
+      :mode="mode"
+      :container="container"
+    />
   </div>
 </template>
 
