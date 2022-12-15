@@ -10,6 +10,7 @@ import SendRequestModal from '../data/Request/SendRequestModal.vue'
 import Settings from '../settings/Settings.vue'
 import { Container } from '../data/Containers/data'
 import { generateSrcDoc } from './srcdoc'
+import { generateSecurityPolicy } from "../data/Containers/policy"
 
 const props = defineProps({
   notebook: {
@@ -64,10 +65,10 @@ useEventListener('message', (e: MessageEvent) => {
   }
 })
 const isSettingsView = computed(() => props.page.isSettings && mode.value === 'view')
-const srcdoc = computed(() => {
+const csp = computed(() => generateSecurityPolicy(props.container.content))
+const src = computed(() => {
   const colorScheme = initialColorScheme.value
   const role = props.page.isSettings ? 'settings' : ''
-  const modeDir = mode.value
   const scriptUrl = (
     role === 'settings' ? (
       mode.value === 'edit' ?
@@ -79,10 +80,11 @@ const srcdoc = computed(() => {
       new URL("/src/app/view/main.ts", import.meta.url)
     )
   )
-  console.log({scriptUrl})
-  const result = generateSrcDoc({colorScheme, scriptUrl: scriptUrl.toString(), containerContent: props.container.content})
-  console.log(result)
-  return result
+  const html = generateSrcDoc({colorScheme, scriptUrl: scriptUrl.toString(), csp: csp.value})
+  const url = new URL('/api/echo', window.location.href)
+  url.searchParams.append('html', btoa(html))
+  url.searchParams.append('csp', btoa(csp.value))
+  return url.href
 })
 watch(colorScheme, () => {
   const contentWindow = frame.value?.contentWindow
@@ -119,7 +121,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <iframe ref="frame" class="h-full w-full" :srcdoc="srcdoc" :style="loadedCount === 0 ? 'visibility: hidden' : ''"
+  <iframe ref="frame" class="h-full w-full" :src="src" :csp="csp" :style="loadedCount === 0 ? 'visibility: hidden' : ''"
     sandbox="allow-scripts allow-popups" @load="onLoad"></iframe>
   <Settings v-if="isSettingsView"></Settings>
   <SendRequestModal v-if="requestModel" @close="() => requestModel = undefined"></SendRequestModal>

@@ -1,6 +1,8 @@
 {
   "name": "@resources/notebook",
+  "type": "module",
   "scripts": {
+    "api": "cross-env PORT=3334 node api/server.js",
     "build": "vue-tsc --noEmit && NODE_ENV=production vite build",
     "dev": "vite --port 3333",
     "test": "vitest --outputTruncateLength=500",
@@ -26,6 +28,7 @@
     "@vueuse/core": "^9.6.0",
     "@vueuse/head": "^1.0.18",
     "ajv": "^8.11.2",
+    "express": "^4.18.2",
     "fflate": "^0.7.4",
     "file-saver": "^2.0.5",
     "highlight.js": "^11.7.0",
@@ -52,6 +55,8 @@
     "@vue/compiler-sfc": "^3.2.45",
     "@vue/server-renderer": "^3.2.45",
     "@vue/test-utils": "^2.2.4",
+    "concurrently": "^7.6.0",
+    "cross-env": "^7.0.3",
     "happy-dom": "^8.1.0",
     "typescript": "^4.9.3",
     "vite": "^3.2.5",

@@ -1,8 +1,6 @@
 import { ContainerContent } from "../data/Containers/data"
-import { generateSecurityPolicy } from "../data/Containers/policy"
 
-export function generateSrcDoc({colorScheme, scriptUrl, containerContent}: {colorScheme: string, scriptUrl: string, containerContent: ContainerContent}) {
-  const csp = generateSecurityPolicy(containerContent)
+export function generateSrcDoc({colorScheme, scriptUrl, csp}: {colorScheme: string, scriptUrl: string, csp: string}) {
   return (
     `<!DOCTYPE html>
     <html lang="en">
@@ -30,7 +28,7 @@ export function generateSrcDoc({colorScheme, scriptUrl, containerContent}: {colo
         </script>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval';" />
+        <meta http-equiv="Content-Security-Policy" content="${csp}" />
         <base target="_blank">
       </head>
       <body>

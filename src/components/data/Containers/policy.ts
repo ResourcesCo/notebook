@@ -14,13 +14,14 @@ const removeTrailingSlash = (s: string) => (s.endsWith('/') ? s.substring(0, s.l
 
 
 export function generateSecurityPolicy(containerContent: ContainerContent) {
+  const origin = window.location.origin
   const policies: {[key: string]: string[]} = {
-    'script': [],
-    'style': [],
-    'img': [],
-    'media': [],
-    'font': [],
-    'connect': [],
+    'script': [origin],
+    'style': [origin],
+    'img': [origin],
+    'media': [origin],
+    'font': [origin],
+    'connect': [origin],
   }
   for (const [contentAreaKey, contentArea] of Object.entries(containerContent)) {
     const host = contentArea.host ?? contentAreaKey
@@ -41,13 +42,13 @@ export function generateSecurityPolicy(containerContent: ContainerContent) {
     }
   }
   return [
-    "default-src 'self';",
+    `default-src 'self' ${origin};`,
     ['script-src', "'self'", ...policies.script, "'unsafe-eval'", "'unsafe-inline'"].join(' ') + ';',
     ['style-src', "'self'", ...policies.style, "'unsafe-eval'", "'unsafe-inline'"].join(' ') + ';',
-    ...(policies.media.length > 0 ? [['media-src', "'self'", ...policies.media].join(' ') + ';'] : []),
-    ...(policies.img.length > 0 ? [['img-src', "'self'", ...policies.img].join(' ') + ';'] : []),
-    ...(policies.font.length > 0 ? [['font-src', "'self'", ...policies.font].join(' ') + ';'] : []),
-    ...(policies.connect.length > 0 ? [['connect-src', "'self'", ...policies.connect].join(' ') + ';'] : []),
+    ...(policies.media.length > 1 ? [['media-src', "'self'", ...policies.media].join(' ') + ';'] : []),
+    ...(policies.img.length > 1 ? [['img-src', "'self'", ...policies.img].join(' ') + ';'] : []),
+    ...(policies.font.length > 1 ? [['font-src', "'self'", ...policies.font].join(' ') + ';'] : []),
+    ...(policies.connect.length > 1 ? [['connect-src', "'self'", ...policies.connect].join(' ') + ';'] : []),
     "object-src 'none';",
   ].join(' ')
 }

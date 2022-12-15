@@ -18,6 +18,14 @@ export default defineConfig({
     }),
     Unocss(),
   ],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3334',
+        changeOrigin: true,
+      }
+    }
+  },
   build: {
     rollupOptions: {
       input: {
