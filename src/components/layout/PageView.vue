@@ -123,6 +123,6 @@ onUnmounted(() => {
 <template>
   <iframe ref="frame" class="h-full w-full" :src="src" :csp="csp" :style="loadedCount === 0 ? 'visibility: hidden' : ''"
     sandbox="allow-scripts allow-popups" @load="onLoad"></iframe>
-  <Settings v-if="isSettingsView"></Settings>
+  <Settings v-if="isSettingsView" :notebook="props.notebook"></Settings>
   <SendRequestModal v-if="requestModel" @close="() => requestModel = undefined"></SendRequestModal>
 </template>
