@@ -82,6 +82,7 @@ type Block =
 
 const value = toRef(props, 'value')
 const blocks = ref<Block[]>([])
+const pageData = ref<{[key: string]: string}>({})
 
 watch(value, () => {
   const source = value.value
@@ -121,6 +122,7 @@ watch(value, () => {
         } else if (tag === 'request') {
           return {tag, data: component.data, client: props.client}
         } else if (tag === 'data' && component.name !== undefined) {
+          pageData.value[component.name] = component.data
           return {tag, data: component.data, name: component.name, info: component.info}
         }
       }
@@ -176,7 +178,7 @@ useEventListener('change', (e) => {
           <Sandbox :data="block.data" :info="block.info" />
         </template>
         <template v-else-if="block.tag === 'request'">
-          <Request :data="block.data" :client="block.client" />
+          <Request :data="block.data" :client="block.client" :pageData="pageData" />
         </template>
         <template v-else-if="block.tag === 'data'">
           <Data :data="block.data" :name="block.name" :info="block.info" />

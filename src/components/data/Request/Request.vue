@@ -13,6 +13,10 @@ const props = defineProps({
     type: Object as PropType<RequestClient>,
     required: true
   },
+  pageData: {
+    type: Object as PropType<{[key: string]: string}>,
+    required: true,
+  },
 })
 
 const data = computed(() => {
