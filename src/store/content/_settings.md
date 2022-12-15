@@ -55,45 +55,7 @@ The "pages" property takes a path or a list of paths to pages, that are matched 
 
 ```json
 {
-  "containers": {
-    "sandbox-example": {
-      "pages": "sandbox-example.md",
-      "content": {
-        "placekitten.com": {
-          "img": true
-        }
-      }
-    },
-    "request-example": {
-      "pages": "request-example.md",
-      "content": {
-        "httpbin.org": {
-          "request": {
-            "headers": {
-              "Authorization": {
-                "env": {
-                  "API_KEY": "${env.HTTPBIN_API_KEY}"
-                }
-              }
-            },
-            "confirm": true
-          }
-        },
-        "jsonplaceholder.typicode.com": {
-          "connect": true
-        },
-        "cdn.jsdelivr.net": {
-          "script": true,
-          "style": true,
-          "media": true,
-          "font": true
-        },
-        "placekitten.com": {
-          "img": true
-        }
-      }
-    }
-  }
+  "containers": {}
 }
 ```
 
@@ -143,6 +105,9 @@ GitLab proxies external content through `user-content.gitlab-static.net`. This a
         },
         "placekitten.com": {
           "img": true
+        },
+        "jsonplaceholder.typicode.com": {
+          "connect": true
         }
       }
     }
@@ -172,7 +137,9 @@ The secrets will be entered on the view side, rather than the editor side, so th
 ```json
 {
   "HTTPBIN_USERNAME": "testing",
-  "HTTPBIN_API_KEY": {"secret": true}
+  "HTTPBIN_API_KEY": {
+    "secret": true
+  }
 }
 ```
 
@@ -202,7 +169,7 @@ Edit the tabs here.
       "sandbox-example.md",
       "request-example.md"
     ],
-    "selected": "sandbox-example.md",
+    "selected": "request-example.md",
     "lastSelected": null,
     "show": "other"
   },

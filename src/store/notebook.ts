@@ -14,6 +14,7 @@ import notesExample from './content/notes-example.md?raw'
 import requestExample from './content/request-example.md?raw'
 import { NotebookContentInfo } from '@/components/data/NotebookContent'
 import { ContainerConfig } from '@/components/data/Containers'
+import { EnvironmentConfig } from '@/components/data/Environment'
 
 function randomClientId() {
   const array = new Uint32Array(2)
@@ -88,6 +89,7 @@ export class Notebook {
   savedView: Ref<NotebookView>
   view: NotebookView
   containers: Ref<ContainerConfig>
+  environment: Ref<EnvironmentConfig>
   channel: BroadcastChannel
   clientId: string
 
@@ -144,6 +146,7 @@ export class Notebook {
       },
     }
     const defaultContainerConfig = {containers: {}}
+    const defaultEnvironmentConfig = {}
     if (this.prefix === notebookDefaults.prefix && (localStorage.getItem(`.notebook/_content.json`) || '').trim() === '') {
       const haveOldData = [1, 2, 3, 4, 5].some(i => (localStorage.getItem(`doc-${i}`) || '').trim().length > 0)
       if (haveOldData) {
@@ -154,6 +157,7 @@ export class Notebook {
     this.savedView = useStorage(`${this.prefix}/_view.json`, defaultView)
     this.view = toReactive(useStorage(`${this.prefix}/_view.json`, this.savedView.value, sessionStorage))
     this.containers = useStorage(`${this.prefix}/_containers.json`, defaultContainerConfig)
+    this.environment = useStorage(`${this.prefix}/_environment.json`, defaultEnvironmentConfig)
     watchDebounced(this.view, () => this.savedView.value = this.view, {debounce: 200, maxWait: 500})
     this.channel = new BroadcastChannel(this.prefix)
     this.channel.onmessage = this.handleMessage.bind(this)
@@ -298,9 +302,9 @@ export class Notebook {
   }
 
   resetSettings(
-    {content, view, containers}:
-    {content?: true, view?: true, containers?: true}
-    = {content: true, view: true, containers: true}
+    {content, view, containers, environment}:
+    {content?: true, view?: true, containers?: true, environment?: true}
+    = {content: true, view: true, containers: true, environment: true}
   ) {
     const settingsDoc = this.getFile('_settings.md').ydoc
     const settingsText = settingsDoc.getText('text')
@@ -315,6 +319,9 @@ export class Notebook {
     }
     if (containers) {
       updateComponentData(settingsText, 'Containers', this.containers.value)
+    }
+    if (environment) {
+      updateComponentData(settingsText, 'Environment', this.environment.value)
     }
     fixSpelling(settingsText)
   }
@@ -369,6 +376,10 @@ export class Notebook {
 
   applyContainerChanges(containers: ContainerConfig) {
     this.containers.value = containers
+  }
+
+  applyEnvironmentChanges(environment: EnvironmentConfig) {
+    this.environment.value = environment
   }
 
   migrateOldData(content: NotebookContent, view: NotebookView) {

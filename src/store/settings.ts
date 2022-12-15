@@ -6,6 +6,7 @@ import { ref } from 'vue'
 import { NotebookContentInfo } from '@/components/data/NotebookContent'
 import { RequestModel } from '@/components/data/Request'
 import { ContainerConfig } from '@/components/data/Containers'
+import { EnvironmentConfig } from '@/components/data/Environment'
 
 export type Action =
   {action: 'exportLocalStorage', name: string, data: Blob} |
@@ -14,6 +15,8 @@ export type Action =
   {action: 'applyContentChanges', data: NotebookContentInfo} |
   {action: 'applyViewChanges', data: NotebookView} |
   {action: 'applyContainerChanges', data: ContainerConfig} |
+  {action: 'applyEnvironmentChanges', data: EnvironmentConfig} |
+  {action: 'openSecrets'} |
   {action: 'sendRequest', data: RequestModel} |
   undefined
 
@@ -55,5 +58,16 @@ export function handleMessage(data: any[], notebook: Notebook) {
     }
   } else if (data[0] === 'resetContainerChanges') {
     notebook.resetSettings({containers: true})
+  } else if (data[0] === 'applyEnvironmentChanges') {
+    action.value = {
+      action: 'applyEnvironmentChanges',
+      data: JSON.parse(data[1]) as EnvironmentConfig,
+    }
+  } else if (data[0] === 'resetEnvironmentChanges') {
+    notebook.resetSettings({containers: true})
+  } else if (data[0] === 'openSecrets') {
+    action.value = {
+      action: 'openSecrets',
+    }
   }
 }
