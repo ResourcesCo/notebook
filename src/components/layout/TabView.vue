@@ -9,7 +9,7 @@ import type { FileData, Notebook, TabState } from "../../store/notebook"
 import TabViewButton from "../TabViewButton.vue"
 import { useAsyncState } from "@vueuse/core"
 import { Container } from "../data/Containers/data"
-import { watch } from "fs"
+import wcmatch from 'wildcard-match'
 
 const props = defineProps({
   notebook: {
@@ -91,7 +91,16 @@ const file = computed<FileData | undefined>(() => {
   return undefined
 })
 const container = computed<Container>(() => {
-  return {pages: ['*'], content: {}}
+  let result = {pages: ['*'], content: {}}
+  const path = filename.value
+  if (path !== null) {
+    for (const container of Object.values(props.notebook.containers.value.containers)) {
+      if (wcmatch(container.pages)(path)) {
+        return container
+      }
+    }
+  }
+  return result
 })
 const pageKey = computed(() => `${filename.value}---${mode.value}---${file.value?.ydocCreated}--${JSON.stringify(container.value)}`)
 </script>
