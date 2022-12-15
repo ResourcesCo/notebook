@@ -51,9 +51,19 @@ Add new files, rename, and delete them here.
 
 Containers give pages access to storage, environment variables, and the network through rules.
 
+The "pages" property takes a path or a list of paths to pages, that are matched using [path-to-regexp](https://www.npmjs.com/package/path-to-regexp). The last container in the list matching the page is used.
+
 ```json
 {
   "containers": {
+    "sandbox-example": {
+      "pages": "sandbox-example.md",
+      "content": {
+        "placekitten.com": {
+          "img": true
+        }
+      }
+    },
     "request-example": {
       "pages": "request-example.md",
       "content": {
@@ -79,7 +89,7 @@ Containers give pages access to storage, environment variables, and the network 
           "font": true
         },
         "placekitten.com": {
-          "media": true
+          "img": true
         }
       }
     }
@@ -99,6 +109,14 @@ GitLab proxies external content through `user-content.gitlab-static.net`. This a
 ```json
 {
   "containers": {
+    "sandbox-example": {
+      "pages": "sandbox-example.md",
+      "content": {
+        "placekitten.com": {
+          "img": true
+        }
+      }
+    },
     "request-example": {
       "pages": "request-example.md",
       "content": {
@@ -124,7 +142,7 @@ GitLab proxies external content through `user-content.gitlab-static.net`. This a
           "font": true
         },
         "placekitten.com": {
-          "media": true
+          "img": true
         }
       }
     }
@@ -184,7 +202,7 @@ Edit the tabs here.
       "sandbox-example.md",
       "request-example.md"
     ],
-    "selected": "request-example.md",
+    "selected": "sandbox-example.md",
     "lastSelected": null,
     "show": "other"
   },

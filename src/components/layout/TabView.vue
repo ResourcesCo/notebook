@@ -9,7 +9,7 @@ import type { FileData, Notebook, TabState } from "../../store/notebook"
 import TabViewButton from "../TabViewButton.vue"
 import { useAsyncState } from "@vueuse/core"
 import { Container } from "../data/Containers/data"
-import wcmatch from 'wildcard-match'
+import { pathToRegexp } from 'path-to-regexp'
 
 const props = defineProps({
   notebook: {
@@ -95,8 +95,11 @@ const container = computed<Container>(() => {
   const path = filename.value
   if (path !== null) {
     for (const container of Object.values(props.notebook.containers.value.containers)) {
-      if (wcmatch(container.pages)(path)) {
-        return container
+      const pages = Array.isArray(container.pages) ? container.pages : [container.pages]
+      for (const page of pages) {
+        if (pathToRegexp(page).test(path)) {
+          return container
+        }
       }
     }
   }
