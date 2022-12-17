@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useEventListener } from '@vueuse/core'
-import { defineComponent, PropType, Ref, ref, computed, watch, onMounted, onBeforeUnmount, onBeforeMount, onUnmounted } from 'vue'
+import { PropType, ref, computed, watch, onMounted, onBeforeMount, onUnmounted } from 'vue'
 import * as Y from 'yjs'
 import { FileData, Notebook } from '@/store/notebook'
 import { colorScheme } from '../../store'
@@ -11,6 +11,7 @@ import Settings from '../settings/Settings.vue'
 import { Container } from '../data/Containers/data'
 import { generateSrcDoc } from './srcdoc'
 import { generateSecurityPolicy } from "../data/Containers/policy"
+import RequestDispatcher from '../data/Request/RequestDispatcher'
 
 const props = defineProps({
   notebook: {
@@ -38,7 +39,7 @@ const props = defineProps({
 const frame = ref<HTMLIFrameElement | undefined>(undefined)
 const loadedCount = ref(0)
 const initialColorScheme = ref('dark')
-const requestModel = ref<RequestModel>()
+const requestDispatcher = ref<RequestDispatcher>()
 onBeforeMount(() => {
   initialColorScheme.value = colorScheme.value
 })
@@ -58,7 +59,16 @@ useEventListener('message', (e: MessageEvent) => {
       const text = props.file.ydoc.getText('text').toString()
       props.file.body = text.length >= 50000 ? text.substring(0, 50000) : text
     } else if (e.data[0] === 'request' && e.data.length === 2) {
-      requestModel.value = JSON.parse(e.data[1]) as RequestModel
+      const data = JSON.parse(e.data[1]) as RequestModel
+      const port = e.ports[0]
+      const dispatcher = new RequestDispatcher({notebook: props.notebook, data, container: props.container, port})
+      if (dispatcher.status === 'allow') {
+        dispatcher.send()
+      } else if (dispatcher.status === 'confirm') {
+        requestDispatcher.value = dispatcher
+      } else if (dispatcher.status === 'deny') {
+        dispatcher.sendDenyMessage()
+      }
     } else if (props.page.isSettings) {
       handleSettingsMessage(e.data, props.notebook)
     }
@@ -124,5 +134,9 @@ onUnmounted(() => {
   <iframe ref="frame" class="h-full w-full" :src="src" :csp="csp" :style="loadedCount === 0 ? 'visibility: hidden' : ''"
     sandbox="allow-scripts allow-popups" @load="onLoad"></iframe>
   <Settings v-if="isSettingsView" :notebook="props.notebook"></Settings>
-  <SendRequestModal v-if="requestModel" @close="() => requestModel = undefined"></SendRequestModal>
+  <SendRequestModal
+    v-if="requestDispatcher"
+    @close="() => requestDispatcher = undefined"
+    :dispatcher="requestDispatcher"
+  />
 </template>

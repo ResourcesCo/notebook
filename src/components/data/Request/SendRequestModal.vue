@@ -1,13 +1,14 @@
 <script lang="ts" setup>
 import {computed, PropType} from 'vue'
-import { RequestModel } from '.'
-import {action as settingsAction} from '../../../store/settings'
 import Modal from '../../layout/Modal.vue'
 import Button from '../../form/Button.vue'
 import RequestDispatcher from './RequestDispatcher'
 
 const props = defineProps({
-  data: Object as PropType<RequestModel>,
+  dispatcher: {
+    type: Object as PropType<RequestDispatcher>,
+    required: true,
+  },
 })
 
 const emit = defineEmits<{
@@ -18,12 +19,13 @@ const status = computed<{messages: string[], deletes: string[]}>(() => {
   return {messages: [], deletes: []}
 })
 
-const requestDispatcher = new RequestDispatcher()
-
 async function send() {
-  if (props.data !== undefined) {
-    await requestDispatcher.send(props.data)
-  }
+  await props.dispatcher.send()
+  emit('close')
+}
+
+async function cancel() {
+  props.dispatcher.sendCancelMessage()
   emit('close')
 }
 </script>
@@ -48,7 +50,7 @@ async function send() {
     </div>
     <div class="pt-5 text-center">
       <Button :disabled="status.messages.length !== 0" @click="send">Send</Button>
-      <Button @click="emit('close')" class="ml-2">Cancel</Button>
+      <Button @click="cancel" class="ml-2">Cancel</Button>
     </div>
   </Modal>
 </template>
