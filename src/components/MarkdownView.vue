@@ -82,7 +82,8 @@ type Block =
 
 const value = toRef(props, 'value')
 const blocks = ref<Block[]>([])
-const pageData = ref<{[key: string]: string}>({})
+
+const pageData = ref<{[key: string]: {data: string, replace(s: string): void}}>({})
 
 watch(value, () => {
   const source = value.value
@@ -122,7 +123,18 @@ watch(value, () => {
         } else if (tag === 'request') {
           return {tag, data: component.data, client: props.client}
         } else if (tag === 'data' && component.name !== undefined) {
-          pageData.value[component.name] = component.data
+          pageData.value[component.name] = {
+            data: component.data,
+            replace: s => {
+              const lines = source.split("\n")
+              const start = (lines.slice(0, component.map[0] + 1).join("\n") + "\n").length
+              const end = (lines.slice(0, component.map[1] - 1).join("\n")).length
+              props.yDoc.transact(() => {
+                props.yText.delete(start, end - start)
+                props.yText.insert(start, s)
+              }, 'view')
+            },
+          }
           return {tag, data: component.data, name: component.name, info: component.info}
         }
       }

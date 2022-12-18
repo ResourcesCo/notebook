@@ -15,12 +15,13 @@ const props = defineProps({
     required: true
   },
   pageData: {
-    type: Object as PropType<{[key: string]: string}>,
+    type: Object as PropType<{[key: string]: {data: string, replace(s: string): void}}>,
     required: true,
   },
 })
 
 const error = ref<string | undefined>()
+const message = ref<string | undefined>()
 
 const data = computed(() => {
   try {
@@ -32,10 +33,11 @@ const data = computed(() => {
 
 async function send() {
   error.value = undefined
+  message.value = undefined
   const inputData = JSON.parse(props.data) as RequestModel
   const data: any = {...inputData}
   if (data.input !== undefined) {
-    data.input = props.pageData[data.input['$ref']]
+    data.input = props.pageData[data.input['$ref']]['data']
   }
   if (data) {
     const result = await props.client.send(data)
@@ -43,11 +45,13 @@ async function send() {
       if ('error' in result && typeof result.error === 'string') {
         error.value = result.error
       } else if ('data' in result) {
-        console.log('received data', result.data)
+        message.value = 'Sent!'
+        if (data.output !== undefined) {
+          props.pageData[data.output['$ref']].replace(JSON.stringify(result.data, null, 2))
+        }
       }
     }
   }
-  // TODO: replace content in component from inputData.output['$ref']
 }
 </script>
 
@@ -56,7 +60,8 @@ async function send() {
     <div v-if="data.err" class="color-red-500">{{data.value}}</div>
     <template v-if="!data.err">
       <Button @click="send">Send</Button>
-      <span v-if="error !== undefined" class="pl-2 color-red-500">{{error}}</span>
+      <span v-if="error !== undefined" class="pl-2 text-red-500">{{error}}</span>
+      <span v-if="message !== undefined" class="pl-2 text-slate-700 dark:text-slate-300">{{message}}</span>
     </template>
   </div>
 </template>
