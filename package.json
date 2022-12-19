@@ -24,6 +24,7 @@
     "@codemirror/search": "^6.2.3",
     "@codemirror/state": "^6.1.4",
     "@codemirror/view": "^6.6.0",
+    "@jsep-plugin/template": "^1.0.2",
     "@unocss/reset": "^0.46.5",
     "@vueuse/core": "^9.6.0",
     "@vueuse/head": "^1.0.18",

@@ -15,6 +15,7 @@ specifiers:
   '@codemirror/search': ^6.2.3
   '@codemirror/state': ^6.1.4
   '@codemirror/view': ^6.6.0
+  '@jsep-plugin/template': ^1.0.2
   '@types/file-saver': ^2.0.5
   '@types/lodash': ^4.14.190
   '@types/markdown-it': ^12.2.3
@@ -68,6 +69,7 @@ dependencies:
   '@codemirror/search': 6.2.3
   '@codemirror/state': 6.1.4
   '@codemirror/view': 6.6.0
+  '@jsep-plugin/template': 1.0.2_jsep@1.3.7
   '@unocss/reset': 0.46.5
   '@vueuse/core': 9.6.0_vue@3.2.45
   '@vueuse/head': 1.0.18_vue@3.2.45
@@ -350,6 +352,15 @@ packages:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.0
       '@jridgewell/sourcemap-codec': 1.4.14
+    dev: false
+
+  /@jsep-plugin/template/1.0.2_jsep@1.3.7:
+    resolution: {integrity: sha512-fGIPHL4W/YZ3YShDByfWlLEIMCLRUTZDUDii4Xat4sJ+DTYeS21RWrZkvbprICyiwmO/fRY7xdHZh7K/ng6xLg==}
+    engines: {node: '>= 10.16.0'}
+    peerDependencies:
+      jsep: ^0.4.0||^1.0.0
+    dependencies:
+      jsep: 1.3.7
     dev: false
 
   /@lezer/common/1.0.2:

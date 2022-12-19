@@ -75,11 +75,47 @@ export default class RequestDispatcher {
           contentBody = {body: JSON.stringify(this.data)}
           contentHeaders = {'content-type': 'application/json'}
         }
+        const headers: {[key: string]: string} = {}
+        const includeHeader: {[key: string]: boolean} = {}
+        for (const [_k, v] of Object.entries(this.data.headers || {})) {
+          const k = _k.toLowerCase()
+          if (typeof v === 'string') {
+            headers[k] = v
+          } else {
+            includeHeader[k] = v
+          }
+        }
+        const source = this.requestSource
+        if (source !== true && source !== undefined && source.headers) {
+          for (const [_k, v] of Object.entries(source.headers)) {
+            const k = _k.toLowerCase()
+            if (typeof v === 'string') {
+              if (!(k in headers)) {
+                headers[k] = v
+              }
+            } else {
+              if ('value' in v) {
+                if (v.sendByDefault || includeHeader[k] === true) {
+                  if (includeHeader[k] === false && v.allowOmit !== false) {
+                    // omitted, skip
+                  } else if (!(k in headers)) {
+                    // headers[k] = v.value
+                  }
+                }
+              }
+              if (v.env) {
+                // TODO: replace environment variable
+              }
+            }
+          }
+        }
+        // for (const [k, v] of this.requestSource)
         const res = await fetch(this.data.url, {
           method: this.data.method,
           headers: {
             accept: 'application/json',
-            ...this.data.headers,
+            ...contentHeaders,
+            ...headers,
           },
           ...contentBody,
         })
