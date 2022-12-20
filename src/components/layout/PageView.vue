@@ -80,20 +80,24 @@ const src = computed(() => {
   const colorScheme = initialColorScheme.value
   const role = props.page.isSettings ? 'settings' : ''
   const scriptUrl = (
-    role === 'settings' ? (
-      mode.value === 'edit' ?
-      new URL("/src/app/edit/main.ts?role=settings", import.meta.url) :
-      new URL("/src/app/view/main.ts?role=settings", import.meta.url)
-    ) : (
-      mode.value === 'edit' ?
-      new URL("/src/app/edit/main.ts", import.meta.url) :
-      new URL("/src/app/view/main.ts", import.meta.url)
-    )
+    mode.value === 'edit' ?
+    new URL("/src/app/edit/main.ts", import.meta.url) :
+    new URL("/src/app/view/main.ts", import.meta.url)
   )
+  if (role === 'settings') {
+    scriptUrl.searchParams.set('role', 'settings')
+  }
   const html = generateSrcDoc({colorScheme, scriptUrl: scriptUrl.toString(), csp: csp.value})
-  const url = new URL('/api/echo', window.location.href)
-  url.searchParams.append('html', btoa(html))
+  const url = new URL('/api/frame', window.location.href)
+  if (import.meta.env.PROD) {
+    url.searchParams.append('mode', mode.value)
+  } else {
+    url.searchParams.append('html', btoa(html))
+  }
   url.searchParams.append('csp', btoa(csp.value))
+  if (role === 'settings') {
+    url.searchParams.set('role', 'settings')
+  }
   return url.href
 })
 watch(colorScheme, () => {
