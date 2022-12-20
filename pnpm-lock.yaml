@@ -46,6 +46,7 @@ specifiers:
   split-grid: ^1.0.11
   typescript: ^4.9.3
   unocss: ^0.46.5
+  unocss-preset-scrollbar: ^0.2.1
   vite: ^3.2.5
   vitest: ^0.25.3
   vue: ^3.2.45
@@ -87,6 +88,7 @@ dependencies:
   path-to-regexp: 6.2.1
   split-grid: 1.0.11
   unocss: 0.46.5_vite@3.2.5
+  unocss-preset-scrollbar: 0.2.1_unocss@0.46.5
   vue: 3.2.45
   vue-router: 4.1.6_vue@3.2.45
   y-codemirror.next: 0.3.2_ys7ftmqkmgpnbyu52oxy3oi7zy
@@ -583,6 +585,10 @@ packages:
       unconfig: 0.3.7
     dev: false
 
+  /@unocss/core/0.31.17:
+    resolution: {integrity: sha512-DJ3Uk2ePVXvV1qQmgoLK44aqB6f0s+naOEvouI97nzVXDZgxDQPBxIPB/L4vvE4U+gQxEiHwwE3gJ75iPqVzXw==}
+    dev: false
+
   /@unocss/core/0.46.5:
     resolution: {integrity: sha512-apPWISH2ASKySyp4vBAkEzr5XNJDv4mu26eQ4wvg2a32cHRokUsiHLWFNMDe7oJquivTAOHsXqbLQuR9ePKNSg==}
 
@@ -607,6 +613,12 @@ packages:
       ohmyfetch: 0.4.21
     transitivePeerDependencies:
       - supports-color
+    dev: false
+
+  /@unocss/preset-mini/0.31.17:
+    resolution: {integrity: sha512-gVgMTOKLt3O1ym348QIBmR5sS9W0Ozkk5xelhH6e0VXcpg0dXDPDrl4hFErMy4x6IB86yyJG6Dz5JhcwQB13Ig==}
+    dependencies:
+      '@unocss/core': 0.31.17
     dev: false
 
   /@unocss/preset-mini/0.46.5:
@@ -2371,6 +2383,15 @@ packages:
     engines: {node: '>=12.18'}
     dependencies:
       busboy: 1.6.0
+    dev: false
+
+  /unocss-preset-scrollbar/0.2.1_unocss@0.46.5:
+    resolution: {integrity: sha512-7ubHdOaUwr7xBn1glPpICNNsM2SZGjvWK5uRPNiQYsrZ9YFjsCGHk9x5S2R8pTkuMDQeiaSa/UQbYhjC8Fra5g==}
+    peerDependencies:
+      unocss: '>= 0.31.13 < 1'
+    dependencies:
+      '@unocss/preset-mini': 0.31.17
+      unocss: 0.46.5_vite@3.2.5
     dev: false
 
   /unocss/0.46.5_vite@3.2.5:
