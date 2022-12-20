@@ -2,11 +2,9 @@ import Ajv from 'ajv'
 import schema from './schema.json'
 
 type HeaderValue = string
-type HeaderEnv = {
-  [key: string]: string | {$env: string}
-}
+type HeaderEnv = string | string[]
 type HeaderWithValue = {
-  value: string
+  value: string | {$env: string}
   env?: HeaderEnv
   sendByDefault?: boolean   // defaults to true; if false, allow sending by passing true for the header
   allowOmit?: boolean  // if sendByDefault is true, allow passing false as the header and not sending

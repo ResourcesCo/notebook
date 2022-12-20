@@ -2,6 +2,10 @@ import { pathToRegexp } from 'path-to-regexp'
 import { Notebook } from "@/store/notebook"
 import { Container, RequestSource } from "../Containers/data"
 import { RequestModel } from "./data"
+import jsep, { Identifier, MemberExpression } from 'jsep'
+import template, { TemplateElement, TemplateLiteral } from '@jsep-plugin/template'
+
+jsep.plugins.register(template)
 
 export default class RequestDispatcher {
   notebook: Notebook
@@ -86,6 +90,19 @@ export default class RequestDispatcher {
           }
         }
         const source = this.requestSource
+        const env: {[key: string]: string} = {}
+        let secrets: {[key: string]: string} = {}
+        try {
+          const key = `${this.notebook.prefix}/secrets.json`
+          secrets = JSON.parse(localStorage.getItem(key) || '{}') as {[key: string]: string}
+        } catch (err) {
+          // ignore - empty secrets
+        }
+        for (const [k, v] of Object.entries(this.notebook.environment)) {
+          if (typeof v === 'object' && v.secret === true && typeof secrets[k] === 'string') {
+            env[k] = secrets[k]
+          }
+        }
         if (source !== true && source !== undefined && source.headers) {
           for (const [_k, v] of Object.entries(source.headers)) {
             const k = _k.toLowerCase()
@@ -94,17 +111,54 @@ export default class RequestDispatcher {
                 headers[k] = v
               }
             } else {
+              let headerSet = false
               if ('value' in v) {
-                if (v.sendByDefault || includeHeader[k] === true) {
-                  if (includeHeader[k] === false && v.allowOmit !== false) {
-                    // omitted, skip
-                  } else if (!(k in headers)) {
-                    // headers[k] = v.value
+                if ((v.sendByDefault && !(includeHeader[k] === false && v.allowOmit !== false)) || includeHeader[k] === true) {
+                  if ((k in headers) ? (v.allowOverride !== false) : true) {
+                    if (typeof v.value === 'object') {
+                      if (v.value.$env in env) {
+                        headers[k] = env[v.value.$env]
+                        headerSet = true
+                      } else {
+                        throw new Error('Missing environment variable')
+                      }
+                    } else {
+                      headers[k] = v.value
+                    }
                   }
                 }
               }
-              if (v.env) {
-                // TODO: replace environment variable
+              const headerEnv = 'env' in v ? v.env : undefined
+              const headerValue = headers[k]
+              if (headerValue !== undefined && headerEnv !== undefined && !headerSet) {
+                const allowedEnv = (
+                  Array.isArray(headerEnv) ?
+                  headerEnv :
+                  (typeof headerEnv === 'string' ? [headerEnv] : [])
+                )
+                const ex = jsep('`' + headerValue + '`')
+                if (ex.type === 'TemplateLiteral') {
+                  const tl = ex as TemplateLiteral
+                  let s = ''
+                  for (let i=0; i < tl.quasis.length; i++) {
+                    // @ts-ignore
+                    s += tl.quasis[i].value.cooked
+                    if (i < tl.expressions.length) {
+                      const ex = tl.expressions[i]
+                      if (ex.type === 'MemberExpression') {
+                        const me = ex as MemberExpression
+                        if (me.object.type === 'Identifier' && me.property.type === 'Identifier') {
+                          const envEx = me.object as Identifier
+                          const nameEx = me.property as Identifier
+                          if (envEx.name === 'env' && allowedEnv.includes(nameEx.name)) {
+                            s += env[nameEx.name] || ''
+                          }
+                        }
+                      }
+                    }
+                  }
+                  headers[k] = s
+                }
               }
             }
           }
@@ -122,7 +176,8 @@ export default class RequestDispatcher {
         const data = await res.json()
         this.port.postMessage({data})
       } catch (e) {
-        this.port.postMessage({error: `${e}`})
+        console.warn(e)
+        this.port.postMessage({error: 'Error sending request'})
       }
     }
   }
