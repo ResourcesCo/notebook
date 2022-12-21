@@ -7,5 +7,6 @@ import '@unocss/reset/tailwind.css'
 import "../../styles/main.css"
 import "uno.css"
 
-const app = createApp(App)
+const params = new URLSearchParams(import.meta.url.split('?')[1])
+const app = createApp(App, {params})
 app.mount("#app")

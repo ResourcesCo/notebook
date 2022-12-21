@@ -1,11 +1,21 @@
 import type MarkdownIt from "markdown-it/lib"
 import type StateCore from "markdown-it/lib/rules_core/state_core"
+import Token from "markdown-it/lib/token"
+
+function getName(children: Token[]): string | undefined {
+  const code = children.find(c => c.type === 'code_inline')
+  if (code) {
+    return code.content
+  }
+}
 
 interface ComponentInfo {
   id: number
   tag: string
   data: string
+  name?: string
   info?: string
+  map: [number, number]
 }
 
 export default class ComponentManager {
@@ -21,7 +31,7 @@ export default class ComponentManager {
     const self = this
     let counter = 0
     return (state: StateCore): boolean => {
-      let componentTag: {tag: string} | undefined
+      let componentTag: {tag: string, name?: string} | undefined
       for (const token of state.tokens) {
         if (token.type === "inline") {
           const { children } = token
@@ -30,23 +40,26 @@ export default class ComponentManager {
             if (firstChild.type === 'link_open') {
               const url = firstChild.attrGet('href')
               if (typeof url === 'string') {
-                if (url.startsWith('https://macchiato.dev/component/#')) {
-                  const tag = url.split('#', 2)[1]
+                const match = url.match(/https:\/\/macchiato.dev\/(component|data|request)\/?([#?].*)?$/)
+                if (match) {
+                  const item = match[1]
+                  const tag = item === 'component' ? url.split('#', 2)[1] : item
                   if (tag.length > 0) {
-                    firstChild.attrJoin('style', 'display: none;')
                     firstChild.attrJoin('class', 'macchiato-link')
-                    componentTag = {tag}
+                    componentTag = {tag, name: getName(children)}
                   }
                 }
               }
             }
           }
-        } else if (token.type === 'fence' && componentTag) {
+        } else if (token.type === 'fence' && componentTag && token.map) {
           const component = {
             id: counter,
             tag: componentTag.tag,
             data: token.content,
             info: token.info,
+            name: componentTag.name,
+            map: token.map,
           }
           self.components.push(component)
           token.attrSet('componentTag', `${component.id}`)

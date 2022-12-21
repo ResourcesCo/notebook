@@ -4,6 +4,7 @@ import Split from 'split-grid'
 import { Notebook } from '../../store/notebook'
 import TabView from './TabView.vue'
 import { useWindowSize } from '@vueuse/core'
+import SecretsModal from '../settings/SecretsModal.vue'
 
 const {notebook} = defineProps({
   notebook: {
@@ -38,6 +39,7 @@ onMounted(() => {
       <div class="view-split-handle p-1 <sm:opacity-0">↔</div>
     </div>
   </div>
+  <SecretsModal :notebook="notebook"></SecretsModal>
 </template>
 
 <style type="text/css">

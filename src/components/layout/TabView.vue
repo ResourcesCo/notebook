@@ -8,6 +8,8 @@ import DisplayButton from "../DisplayButton.vue"
 import type { FileData, Notebook, TabState } from "../../store/notebook"
 import TabViewButton from "../TabViewButton.vue"
 import { useAsyncState } from "@vueuse/core"
+import { Container } from "../data/Containers/data"
+import { pathToRegexp } from 'path-to-regexp'
 
 const props = defineProps({
   notebook: {
@@ -55,8 +57,8 @@ const toggleSettings = () => {
     } else if (props.tabState.tabs.length > 0) {
       props.tabState.selected = props.tabState.tabs[0]
     }
-    props.tabState.show = 'self'
-    props.otherTabState.show = 'other'
+    props.tabState.show = 'other'
+    props.otherTabState.show = 'self'
     props.tabState.lastSelected = null
   } else {
     props.tabState.selected = '_settings.md'
@@ -88,7 +90,22 @@ const file = computed<FileData | undefined>(() => {
   }
   return undefined
 })
-const pageKey = computed(() => `${filename.value}---${mode.value}---${file.value?.ydocCreated}`)
+const container = computed<Container>(() => {
+  let result = {pages: ['*'], content: {}}
+  const path = filename.value
+  if (path !== null) {
+    for (const container of Object.values(props.notebook.containers.value.containers)) {
+      const pages = Array.isArray(container.pages) ? container.pages : [container.pages]
+      for (const page of pages) {
+        if (pathToRegexp(page).test(path)) {
+          return container
+        }
+      }
+    }
+  }
+  return result
+})
+const pageKey = computed(() => `${filename.value}---${mode.value}---${file.value?.ydocCreated}--${JSON.stringify(container.value)}`)
 </script>
 
 <template>
@@ -111,7 +128,14 @@ const pageKey = computed(() => `${filename.value}---${mode.value}---${file.value
     <div class="spacer <sm:hidden" v-if="side === 'left'"></div>
   </div>
   <div :class="['overflow-auto', 'content', 'relative', side]" v-if="page && file?.ydocCreated">
-    <PageView :notebook="notebook" :key="pageKey" :page="page" :file="file" :mode="mode" />
+    <PageView
+      :key="pageKey"
+      :notebook="notebook"
+      :page="page"
+      :file="file"
+      :mode="mode"
+      :container="container"
+    />
   </div>
 </template>
 

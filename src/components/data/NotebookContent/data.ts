@@ -1,6 +1,6 @@
 import { isPlainObject, isString } from "lodash"
 
-import type { NotebookFileInfo } from "~/store/notebook"
+import type { NotebookFileInfo } from "@/store/notebook"
 export interface FileInfo extends NotebookFileInfo {
   rename?: string,
   delete?: true

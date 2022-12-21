@@ -20,4 +20,19 @@ export default class Settings {
   resetViewChanges() {
     parent.postMessage(['resetViewChanges'], '*')
   }
+  applyContainerChanges(data: any) {
+    parent.postMessage(['applyContainerChanges', JSON.stringify(data)], '*')
+  }
+  resetContainerChanges() {
+    parent.postMessage(['resetContainerChanges'], '*')
+  }
+  applyEnvironmentChanges(data: any) {
+    parent.postMessage(['applyEnvironmentChanges', JSON.stringify(data)], '*')
+  }
+  resetEnvironmentChanges() {
+    parent.postMessage(['resetEnvironmentChanges'], '*')
+  }
+  openSecrets() {
+    parent.postMessage(['openSecrets'], '*')
+  }
 }

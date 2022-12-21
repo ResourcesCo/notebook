@@ -1,9 +1,31 @@
 # Notebook
 
-This is a work-in-progress prototype of a code notebook. The longer-running
-project is at https://github.com/ResourcesCo/app - this is an attempt to
-make a lighter weight code notebook with gitea as the backend, that would
-be easier to self-host or run locally. It would log in with OAuth. I have
-tried using Gitea as a local OAuth server, and it works quite well. On
-Docker or Vagrant, or as a separate user, it would be protected from an
-unprivileged script.
+This is a split-view notebook, intended for all sorts of documents, including notes and code.
+
+It uses browser security features to control what resources components can access.
+
+## Running it
+
+This uses pnpm. If you don't have pnpm, install it:
+
+```
+npm install -g pnpm
+```
+
+Then install the dependencies:
+
+```
+pnpm install
+```
+
+open up two terminals, and run this in the first one:
+
+```
+pnpm api
+```
+
+...and run this in the other one:
+
+```
+pnpm dev
+```

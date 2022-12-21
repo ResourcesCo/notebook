@@ -1,4 +1,4 @@
-import { reactive, toRef, Ref, watch } from 'vue'
+import { reactive, Ref } from 'vue'
 import { useStorage, toReactive, watchDebounced } from '@vueuse/core'
 import { sortBy, uniqBy } from 'lodash'
 import { wait } from 'lib0/promise'
@@ -11,7 +11,10 @@ import defaultWelcome from './content/_welcome.md?raw'
 import defaultSettings from './content/_settings.md?raw'
 import sandboxExample from './content/sandbox-example.md?raw'
 import notesExample from './content/notes-example.md?raw'
-import { NotebookContentInfo } from '~/components/data/NotebookContent'
+import requestExample from './content/request-example.md?raw'
+import { NotebookContentInfo } from '@/components/data/NotebookContent'
+import { ContainerConfig } from '@/components/data/Containers'
+import { EnvironmentConfig } from '@/components/data/Environment'
 
 function randomClientId() {
   const array = new Uint32Array(2)
@@ -25,6 +28,7 @@ const defaultFileData: {[key: string]: string} = {
   '_settings.md': defaultSettings,
   'sandbox-example.md': sandboxExample,
   'notes-example.md': notesExample,
+  'request-example.md': requestExample,
 }
 
 export interface TabState {
@@ -84,6 +88,8 @@ export class Notebook {
   content: NotebookContent
   savedView: Ref<NotebookView>
   view: NotebookView
+  containers: Ref<ContainerConfig>
+  environment: Ref<EnvironmentConfig>
   channel: BroadcastChannel
   clientId: string
 
@@ -118,11 +124,16 @@ export class Notebook {
           "title": "Sandbox Example",
           "primaryComponent": "edit",
         },
+        "request-example.md": {
+          "emoji": "🌐",
+          "title": "Request Example",
+          "primaryComponent": "edit",
+        },
       }
     }
     const defaultView: NotebookView = {
       "left": {
-        "tabs": ["notes-example.md", "sandbox-example.md"],
+        "tabs": ["notes-example.md", "sandbox-example.md", "request-example.md"],
         "selected": "notes-example.md",
         "lastSelected": null,
         "show": "self",
@@ -134,6 +145,8 @@ export class Notebook {
         "show": "self",
       },
     }
+    const defaultContainerConfig = {containers: {}}
+    const defaultEnvironmentConfig = {}
     if (this.prefix === notebookDefaults.prefix && (localStorage.getItem(`.notebook/_content.json`) || '').trim() === '') {
       const haveOldData = [1, 2, 3, 4, 5].some(i => (localStorage.getItem(`doc-${i}`) || '').trim().length > 0)
       if (haveOldData) {
@@ -143,6 +156,8 @@ export class Notebook {
     this.content = toReactive(useStorage(`${this.prefix}/_content.json`, defaultContent))
     this.savedView = useStorage(`${this.prefix}/_view.json`, defaultView)
     this.view = toReactive(useStorage(`${this.prefix}/_view.json`, this.savedView.value, sessionStorage))
+    this.containers = useStorage(`${this.prefix}/_containers.json`, defaultContainerConfig)
+    this.environment = useStorage(`${this.prefix}/_environment.json`, defaultEnvironmentConfig)
     watchDebounced(this.view, () => this.savedView.value = this.view, {debounce: 200, maxWait: 500})
     this.channel = new BroadcastChannel(this.prefix)
     this.channel.onmessage = this.handleMessage.bind(this)
@@ -286,7 +301,11 @@ export class Notebook {
     }
   }
 
-  resetSettings({content, view}: {content?: true, view?: true} = {content: true, view: true}) {
+  resetSettings(
+    {content, view, containers, environment}:
+    {content?: true, view?: true, containers?: true, environment?: true}
+    = {content: true, view: true, containers: true, environment: true}
+  ) {
     const settingsDoc = this.getFile('_settings.md').ydoc
     const settingsText = settingsDoc.getText('text')
     if (content) {
@@ -297,6 +316,12 @@ export class Notebook {
     }
     if (view) {
       updateComponentData(settingsText, 'NotebookView', this.view)
+    }
+    if (containers) {
+      updateComponentData(settingsText, 'Containers', this.containers.value)
+    }
+    if (environment) {
+      updateComponentData(settingsText, 'Environment', this.environment.value)
     }
     fixSpelling(settingsText)
   }
@@ -347,6 +372,14 @@ export class Notebook {
     this.view.right.show = view.right.show
     this.view.left.lastSelected = view.left.lastSelected
     this.view.right.lastSelected = view.right.lastSelected
+  }
+
+  applyContainerChanges(containers: ContainerConfig) {
+    this.containers.value = containers
+  }
+
+  applyEnvironmentChanges(environment: EnvironmentConfig) {
+    this.environment.value = environment
   }
 
   migrateOldData(content: NotebookContent, view: NotebookView) {

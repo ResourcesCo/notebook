@@ -22,6 +22,11 @@ import highlight from "markdown-it-highlightjs/core"
 import taskLists from 'markdown-it-task-list-plus'
 import { useEventListener } from "@vueuse/core"
 import * as Y from 'yjs'
+import Request from './data/Request'
+import Data from './data/Data'
+import RequestClient from "./data/Request/RequestClient"
+import { Containers, ContainerConfig } from "./data/Containers"
+import { Environment, EnvironmentConfig } from "./data/Environment"
 
 hljs.registerLanguage("xml", xml)
 hljs.registerLanguage("css", css)
@@ -46,20 +51,39 @@ const props = defineProps({
   settings: {
     type: Object as PropType<SettingsClient>,
   },
+  client: {
+    type: Object as PropType<RequestClient>,
+    required: true,
+  },
 })
 
-const components = {NotebookContent, NotebookView, LocalStorageTools, Sandbox} as const
+const components = {
+  NotebookContent,
+  NotebookView,
+  Containers,
+  Environment,
+  LocalStorageTools,
+  Sandbox,
+  request: Request,
+  data: Data
+} as const
 
 type Block =
   {html: string} |
   {tag: 'NotebookContent', data: NotebookContentInfo, settings: SettingsClient } |
   {tag: 'NotebookView', data: NotebookViewType, settings: SettingsClient } |
+  {tag: 'Containers', data: ContainerConfig, settings: SettingsClient } |
+  {tag: 'Environment', data: EnvironmentConfig, settings: SettingsClient } |
   {tag: 'LocalStorageTools', settings: SettingsClient} |
   {tag: 'Sandbox', data: string, info?: string} |
+  {tag: 'request', data: string, client: RequestClient} |
+  {tag: 'data', data: string, info?: string, name: string} |
   { error: string }
 
 const value = toRef(props, 'value')
 const blocks = ref<Block[]>([])
+
+const pageData = ref<{[key: string]: {data: string, replace(s: string): void}}>({})
 
 watch(value, () => {
   const source = value.value
@@ -80,11 +104,15 @@ watch(value, () => {
       const component = componentManager.components.find(({id: _id}) => id === String(_id))
       const settings = props.settings
       if (component && Object.keys(components).includes(tag)) {
-        if (settings && (tag === 'NotebookContent' || tag === 'NotebookView')) {
+        if (settings && (tag === 'NotebookContent' || tag === 'NotebookView' || tag === 'Containers' || tag === 'Environment')) {
           const data = parseJson(component.data)
           if (tag === 'NotebookContent' && validateNotebookContent(data)) {
             return {tag, data, settings}
           } else if (tag === 'NotebookView' && validateNotebookView(data)) {
+            return {tag, data, settings}
+          } else if (tag === 'Containers') {
+            return {tag, data, settings}
+          } else if (tag === 'Environment') {
             return {tag, data, settings}
           }
           return { error: 'Schema mismatch' }
@@ -92,6 +120,22 @@ watch(value, () => {
           return {tag, settings}
         } else if (!settings && tag === 'Sandbox') {
           return {tag, data: component.data, info: component.info}
+        } else if (tag === 'request') {
+          return {tag, data: component.data, client: props.client}
+        } else if (tag === 'data' && component.name !== undefined) {
+          pageData.value[component.name] = {
+            data: component.data,
+            replace: s => {
+              const lines = source.split("\n")
+              const start = (lines.slice(0, component.map[0] + 1).join("\n") + "\n").length
+              const end = (lines.slice(0, component.map[1] - 1).join("\n")).length
+              props.yDoc.transact(() => {
+                props.yText.delete(start, end - start)
+                props.yText.insert(start, s)
+              }, 'view')
+            },
+          }
+          return {tag, data: component.data, name: component.name, info: component.info}
         }
       }
       return { error: `Missing or invalid component: {tag: ${tag}, id: ${id}}` }
@@ -126,11 +170,33 @@ useEventListener('change', (e) => {
   <div class="mb-2">
     <template v-for="block in blocks">
       <div class="prose px-2" v-if="'html' in block" v-html="block.html"></div>
-      <template v-else-if="'tag' in block && block.tag === 'NotebookContent'"><NotebookContent :data="block.data" :settings="block.settings" /></template>
-      <template v-else-if="'tag' in block && block.tag === 'NotebookView'"><NotebookView :data="block.data" :settings="block.settings" /></template>
-      <template v-else-if="'tag' in block && block.tag === 'LocalStorageTools'"><LocalStorageTools :settings="block.settings" /></template>
-      <template v-else-if="'tag' in block && block.tag === 'Sandbox'"><Sandbox :data="block.data" :info="block.info" /></template>
-      <div class="prose my-2" v-else-if="'error' in block" style="color: red">{{block.error}}</div>
+      <template v-else-if="'tag' in block">
+        <template v-if="block.tag === 'NotebookContent'">
+          <NotebookContent :data="block.data" :settings="block.settings" />
+        </template>
+        <template v-else-if="block.tag === 'NotebookView'">
+          <NotebookView :data="block.data" :settings="block.settings" />
+        </template>
+        <template v-else-if="block.tag === 'Containers'">
+          <Containers :data="block.data" :settings="block.settings" />
+        </template>
+        <template v-else-if="block.tag === 'Environment'">
+          <Environment :data="block.data" :settings="block.settings" />
+        </template>
+        <template v-else-if="block.tag === 'LocalStorageTools'">
+          <LocalStorageTools :settings="block.settings" />
+        </template>
+        <template v-else-if="block.tag === 'Sandbox'">
+          <Sandbox :data="block.data" :info="block.info" />
+        </template>
+        <template v-else-if="block.tag === 'request'">
+          <Request :data="block.data" :client="block.client" :pageData="pageData" />
+        </template>
+        <template v-else-if="block.tag === 'data'">
+          <Data :data="block.data" :name="block.name" :info="block.info" />
+        </template>
+      </template>
+      <div class="prose my-2 text-red" v-else-if="'error' in block">{{block.error}}</div>
     </template>
   </div>
 </template>

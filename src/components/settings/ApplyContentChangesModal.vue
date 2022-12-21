@@ -2,8 +2,8 @@
 import {computed} from 'vue'
 import {notebook} from '../../store/notebook'
 import {action as settingsAction} from '../../store/settings'
-import Modal from './Modal.vue'
-import Button from './Button.vue'
+import Modal from '../layout/Modal.vue'
+import Button from '../form/Button.vue'
 import { uniq } from 'lodash'
 
 const action = computed(() => settingsAction.value?.action === 'applyContentChanges' ? settingsAction.value : undefined)

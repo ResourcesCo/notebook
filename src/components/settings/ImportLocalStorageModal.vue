@@ -3,8 +3,8 @@ import {ref, computed} from 'vue'
 import {action as settingsAction} from '../../store/settings'
 import readMarkdown from '../data/LocalStorageTools/readMarkdown'
 import setStorage from '../data/LocalStorageTools/setStorage'
-import Modal from './Modal.vue'
-import Button from './Button.vue'
+import Modal from '../layout/Modal.vue'
+import Button from '../form/Button.vue'
 import { StoragesExport } from '../data/LocalStorageTools/getStorage'
 
 const hasError = ref<Boolean>(false)

@@ -17,7 +17,8 @@ With a postMessage, it can update its own text, but is limited to 50K characters
 
 ```css
 .hello {
-  color: rebeccapurple;
+  color: #cd0dd5;
+  filter: invert(0.4);
   transition: opacity 2s;
   font-size: 50px;
 }
@@ -40,3 +41,7 @@ document.querySelector('#toggle-hello').addEventListener('click', () => {
   document.querySelector('.hello').classList.toggle('hide-me')
 })
 ```
+
+This is a demo for containers (in Settings). It will only show if `sandbox-example.md` is in a container that allows showing images from placekitten.com.
+
+![](https://placekitten.com/200/300)

@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { PropType } from 'vue'
 import type { NotebookView as NotebookViewType } from '../../../store/notebook'
-import SettingsClient from '~/store/SettingsClient'
-import Button from '~/components/settings/Button.vue'
+import SettingsClient from '@/store/SettingsClient'
+import Button from '@/components/form/Button.vue'
 
 const {data, settings} = defineProps({
   data: {

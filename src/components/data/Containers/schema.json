@@ -1,0 +1,133 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "contentSource": {
+      "type": "object",
+      "required": ["paths"],
+      "properties": {
+        "paths": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      },
+      "additionalProperties": false
+    },
+    "env": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      ]
+    }
+  },
+  "type": "object",
+  "required": ["containers"],
+  "properties": {
+    "containers": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "pages": {
+            "anyOf": [
+              {"type": "string"},
+              {
+                "type": "array",
+                "items": {"type": "string"}
+              }
+            ]
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "host": {"type": "string"},
+                "request": {
+                  "anyOf": [
+                    {
+                      "const": true
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "headers": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "required": ["env"],
+                                "properties": {
+                                  "env": {"$ref": "#/definitions/env"}
+                                }
+                              },
+                              {
+                                "type": "object",
+                                "required": ["value"],
+                                "properties": {
+                                  "value": {"type": "string"},
+                                  "env": {"$ref": "#/definitions/env"},
+                                  "sendByDefault": {"type": "boolean"},
+                                  "allowOmit": {"type": "boolean"},
+                                  "allowOverride": {"type": "boolean"}
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "script": {
+                  "anyOf": [
+                    {"const": true},
+                    {"$ref": "#/definitions/contentSource"}
+                  ]
+                },
+                "style": {
+                  "anyOf": [
+                    {"const": true},
+                    {"$ref": "#/definitions/contentSource"}
+                  ]
+                },
+                "img": {
+                  "anyOf": [
+                    {"const": true},
+                    {"$ref": "#/definitions/contentSource"}
+                  ]
+                },
+                "media": {
+                  "anyOf": [
+                    {"const": true},
+                    {"$ref": "#/definitions/contentSource"}
+                  ]
+                },
+                "font": {
+                  "anyOf": [
+                    {"const": true},
+                    {"$ref": "#/definitions/contentSource"}
+                  ]
+                },
+                "connect": {
+                  "anyOf": [
+                    {"const": true},
+                    {"$ref": "#/definitions/contentSource"}
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

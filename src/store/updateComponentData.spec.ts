@@ -47,7 +47,7 @@ describe('no-op', () => {
     const input = (
 `# Testing
 
-[![](https://img.shields.io/badge/%E2%98%95%EF%B8%8F-NotebookView-blue)](https://macchiato.dev/component/#NotebookContent)
+[\`NotebookContent\`](https://macchiato.dev/component/#NotebookContent)
 
 ${bq}json
 {
