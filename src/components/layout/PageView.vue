@@ -89,15 +89,15 @@ const src = computed(() => {
   }
   const html = generateSrcDoc({colorScheme, scriptUrl: scriptUrl.toString(), csp: csp.value})
   const url = new URL('/api/frame', window.location.href)
-  if (import.meta.env.PROD) {
-    url.searchParams.append('mode', mode.value)
-  } else {
-    url.searchParams.append('html', btoa(html))
-  }
-  url.searchParams.append('csp', btoa(csp.value))
   if (role === 'settings') {
     url.searchParams.set('role', 'settings')
   }
+  if (import.meta.env.PROD) {
+    url.searchParams.set('mode', mode.value)
+  } else {
+    url.searchParams.set('html', btoa(html))
+  }
+  url.searchParams.set('csp', btoa(csp.value))
   return url.href
 })
 watch(colorScheme, () => {
