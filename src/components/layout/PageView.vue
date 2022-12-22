@@ -45,11 +45,12 @@ onBeforeMount(() => {
 })
 const mode = computed(() => props.mode === 'edit' ? 'edit' : 'view')
 useEventListener('message', (e: MessageEvent) => {
+  const contentWindow = frame.value?.contentWindow
   if (
     e.isTrusted &&
     // this only allows the source to be from the current frame
     // - so a child iframe wouldn't be permitted to send this message
-    e.source == frame.value?.contentWindow &&
+    e.source == contentWindow &&
     Array.isArray(e.data) &&
     e.data.length >= 1
   ) {
@@ -68,6 +69,10 @@ useEventListener('message', (e: MessageEvent) => {
         requestDispatcher.value = dispatcher
       } else if (dispatcher.status === 'deny') {
         dispatcher.sendDenyMessage()
+      }
+    } else if (e.data[0] === 'need-doc') {
+      if (contentWindow) {
+        contentWindow.postMessage(['md-doc', Y.encodeStateAsUpdate(props.file.ydoc)], '*')
       }
     } else if (props.page.isSettings) {
       handleSettingsMessage(e.data, props.notebook)

@@ -6,6 +6,7 @@ import { useEventListener } from '@vueuse/core'
 import * as Y from 'yjs'
 
 const ready = ref(false)
+const haveDoc = ref(false)
 const yDoc = new Y.Doc()
 const yText = yDoc.getText('text')
 const undoManager = new Y.UndoManager(yText)
@@ -13,10 +14,26 @@ const undoManager = new Y.UndoManager(yText)
 const page = reactive({body: '', counter: 0})
 
 function handleMessage(e: MessageEvent) {
-  if (e.isTrusted && e.source === parent && Array.isArray(e.data) && e.data.length === 2 && ['md-doc', 'md-update'].includes(e.data[0])) {
+  if (
+    e.isTrusted &&
+    e.source === parent &&
+    Array.isArray(e.data) &&
+    e.data.length === 2 &&
+    ['md-doc', 'md-update'].includes(e.data[0])
+  ) {
     const update = e.data[1] as Uint8Array
-    Y.applyUpdate(yDoc, update, 'local')
-    ready.value = true
+    if (e.data[0] === 'md-doc') {
+      haveDoc.value = true
+      Y.applyUpdate(yDoc, update, 'local')      
+      ready.value = true
+    } else if (e.data[0] === 'md-update') {
+      if (haveDoc.value === true) {
+        Y.applyUpdate(yDoc, update, 'local')
+      } else {
+        parent.postMessage(['need-doc'], '*')
+        console.warn("Received update but don't have doc")
+      }
+    }
   }
 }
 
@@ -34,6 +51,14 @@ if (firstMessageEvent?.event !== null) {
   }, 0)
 }
 useEventListener('message', handleMessage)
+
+const checkDoc = setInterval(() => {
+  if (haveDoc.value === true) {
+    clearInterval(checkDoc)
+  } else {
+    parent.postMessage(['need-doc'], '*')    
+  }
+}, 200)
 </script>
 
 <template>
