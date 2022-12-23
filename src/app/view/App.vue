@@ -8,7 +8,11 @@ import RequestClient from '@/components/data/Request/RequestClient'
 
 const { params } = defineProps({ params: { type: Object as PropType<URLSearchParams>, required: true } })
 
+// This is used to check if it's received the doc from an `md-doc` message. If it hasn't
+// received it, it will not apply `md-update` messages and will send `need-doc` messages
+// until it receives the doc.
 const haveDoc = ref(false)
+
 const yDoc = new Y.Doc()
 const yText = yDoc.getText('text')
 

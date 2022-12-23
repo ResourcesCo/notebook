@@ -1,12 +1,14 @@
 <script lang="ts" setup>
-import { defineComponent, onMounted, reactive, ref } from 'vue'
-import debounce from 'lodash/debounce'
+import { reactive, ref } from 'vue'
 import MarkdownEdit from '../../components/markdown/MarkdownEdit'
 import { useEventListener } from '@vueuse/core'
 import * as Y from 'yjs'
 
-const ready = ref(false)
+// This is used to check if it's received the doc from an `md-doc` message. If it hasn't
+// received it, it will not apply `md-update` messages and will send `need-doc` messages
+// until it receives the doc.
 const haveDoc = ref(false)
+
 const yDoc = new Y.Doc()
 const yText = yDoc.getText('text')
 const undoManager = new Y.UndoManager(yText)
@@ -25,7 +27,6 @@ function handleMessage(e: MessageEvent) {
     if (e.data[0] === 'md-doc') {
       haveDoc.value = true
       Y.applyUpdate(yDoc, update, 'local')      
-      ready.value = true
     } else if (e.data[0] === 'md-update') {
       if (haveDoc.value === true) {
         Y.applyUpdate(yDoc, update, 'local')
@@ -63,7 +64,7 @@ const checkDoc = setInterval(() => {
 
 <template>
   <main class="p-1 flex flex-col flex-grow">
-    <MarkdownEdit v-if="ready" :page="page" :yText="yText" :undoManager="undoManager" />
+    <MarkdownEdit v-if="haveDoc" :page="page" :yText="yText" :undoManager="undoManager" />
   </main>
 </template>
 
