@@ -342,8 +342,8 @@ export class Notebook {
           console.error('ERROR: trying to rename to the same name; skipping')
           continue
         }
-        const newFile = this.getFile(rename)
         const oldFile = this.getFile(name)
+        const newFile = this.getFile(rename, oldFile.body)
         newFile.body = oldFile.body
         this.content.files[rename] = {title: file.title, emoji: file.emoji, primaryComponent: file.primaryComponent}
         this.renameFile(name, rename)

@@ -57,7 +57,7 @@ const checkDoc = setInterval(() => {
   if (haveDoc.value === true) {
     clearInterval(checkDoc)
   } else {
-    parent.postMessage(['need-doc'], '*')    
+    parent.postMessage(['need-doc'], '*')
   }
 }, 200)
 </script>
