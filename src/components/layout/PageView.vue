@@ -12,6 +12,7 @@ import { Container } from '../data/Containers/data'
 import { generateSrcDoc } from './srcdoc'
 import { generateSecurityPolicy } from "../data/Containers/policy"
 import RequestDispatcher from '../data/Request/RequestDispatcher'
+import { color } from '@/styles/editorThemeDark'
 
 const props = defineProps({
   notebook: {
@@ -97,6 +98,7 @@ const src = computed(() => {
   if (role === 'settings') {
     url.searchParams.set('role', 'settings')
   }
+  url.searchParams.set('color-scheme', colorScheme)
   if (import.meta.env.PROD) {
     url.searchParams.set('mode', mode.value)
   } else {
@@ -108,10 +110,7 @@ const src = computed(() => {
 watch(colorScheme, () => {
   const contentWindow = frame.value?.contentWindow
   if (contentWindow) {
-    contentWindow?.postMessage!(
-      ["color-scheme", colorScheme.value],
-      "*"
-    )
+    contentWindow?.postMessage!(["color-scheme", colorScheme.value], "*")
   }
 })
 const onLoad = () => {
