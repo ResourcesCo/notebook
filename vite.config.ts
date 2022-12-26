@@ -20,6 +20,9 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: null,
+      srcDir: 'src',
+      filename: 'custom-sw.ts',
+      strategies: 'injectManifest',
     }),
   ],
   server: {

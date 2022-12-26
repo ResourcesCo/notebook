@@ -105,7 +105,8 @@ const src = computed(() => {
     url.searchParams.set('html', btoa(html))
   }
   url.searchParams.set('csp', btoa(csp.value))
-  return url.href
+  const appUrl = new URL(mode.value === 'edit' ? '/app/edit/' : '/app/view/', window.location.href)
+  return appUrl.href
 })
 watch(colorScheme, () => {
   const contentWindow = frame.value?.contentWindow
