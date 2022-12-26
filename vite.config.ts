@@ -17,7 +17,10 @@ export default defineConfig({
       include: [/\.vue$/],
     }),
     Unocss(),
-    VitePWA({ registerType: 'autoUpdate' }),
+    VitePWA({
+      registerType: 'autoUpdate',
+      injectRegister: null,
+    }),
   ],
   server: {
     proxy: {

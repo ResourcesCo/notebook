@@ -19,7 +19,8 @@
     "types": [
       "vite/client",
       "vitest",
-      "vue/ref-macros"
+      "vue/ref-macros",
+      "vite-plugin-pwa/client"
     ],
     "paths": {
       "@/*": [
