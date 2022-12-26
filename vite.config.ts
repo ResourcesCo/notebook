@@ -3,7 +3,7 @@ import { resolve } from "path"
 import { defineConfig } from "vite"
 import Vue from "@vitejs/plugin-vue"
 import Unocss from 'unocss/vite'
-
+import { VitePWA } from 'vite-plugin-pwa'
 const packageDir = './'
 
 export default defineConfig({
@@ -17,6 +17,7 @@ export default defineConfig({
       include: [/\.vue$/],
     }),
     Unocss(),
+    VitePWA({ registerType: 'autoUpdate' }),
   ],
   server: {
     proxy: {
