@@ -21,8 +21,6 @@ export default defineConfig({
       registerType: 'autoUpdate',
       injectRegister: null,
       srcDir: 'src',
-      filename: 'custom-sw.ts',
-      strategies: 'injectManifest',
     }),
   ],
   server: {
@@ -49,6 +47,7 @@ export default defineConfig({
         }
       }
     },
+    manifest: true
   },
   optimizeDeps: {
     include: ["vue", "vue-router", "@vueuse/core"],
