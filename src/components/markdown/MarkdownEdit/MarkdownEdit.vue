@@ -41,6 +41,11 @@ import { isDark } from "../../../store"
 import { insertNewlineContinueMarkup, deleteMarkupBackward } from '../../../vendor/commands'
 import * as Y from 'yjs'
 
+import { jsxLanguage, tsxLanguage } from "@codemirror/lang-javascript"
+import { cssLanguage } from "@codemirror/lang-css"
+import { jsonLanguage } from "@codemirror/lang-json"
+import { htmlLanguage } from "@codemirror/lang-html"
+
 const props = defineProps({
   page: {
     type: Object as PropType<{body: string}>,
@@ -75,7 +80,6 @@ const codeLanguages = [
     name: "javascript",
     alias: ["js", "jsx"],
     async load() {
-      const { jsxLanguage } = await import("@codemirror/lang-javascript")
       return new LanguageSupport(jsxLanguage)
     },
   }),
@@ -83,49 +87,42 @@ const codeLanguages = [
     name: "typescript",
     alias: ["ts", "tsx"],
     async load() {
-      const { tsxLanguage } = await import("@codemirror/lang-javascript")
       return new LanguageSupport(tsxLanguage)
     },
   }),
   LanguageDescription.of({
     name: "css",
     async load() {
-      const { cssLanguage } = await import("@codemirror/lang-css")
       return new LanguageSupport(cssLanguage)
     },
   }),
-  LanguageDescription.of({
-    name: "python",
-    alias: ["py"],
-    async load() {
-      const { pythonLanguage } = await import("@codemirror/lang-python")
-      return new LanguageSupport(pythonLanguage)
-    },
-  }),
+  // LanguageDescription.of({
+  //   name: "python",
+  //   alias: ["py"],
+  //   async load() {
+  //     const { pythonLanguage } = await import("@codemirror/lang-python")
+  //     return new LanguageSupport(pythonLanguage)
+  //   },
+  // }),
   LanguageDescription.of({
     name: "json",
     async load() {
-      const { jsonLanguage } = await import("@codemirror/lang-json")
       return new LanguageSupport(jsonLanguage)
     },
   }),
-  LanguageDescription.of({
-    name: "sql",
-    async load() {
-      const { sql, PostgreSQL } = await import("@codemirror/lang-sql")
-      return sql({ dialect: PostgreSQL })
-    },
-  }),
+  // LanguageDescription.of({
+  //   name: "sql",
+  //   async load() {
+  //     const { sql, PostgreSQL } = await import("@codemirror/lang-sql")
+  //     return sql({ dialect: PostgreSQL })
+  //   },
+  // }),
   LanguageDescription.of({
     name: "html",
     alias: ["htm"],
     async load() {
-      const { jsxLanguage } = await import("@codemirror/lang-javascript")
       const javascript = new LanguageSupport(jsxLanguage)
-      const { cssLanguage } = await import("@codemirror/lang-css")
       const css = new LanguageSupport(cssLanguage)
-      const { htmlLanguage } = await import("@codemirror/lang-html")
-
       return new LanguageSupport(htmlLanguage, [css, javascript])
     },
   }),
