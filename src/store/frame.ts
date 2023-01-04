@@ -5,8 +5,8 @@ export class FrameStore {
 
   async loadModules() {
     await Promise.allSettled([
-      this.loadPage('/app/view/view'),
-      this.loadPage('/app/view/edit'),
+      this.loadPage('/app/view/'),
+      this.loadPage('/app/edit/'),
     ])
   }
 
@@ -17,6 +17,14 @@ export class FrameStore {
 
   unloadModules() {
     this.buffers = {}
+  }
+
+  buildPage(mode: string): string {
+    const data = this.buffers[`/app/${mode}/`]
+    if (data === undefined) {
+      throw new Error('Page missing')
+    }
+    return new TextDecoder().decode(data)
   }
 }
 

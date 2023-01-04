@@ -16,5 +16,5 @@ const frameStore = useFrameStore()
 </script>
 
 <template>
-  <SplitView :notebook="notebook" />
+  <SplitView :notebook="notebook" :frameStore="frameStore" />
 </template>

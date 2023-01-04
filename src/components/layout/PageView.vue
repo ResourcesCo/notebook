@@ -3,6 +3,7 @@ import { useEventListener } from '@vueuse/core'
 import { PropType, ref, computed, watch, onMounted, onBeforeMount, onUnmounted } from 'vue'
 import * as Y from 'yjs'
 import { FileData, Notebook } from '@/store/notebook'
+import { FrameStore } from '@/store/frame'
 import { colorScheme } from '../../store'
 import { handleMessage as handleSettingsMessage } from '../../store/settings'
 import { RequestModel } from '../data/Request'
@@ -12,11 +13,14 @@ import { Container } from '../data/Containers/data'
 import { generateSrcDoc } from './srcdoc'
 import { generateSecurityPolicy } from "../data/Containers/policy"
 import RequestDispatcher from '../data/Request/RequestDispatcher'
-import { color } from '@/styles/editorThemeDark'
 
 const props = defineProps({
   notebook: {
     type: Object as PropType<Notebook>,
+    required: true,
+  },
+  frameStore: {
+    type: Object as PropType<FrameStore>,
     required: true,
   },
   page: {
@@ -107,6 +111,9 @@ const src = computed(() => {
   url.searchParams.set('csp', btoa(csp.value))
   const appUrl = new URL(mode.value === 'edit' ? '/app/edit/' : '/app/view/', window.location.href)
   return appUrl.href
+})
+const srcdoc = computed(() => {
+  return props.frameStore.buildPage(mode.value)
 })
 watch(colorScheme, () => {
   const contentWindow = frame.value?.contentWindow
