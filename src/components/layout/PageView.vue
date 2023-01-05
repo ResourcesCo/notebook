@@ -115,6 +115,13 @@ const src = computed(() => {
 const srcdoc = computed(() => {
   return props.frameStore.buildPage(mode.value)
 })
+const frameUrl = computed(() => {
+  const url = new URL('/app/frame/', window.location.href)
+  const colorScheme = initialColorScheme.value
+  url.searchParams.set('color-scheme', colorScheme)
+  url.searchParams.set('srcdoc', srcdoc.value)
+  return url.href
+})
 watch(colorScheme, () => {
   const contentWindow = frame.value?.contentWindow
   if (contentWindow) {
@@ -147,8 +154,8 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <iframe ref="frame" class="h-full w-full" :src="src" :csp="csp" :style="loadedCount === 0 ? 'visibility: hidden' : ''"
-    sandbox="allow-scripts allow-popups" @load="onLoad"></iframe>
+  <iframe ref="frame" class="h-full w-full" :src="frameUrl" :style="loadedCount === 0 ? 'visibility: hidden' : ''"
+     @load="onLoad"></iframe>
   <Settings v-if="isSettingsView" :notebook="props.notebook"></Settings>
   <SendRequestModal
     v-if="requestDispatcher"

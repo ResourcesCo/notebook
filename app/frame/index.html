@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Frame</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests; default-src 'self' 'unsafe-inline' 'unsafe-eval';" />
+    <base target="_blank">
+    <style type="text/css">
+      html {
+        background-color: white;
+      }
+      html.dark {
+        background-color: black;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      iframe {
+        border: 0;
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      (function () {
+        const prefersDark =
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches
+        const params = new URLSearchParams(window.location.search)
+        const setting = params.get("color-scheme") || "auto"
+        const dark = setting === 'auto' ? prefersDark : (setting === 'dark')
+        document.documentElement.classList[dark ? 'add' : 'remove']("dark")
+        const srcdoc = params.get("srcdoc")
+        const frame = document.createElement('iframe')
+        frame.setAttribute('srcdoc', srcdoc)
+        frame.setAttribute('sandbox', 'allow-scripts allow-popups')
+        document.body.appendChild(frame)
+        window.addEventListener('message', (e) => {
+          if (e.source === window.parent) {
+            frame.contentWindow.postMessage(e.data, '*')
+          } else if (e.source === frame.contentWindow) {
+            window.parent.postMessage(e.data, '*')
+          }
+        })
+      })()
+    </script>    
+  </body>
+</html>
