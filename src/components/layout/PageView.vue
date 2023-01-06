@@ -41,6 +41,7 @@ const props = defineProps({
   },
 })
 
+const srcdoc = ref<string | undefined>(undefined)
 const frame = ref<HTMLIFrameElement | undefined>(undefined)
 const loadedCount = ref(0)
 const initialColorScheme = ref('dark')
@@ -112,15 +113,16 @@ const src = computed(() => {
   const appUrl = new URL(mode.value === 'edit' ? '/app/edit/' : '/app/view/', window.location.href)
   return appUrl.href
 })
-const srcdoc = computed(() => {
-  return props.frameStore.buildPage(mode.value)
-})
 const frameUrl = computed(() => {
-  const url = new URL('/app/frame/', window.location.href)
-  const colorScheme = initialColorScheme.value
-  url.searchParams.set('color-scheme', colorScheme)
-  url.searchParams.set('srcdoc', srcdoc.value)
-  return url.href
+  if (srcdoc.value !== undefined) {
+    const url = new URL('/app/frame/', window.location.href)
+    const colorScheme = initialColorScheme.value
+    url.searchParams.set('color-scheme', colorScheme)
+    url.searchParams.set('srcdoc', srcdoc.value)
+    return url.href
+  } else {
+    return undefined
+  }
 })
 watch(colorScheme, () => {
   const contentWindow = frame.value?.contentWindow
@@ -141,7 +143,10 @@ const handleUpdate = (update: Uint8Array, origin: string | null) => {
     contentWindow.postMessage(['md-update', update], '*')
   }
 }
-onMounted(() => {
+onMounted(async () => {
+  const data = await props.frameStore.buildPage(mode.value)
+  console.log({data, buffers: props.frameStore.buffers})
+  srcdoc.value = data
   props.file.ydoc.on('update', handleUpdate)
   if (props.page.isSettings) {
     props.notebook.resetSettings()
@@ -154,7 +159,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <iframe ref="frame" class="h-full w-full" :src="frameUrl" :style="loadedCount === 0 ? 'visibility: hidden' : ''"
+  <iframe v-if="frameUrl" ref="frame" class="h-full w-full" :src="frameUrl" :style="loadedCount === 0 ? 'visibility: hidden' : ''"
      @load="onLoad"></iframe>
   <Settings v-if="isSettingsView" :notebook="props.notebook"></Settings>
   <SendRequestModal
