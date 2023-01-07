@@ -1,43 +1,102 @@
 import { onMounted, onUnmounted } from 'vue'
 
+// Adapted from https://github.com/richardtallent/vite-plugin-singlefile/
+
+// MIT License
+
+// Copyright (c) 2021-present, Richard S. Tallent, II
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+export function getScripts(html: string) {
+  const reScript = new RegExp(`<script([^>]*?) src="([^"]+)"([^>]*)></script>`)
+  return [...html.matchAll(reScript)].map(m => m[2])
+}
+
+export function replaceScript(html: string, scriptFilename: string, scriptCode: string, removeViteModuleLoader = false): string {
+	const reScript = new RegExp(`<script([^>]*?) src="${scriptFilename}"([^>]*)></script>`)
+	const preloadMarker = /"__VITE_PRELOAD__"/
+	const newCode = scriptCode.replaceAll(preloadMarker, "void 0")
+	return html.replace(reScript, (_, beforeSrc, afterSrc) => `<script${beforeSrc}${afterSrc}>\n${newCode}\n</script>`)
+}
+
+export function getStyles(html: string) {
+  const reScript = new RegExp(`<link[^>]*? href="([^"]+)"[^>]*?>`)
+  return [...html.matchAll(reScript)].map(m => m[2])
+}
+
+export function replaceCss(html: string, scriptFilename: string, scriptCode: string): string {
+	const reCss = new RegExp(`<link[^>]*? href="${scriptFilename}"[^>]*?>`)
+	const inlined = html.replace(reCss, `<style>\n${scriptCode}\n</style>`)
+	return inlined
+}
+
 export class FrameStore {
   buffers: {[key: string]: ArrayBuffer} = {}
   bufferPromises: {[key: string]: Promise<ArrayBuffer>} = {}
 
   async loadModules() {
-    for (const path of ['/app/view/', '/app/edit/']) {
-      this.bufferPromises[path] = this.loadPage(path)
-    }
-    await Promise.allSettled(Object.values(this.bufferPromises))
+    await Promise.allSettled([this.buildPage('edit'), this.buildPage('view')])
   }
 
-  async loadPage(page: string) {
-    const resp = await fetch(page)
+  async loadFile(path: string): Promise<ArrayBuffer> {
+    const resp = await fetch(path)
     const data = await resp.arrayBuffer()
-    this.buffers[page] = data
+    this.buffers[path] = data
     return data
+  }
+
+  getFile(path: string): Promise<ArrayBuffer> {
+    if (path in this.bufferPromises) {
+      return this.bufferPromises[path]
+    } else {
+      const promise = this.loadFile(path)
+      this.bufferPromises[path] = promise
+      return promise
+    }
   }
 
   unloadModules() {
     this.buffers = {}
   }
 
+  // from generateBundle() in vite-plugin-singlefile
+  async replaceHtml(html: string, basePath: string): Promise<string> {
+    let replacedHtml = html
+    const jsAssets = getScripts(html)
+    for (const jsPath of jsAssets) {
+      const jsSource = await this.getFile(new URL(jsPath, basePath).pathname)
+      replacedHtml = replaceScript(replacedHtml, jsPath, new TextDecoder().decode(jsSource))
+    }
+    const cssAssets = getStyles(html)
+    for (const cssPath of cssAssets) {
+      const cssSource = await this.getFile(new URL(cssPath, basePath).pathname)
+      replacedHtml = replaceCss(replacedHtml, cssPath, new TextDecoder().decode(cssSource))
+    }
+    return replacedHtml
+  }
+
   async buildPage(mode: string): Promise<string> {
     const path = `/app/${mode}/`
-    let data = this.buffers[path]
-    if (data === undefined) {
-      const promise = this.bufferPromises[path]
-      if (promise !== undefined) {
-        await promise
-        data = this.buffers[path]
-        if (data === undefined) {
-          throw new Error(`Page missing: ${path}`)
-        }
-      } else {
-        throw new Error(`Page missing: ${path}`)
-      }
-    }
-    return new TextDecoder().decode(data)
+    let html = new TextDecoder().decode(await this.getFile(path))
+    html = await this.replaceHtml(html, new URL(path, window.location.href).href)
+    return html
   }
 }
 
