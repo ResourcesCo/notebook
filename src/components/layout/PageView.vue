@@ -133,7 +133,6 @@ const onLoad = () => {
   const contentWindow = frame.value?.contentWindow
   if (contentWindow) {
     contentWindow.postMessage(['srcdoc', srcdoc.value])
-    contentWindow.postMessage(['md-doc', Y.encodeStateAsUpdate(props.file.ydoc)], '*')
   }
   loadedCount.value += 1
 }

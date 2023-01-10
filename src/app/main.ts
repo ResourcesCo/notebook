@@ -6,11 +6,5 @@ import '@unocss/reset/tailwind.css'
 import "../styles/main.css"
 import "uno.css"
 
-import { registerSW } from 'virtual:pwa-register'
-
 const app = createApp(App)
 app.mount("#app")
-
-if (import.meta.env.PROD) {
-  registerSW()
-}

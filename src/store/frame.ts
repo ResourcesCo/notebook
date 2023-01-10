@@ -96,7 +96,7 @@ export class FrameStore {
   async buildPage(mode: string): Promise<string> {
     const path = `/app/${mode}/index.html`
     let html = new TextDecoder().decode(await this.getFile(path))
-    html = await this.replaceHtml(html, new URL(path, window.location.href).href)
+    // html = await this.replaceHtml(html, new URL(path, window.location.href).href)
     return html
   }
 }
