@@ -38,14 +38,8 @@ export default defineConfig({
         app: resolve(packageDir, "app/index.html"),
         "app/edit": resolve(packageDir, "app/edit/index.html"),
         "app/view": resolve(packageDir, "app/view/index.html"),
+        "app/frame": resolve(packageDir, "app/frame/index.html"),
       },
-      output: {
-        manualChunks: {
-          'codemirror-web': ['@codemirror/lang-javascript', '@codemirror/lang-html', '@codemirror/lang-css'],
-          'codemirror-py': ['@codemirror/lang-python'],
-          'codemirror-sql': ['@codemirror/lang-sql'],
-        }
-      }
     },
     manifest: true
   },

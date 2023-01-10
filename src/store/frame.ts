@@ -25,25 +25,25 @@ import { onMounted, onUnmounted } from 'vue'
 // SOFTWARE.
 
 export function getScripts(html: string) {
-  const reScript = new RegExp(`<script([^>]*?) src="([^"]+)"([^>]*)></script>`)
+  const reScript = /<script([^>]*?) src="([^"]+)"([^>]*)><\/script>/g
   return [...html.matchAll(reScript)].map(m => m[2])
 }
 
 export function replaceScript(html: string, scriptFilename: string, scriptCode: string, removeViteModuleLoader = false): string {
-	const reScript = new RegExp(`<script([^>]*?) src="${scriptFilename}"([^>]*)></script>`)
-	const preloadMarker = /"__VITE_PRELOAD__"/
+	const reScript = new RegExp(`<script([^>]*?) src="${scriptFilename}"([^>]*)></script>`, 'g')
+	const preloadMarker = /"__VITE_PRELOAD__"/g
 	const newCode = scriptCode.replaceAll(preloadMarker, "void 0")
-	return html.replace(reScript, (_, beforeSrc, afterSrc) => `<script${beforeSrc}${afterSrc}>\n${newCode}\n</script>`)
+	return html.replaceAll(reScript, (_, beforeSrc, afterSrc) => `<script${beforeSrc}${afterSrc}>\n${newCode}\n</script>`)
 }
 
 export function getStyles(html: string) {
-  const reScript = new RegExp(`<link[^>]*? href="([^"]+)"[^>]*?>`)
-  return [...html.matchAll(reScript)].map(m => m[2])
+  const reScript = /<link[^>]*? href="([^"]+)"[^>]*?>/g
+  return [...html.matchAll(reScript)].map(m => m[1])
 }
 
 export function replaceCss(html: string, scriptFilename: string, scriptCode: string): string {
-	const reCss = new RegExp(`<link[^>]*? href="${scriptFilename}"[^>]*?>`)
-	const inlined = html.replace(reCss, `<style>\n${scriptCode}\n</style>`)
+	const reCss = new RegExp(`<link[^>]*? href="${scriptFilename}"[^>]*?>`, 'g')
+	const inlined = html.replaceAll(reCss, `<style>\n${scriptCode}\n</style>`)
 	return inlined
 }
 
@@ -63,6 +63,7 @@ export class FrameStore {
   }
 
   getFile(path: string): Promise<ArrayBuffer> {
+    console.log(path)
     if (path in this.bufferPromises) {
       return this.bufferPromises[path]
     } else {
@@ -93,7 +94,7 @@ export class FrameStore {
   }
 
   async buildPage(mode: string): Promise<string> {
-    const path = `/app/${mode}/`
+    const path = `/app/${mode}/index.html`
     let html = new TextDecoder().decode(await this.getFile(path))
     html = await this.replaceHtml(html, new URL(path, window.location.href).href)
     return html

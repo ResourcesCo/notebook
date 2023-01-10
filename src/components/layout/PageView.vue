@@ -60,7 +60,11 @@ useEventListener('message', (e: MessageEvent) => {
     Array.isArray(e.data) &&
     e.data.length >= 1
   ) {
-    if (e.data[0] === "md-update" && e.data.length === 2) {
+    if (e.data[0] === 'need-doc' || e.data[0] === 'srcdoc-loaded') {
+      if (contentWindow) {
+        contentWindow.postMessage(['md-doc', Y.encodeStateAsUpdate(props.file.ydoc)], '*')
+      }
+    } else if (e.data[0] === "md-update" && e.data.length === 2) {
       const update = e.data[1] as Uint8Array
       Y.applyUpdate(props.file.ydoc, update, mode.value)
       const text = props.file.ydoc.getText('text').toString()
@@ -76,49 +80,44 @@ useEventListener('message', (e: MessageEvent) => {
       } else if (dispatcher.status === 'deny') {
         dispatcher.sendDenyMessage()
       }
-    } else if (e.data[0] === 'need-doc') {
-      if (contentWindow) {
-        contentWindow.postMessage(['md-doc', Y.encodeStateAsUpdate(props.file.ydoc)], '*')
-      }
     } else if (props.page.isSettings) {
       handleSettingsMessage(e.data, props.notebook)
     }
   }
 })
 const isSettingsView = computed(() => props.page.isSettings && mode.value === 'view')
-const csp = computed(() => generateSecurityPolicy(props.container.content))
-const src = computed(() => {
-  const colorScheme = initialColorScheme.value
-  const role = props.page.isSettings ? 'settings' : ''
-  const scriptUrl = (
-    mode.value === 'edit' ?
-    new URL("/src/app/edit/main.ts", import.meta.url) :
-    new URL("/src/app/view/main.ts", import.meta.url)
-  )
-  if (role === 'settings') {
-    scriptUrl.searchParams.set('role', 'settings')
-  }
-  const html = generateSrcDoc({colorScheme, scriptUrl: scriptUrl.toString(), csp: csp.value})
-  const url = new URL('/api/frame', window.location.href)
-  if (role === 'settings') {
-    url.searchParams.set('role', 'settings')
-  }
-  url.searchParams.set('color-scheme', colorScheme)
-  if (import.meta.env.PROD) {
-    url.searchParams.set('mode', mode.value)
-  } else {
-    url.searchParams.set('html', btoa(html))
-  }
-  url.searchParams.set('csp', btoa(csp.value))
-  const appUrl = new URL(mode.value === 'edit' ? '/app/edit/' : '/app/view/', window.location.href)
-  return appUrl.href
-})
+// const csp = computed(() => generateSecurityPolicy(props.container.content))
+// const src = computed(() => {
+//   const colorScheme = initialColorScheme.value
+//   const role = props.page.isSettings ? 'settings' : ''
+//   const scriptUrl = (
+//     mode.value === 'edit' ?
+//     new URL("/src/app/edit/main.ts", import.meta.url) :
+//     new URL("/src/app/view/main.ts", import.meta.url)
+//   )
+//   if (role === 'settings') {
+//     scriptUrl.searchParams.set('role', 'settings')
+//   }
+//   const html = generateSrcDoc({colorScheme, scriptUrl: scriptUrl.toString(), csp: csp.value})
+//   const url = new URL('/api/frame', window.location.href)
+//   if (role === 'settings') {
+//     url.searchParams.set('role', 'settings')
+//   }
+//   url.searchParams.set('color-scheme', colorScheme)
+//   if (import.meta.env.PROD) {
+//     url.searchParams.set('mode', mode.value)
+//   } else {
+//     url.searchParams.set('html', btoa(html))
+//   }
+//   url.searchParams.set('csp', btoa(csp.value))
+//   const appUrl = new URL(mode.value === 'edit' ? '/app/edit/' : '/app/view/', window.location.href)
+//   return appUrl.href
+// })
 const frameUrl = computed(() => {
   if (srcdoc.value !== undefined) {
     const url = new URL('/app/frame/', window.location.href)
     const colorScheme = initialColorScheme.value
     url.searchParams.set('color-scheme', colorScheme)
-    url.searchParams.set('srcdoc', srcdoc.value)
     return url.href
   } else {
     return undefined
@@ -127,12 +126,13 @@ const frameUrl = computed(() => {
 watch(colorScheme, () => {
   const contentWindow = frame.value?.contentWindow
   if (contentWindow) {
-    contentWindow?.postMessage!(["color-scheme", colorScheme.value], "*")
+    contentWindow.postMessage(["color-scheme", colorScheme.value], "*")
   }
 })
 const onLoad = () => {
   const contentWindow = frame.value?.contentWindow
   if (contentWindow) {
+    contentWindow.postMessage(['srcdoc', srcdoc.value])
     contentWindow.postMessage(['md-doc', Y.encodeStateAsUpdate(props.file.ydoc)], '*')
   }
   loadedCount.value += 1
@@ -145,7 +145,6 @@ const handleUpdate = (update: Uint8Array, origin: string | null) => {
 }
 onMounted(async () => {
   const data = await props.frameStore.buildPage(mode.value)
-  console.log({data, buffers: props.frameStore.buffers})
   srcdoc.value = data
   props.file.ydoc.on('update', handleUpdate)
   if (props.page.isSettings) {

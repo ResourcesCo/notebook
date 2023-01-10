@@ -4,7 +4,7 @@
     <title>Frame</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests; default-src 'self' 'unsafe-inline' 'unsafe-eval';" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval';" />
     <base target="_blank">
     <style type="text/css">
       html {
@@ -33,15 +33,24 @@
         const params = new URLSearchParams(window.location.search)
         const setting = params.get("color-scheme") || "auto"
         const dark = setting === 'auto' ? prefersDark : (setting === 'dark')
+        let frame = undefined
         document.documentElement.classList[dark ? 'add' : 'remove']("dark")
-        const srcdoc = params.get("srcdoc")
-        const frame = document.createElement('iframe')
-        frame.setAttribute('srcdoc', srcdoc)
-        frame.setAttribute('sandbox', 'allow-scripts allow-popups')
-        document.body.appendChild(frame)
         window.addEventListener('message', (e) => {
           if (e.source === window.parent) {
-            frame.contentWindow.postMessage(e.data, '*')
+            if (Array.isArray(e.data) && e.data[0] === 'srcdoc') {
+              const srcdoc = e.data[1]
+              console.log('srcdoc', srcdoc)
+              frame = document.createElement('iframe')
+              frame.setAttribute('srcdoc', srcdoc)
+              frame.setAttribute('sandbox', 'allow-scripts allow-popups')
+              frame.addEventListener('load', () => {
+                console.log('sending srcdoc-loaded')
+                window.parent.postMessage(['srcdoc-loaded'])
+              })
+              document.body.appendChild(frame)
+            } else if (frame !== undefined) {
+              frame.contentWindow.postMessage(e.data, '*')
+            }
           } else if (e.source === frame.contentWindow) {
             window.parent.postMessage(e.data, '*')
           }
