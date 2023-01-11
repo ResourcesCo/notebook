@@ -11,3 +11,4 @@ node_modules
 tsconfig.tsbuildinfo
 .vscode/settings.json
 .vscode
+public/app

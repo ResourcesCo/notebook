@@ -7,7 +7,7 @@
     "build:view": "NODE_ENV=production vite build -c vite-view.config.ts",
     "build:vite-frames": "pnpm build:edit && pnpm build:view",
     "build:main": "NODE_ENV=production vite build",
-    "build:copy": "mkdir -p dist/app/edit && cp dist-edit/app/edit/index.html dist/app/edit/index.html && mkdir -p dist/app/view && cp dist-view/app/view/index.html dist/app/view/index.html",
+    "build:copy": "mkdir -p public/app/edit && cp dist-edit/app/edit/index.html public/app/edit/index.html && mkdir -p public/app/view && cp dist-view/app/view/index.html public/app/view/index.html",
     "build": "vue-tsc --noEmit && pnpm build:vite-frames && pnpm build:copy && pnpm build:main && cp -r vercel.json dist/vercel.json && cp -r api dist/api",
     "dev": "vite --port 3333",
     "test": "vitest --outputTruncateLength=500",
