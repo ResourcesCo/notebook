@@ -10,6 +10,7 @@
     "build:copy": "mkdir -p public/app/edit && cp dist-edit/app/edit/index.html public/app/edit/index.html && mkdir -p public/app/view && cp dist-view/app/view/index.html public/app/view/index.html",
     "build": "vue-tsc --noEmit && pnpm build:vite-frames && pnpm build:copy && pnpm build:main && cp -r vercel.json dist/vercel.json && cp -r api dist/api",
     "dev": "vite --port 3333",
+    "preview": "vite preview",
     "test": "vitest --outputTruncateLength=500",
     "test:ui": "vitest --ui --outputTruncateLength=500",
     "test:run": "vitest run"

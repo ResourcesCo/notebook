@@ -63,7 +63,6 @@ export class FrameStore {
   }
 
   getFile(path: string): Promise<ArrayBuffer> {
-    console.log(path)
     if (path in this.bufferPromises) {
       return this.bufferPromises[path]
     } else {

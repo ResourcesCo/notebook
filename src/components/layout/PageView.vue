@@ -61,6 +61,7 @@ useEventListener('message', (e: MessageEvent) => {
     e.data.length >= 1
   ) {
     if (e.data[0] === 'need-doc' || e.data[0] === 'srcdoc-loaded') {
+      loadedCount.value += 1
       if (contentWindow) {
         contentWindow.postMessage(['md-doc', Y.encodeStateAsUpdate(props.file.ydoc)], '*')
       }
@@ -113,16 +114,6 @@ const isSettingsView = computed(() => props.page.isSettings && mode.value === 'v
 //   const appUrl = new URL(mode.value === 'edit' ? '/app/edit/' : '/app/view/', window.location.href)
 //   return appUrl.href
 // })
-const frameUrl = computed(() => {
-  if (srcdoc.value !== undefined) {
-    const url = new URL('/app/frame/', window.location.href)
-    const colorScheme = initialColorScheme.value
-    url.searchParams.set('color-scheme', colorScheme)
-    return url.href
-  } else {
-    return undefined
-  }
-})
 watch(colorScheme, () => {
   const contentWindow = frame.value?.contentWindow
   if (contentWindow) {
@@ -133,8 +124,8 @@ const onLoad = () => {
   const contentWindow = frame.value?.contentWindow
   if (contentWindow) {
     contentWindow.postMessage(['srcdoc', srcdoc.value])
+    contentWindow.postMessage(['color-scheme', colorScheme.value])
   }
-  loadedCount.value += 1
 }
 const handleUpdate = (update: Uint8Array, origin: string | null) => {
   const contentWindow = frame.value?.contentWindow
@@ -157,7 +148,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <iframe v-if="frameUrl" ref="frame" class="h-full w-full" :src="frameUrl" :style="loadedCount === 0 ? 'visibility: hidden' : ''"
+  <iframe ref="frame" class="h-full w-full" src="/app/frame/index.html" :style="loadedCount === 0 ? 'visibility: hidden' : ''"
      @load="onLoad"></iframe>
   <Settings v-if="isSettingsView" :notebook="props.notebook"></Settings>
   <SendRequestModal

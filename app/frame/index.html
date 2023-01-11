@@ -30,24 +30,22 @@
         const prefersDark =
           window.matchMedia &&
           window.matchMedia("(prefers-color-scheme: dark)").matches
-        const params = new URLSearchParams(window.location.search)
-        const setting = params.get("color-scheme") || "auto"
-        const dark = setting === 'auto' ? prefersDark : (setting === 'dark')
         let frame = undefined
-        document.documentElement.classList[dark ? 'add' : 'remove']("dark")
         window.addEventListener('message', (e) => {
           if (e.source === window.parent) {
             if (Array.isArray(e.data) && e.data[0] === 'srcdoc') {
               const srcdoc = e.data[1]
-              console.log('srcdoc', srcdoc)
               frame = document.createElement('iframe')
-              frame.setAttribute('srcdoc', srcdoc)
-              frame.setAttribute('sandbox', 'allow-scripts allow-popups')
+              frame.sandbox = 'allow-scripts allow-popups'
+              frame.srcdoc = srcdoc
               frame.addEventListener('load', () => {
-                console.log('sending srcdoc-loaded')
                 window.parent.postMessage(['srcdoc-loaded'])
               })
               document.body.appendChild(frame)
+            } else if (Array.isArray(e.data) && e.data[0] === 'color-scheme') {
+              const setting = e.data[1]
+              const dark = setting === 'auto' ? prefersDark : (setting === 'dark')
+              document.documentElement.classList[dark ? 'add' : 'remove']("dark")
             } else if (frame !== undefined) {
               frame.contentWindow.postMessage(e.data, '*')
             }
