@@ -4,7 +4,11 @@
 *.local
 dist
 dist-ssr
+dist-view
+dist-edit
+dev-dist
 node_modules
 tsconfig.tsbuildinfo
 .vscode/settings.json
 .vscode
+public/app

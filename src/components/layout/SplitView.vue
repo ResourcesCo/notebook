@@ -1,14 +1,19 @@
 <script lang="ts" setup>
 import { ref, onMounted, PropType } from 'vue'
 import Split from 'split-grid'
-import { Notebook } from '../../store/notebook'
+import { Notebook } from '@/store/notebook'
+import { FrameStore } from '@/store/frame'
 import TabView from './TabView.vue'
 import { useWindowSize } from '@vueuse/core'
 import SecretsModal from '../settings/SecretsModal.vue'
 
-const {notebook} = defineProps({
+const {notebook, frameStore} = defineProps({
   notebook: {
     type: Object as PropType<Notebook>,
+    required: true,
+  },
+  frameStore: {
+    type: Object as PropType<FrameStore>,
     required: true,
   },
 })
@@ -32,8 +37,20 @@ onMounted(() => {
 
 <template>
   <div class="view-container text-zinc-700 dark:text-zinc-200 side-left">
-    <TabView :notebook="notebook" :tabState="notebook.view.left" :otherTabState="notebook.view.right" side="left" />
-    <TabView :notebook="notebook" :tabState="notebook.view.right" :otherTabState="notebook.view.left" side="right" />
+    <TabView
+      :notebook="notebook"
+      :frameStore="frameStore"
+      :tabState="notebook.view.left"
+      :otherTabState="notebook.view.right"
+      side="left"
+    />
+    <TabView
+      :notebook="notebook"
+      :frameStore="frameStore"
+      :tabState="notebook.view.right"
+      :otherTabState="notebook.view.left"
+      side="right"
+    />
     <div ref="split" class="view-split">
       <div class="view-split-bar h-full"></div>
       <div class="view-split-handle p-1 <sm:opacity-0">↔</div>

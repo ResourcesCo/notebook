@@ -8,6 +8,11 @@ import RequestClient from '@/components/data/Request/RequestClient'
 
 const { params } = defineProps({ params: { type: Object as PropType<URLSearchParams>, required: true } })
 
+// This is used to check if it's received the doc from an `md-doc` message. If it hasn't
+// received it, it will not apply `md-update` messages and will send `need-doc` messages
+// until it receives the doc.
+const haveDoc = ref(false)
+
 const yDoc = new Y.Doc()
 const yText = yDoc.getText('text')
 
@@ -26,8 +31,19 @@ function handleMessage(e: MessageEvent) {
     ['md-doc', 'md-update'].includes(e.data[0])
   ) {
     const update = e.data[1] as Uint8Array
-    Y.applyUpdate(yDoc, update, 'local')
-    value.value = yDoc.getText('text').toString()
+    if (e.data[0] === 'md-doc') {
+      haveDoc.value = true
+      Y.applyUpdate(yDoc, update, 'local')      
+      value.value = yDoc.getText('text').toString()
+    } else if (e.data[0] === 'md-update') {
+      if (haveDoc.value === true) {
+        Y.applyUpdate(yDoc, update, 'local')
+        value.value = yDoc.getText('text').toString()
+      } else {
+        parent.postMessage(['need-doc'], '*')
+        console.warn("Received update but don't have doc")
+      }
+    }
   }
 }
 
@@ -47,6 +63,14 @@ if (firstMessageEvent.event !== null) {
   }, 0)
 }
 useEventListener('message', handleMessage)
+
+const checkDoc = setInterval(() => {
+  if (haveDoc.value === true) {
+    clearInterval(checkDoc)
+  } else {
+    parent.postMessage(['need-doc'], '*')    
+  }
+}, 200)
 </script>
 
 <template>

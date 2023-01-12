@@ -1,19 +1,22 @@
 <script lang="ts" setup>
 import { defineComponent, computed, toRef, reactive, PropType } from "vue"
-import Nav from "../Nav.vue"
 import TabArea from "../TabArea.vue"
 import Tab from "../Tab.vue"
 import PageView from "./PageView.vue"
 import DisplayButton from "../DisplayButton.vue"
-import type { FileData, Notebook, TabState } from "../../store/notebook"
+import type { FileData, Notebook, TabState } from "@/store/notebook"
+import { FrameStore } from '@/store/frame'
 import TabViewButton from "../TabViewButton.vue"
-import { useAsyncState } from "@vueuse/core"
 import { Container } from "../data/Containers/data"
 import { pathToRegexp } from 'path-to-regexp'
 
 const props = defineProps({
   notebook: {
     type: Object as PropType<Notebook>,
+    required: true,
+  },
+  frameStore: {
+    type: Object as PropType<FrameStore>,
     required: true,
   },
   side: {
@@ -131,6 +134,7 @@ const pageKey = computed(() => `${filename.value}---${mode.value}---${file.value
     <PageView
       :key="pageKey"
       :notebook="notebook"
+      :frameStore="frameStore"
       :page="page"
       :file="file"
       :mode="mode"
