@@ -4,7 +4,6 @@
     <title>Frame</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval';" />
     <base target="_blank">
     <style type="text/css">
       html {
@@ -34,7 +33,7 @@
         window.addEventListener('message', (e) => {
           if (e.source === window.parent) {
             if (Array.isArray(e.data) && e.data[0] === 'srcdoc') {
-              const srcdoc = e.data[1]
+              const srcdoc = e.data[1].replace('__PARENT_LOCATION_SEARCH__', window.location.search)
               frame = document.createElement('iframe')
               frame.sandbox = 'allow-scripts allow-popups'
               frame.srcdoc = srcdoc

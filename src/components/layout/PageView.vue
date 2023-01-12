@@ -86,7 +86,16 @@ useEventListener('message', (e: MessageEvent) => {
   }
 })
 const isSettingsView = computed(() => props.page.isSettings && mode.value === 'view')
-// const csp = computed(() => generateSecurityPolicy(props.container.content))
+const csp = computed(() => generateSecurityPolicy(props.container.content))
+const frameUrl = computed(() => {
+  const url = new URL('/api/frame', window.location.href)
+  url.searchParams.set('csp', btoa(csp.value))
+  url.searchParams.set('color-scheme', colorScheme.value)
+  if (props.page.isSettings) {
+    url.searchParams.set('role', 'settings')
+  }
+  return url.href
+})
 // const src = computed(() => {
 //   const colorScheme = initialColorScheme.value
 //   const role = props.page.isSettings ? 'settings' : ''
@@ -151,7 +160,7 @@ onUnmounted(() => {
     v-if="srcdoc"
     ref="frame"
     class="h-full w-full"
-    src="/app/frame/index.html"
+    :src="frameUrl"
     :style="loadedCount === 0 ? 'visibility: hidden' : ''"
     @load="onLoad"
   ></iframe>

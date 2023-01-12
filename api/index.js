@@ -10,36 +10,68 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const content = {}
 
-async function getContent(mode) {
-  if (typeof content[mode] === 'string') {
-    return content[mode]
-  } else {
-    if (mode === 'edit' || mode === 'view') {
-      const paths = [
-        resolve(__dirname, `../dist/app/${mode}/index.html`),
-        resolve(__dirname, `../app/${mode}/index.html`),
-      ]
-      for (const path of paths) {
-        try {
-          const html = await readFile(path, 'utf8')
-          content[mode] = html
-          return html
-        } catch (e) {
-          console.error('Cannot read file', e)
-        }
+const html = `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Frame</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base target="_blank">
+    <style type="text/css">
+      html {
+        background-color: white;
       }
-    }
-  }
-}
+      html.dark {
+        background-color: black;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      iframe {
+        border: 0;
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      (function () {
+        const prefersDark =
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches
+        let frame = undefined
+        window.addEventListener('message', (e) => {
+          if (e.source === window.parent) {
+            if (Array.isArray(e.data) && e.data[0] === 'srcdoc') {
+              const srcdoc = e.data[1].replace('__PARENT_LOCATION_SEARCH__', window.location.search)
+              frame = document.createElement('iframe')
+              frame.sandbox = 'allow-scripts allow-popups'
+              frame.srcdoc = srcdoc
+              frame.addEventListener('load', () => {
+                window.parent.postMessage(['srcdoc-loaded'])
+              })
+              document.body.appendChild(frame)
+            } else if (Array.isArray(e.data) && e.data[0] === 'color-scheme') {
+              const setting = e.data[1]
+              const dark = setting === 'auto' ? prefersDark : (setting === 'dark')
+              document.documentElement.classList[dark ? 'add' : 'remove']("dark")
+            } else if (frame !== undefined) {
+              frame.contentWindow.postMessage(e.data, '*')
+            }
+          } else if (e.source === frame.contentWindow) {
+            window.parent.postMessage(e.data, '*')
+          }
+        })
+      })()
+    </script>    
+  </body>
+</html>
+`
 
 app.get('/api/frame', asyncHandler(async (req, res, next) => {
   const csp = Buffer.from(req.query.csp, 'base64').toString()
-  let html = ''
-  if (typeof req.query.html === 'string') {
-    html = Buffer.from(req.query.html, 'base64').toString()
-  } else {
-    html = await getContent(req.query.mode)
-  }
   res.set('Content-Type', 'text/html')
   res.set('Content-Security-Policy', csp)
   res.send(html)

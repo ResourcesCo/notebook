@@ -11,7 +11,7 @@
         const setting = params.get("color-scheme") || "auto"
         const dark = setting === 'auto' ? prefersDark : (setting === 'dark')
         document.documentElement.classList[dark ? 'add' : 'remove']("dark")
-
+        window.parentLocationSearch = '__PARENT_LOCATION_SEARCH__'
         window.firstMessageEvent = {event: null}
         function listener(e) {
           if (window.firstMessageEvent && e.data.length > 0 && e.data[0] === 'md-doc') {
@@ -25,7 +25,6 @@
     </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval';" />
     <base target="_blank">
   </head>
   <body>
