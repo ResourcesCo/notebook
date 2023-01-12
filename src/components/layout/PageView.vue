@@ -10,8 +10,7 @@ import { RequestModel } from '../data/Request'
 import SendRequestModal from '../data/Request/SendRequestModal.vue'
 import Settings from '../settings/Settings.vue'
 import { Container } from '../data/Containers/data'
-import { generateSrcDoc } from './srcdoc'
-import { generateSecurityPolicy } from "../data/Containers/policy"
+import { generateSecurityPolicy } from '../data/Containers/policy'
 import RequestDispatcher from '../data/Request/RequestDispatcher'
 
 const props = defineProps({
@@ -148,8 +147,14 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <iframe ref="frame" class="h-full w-full" src="/app/frame/index.html" :style="loadedCount === 0 ? 'visibility: hidden' : ''"
-     @load="onLoad"></iframe>
+  <iframe
+    v-if="srcdoc"
+    ref="frame"
+    class="h-full w-full"
+    src="/app/frame/index.html"
+    :style="loadedCount === 0 ? 'visibility: hidden' : ''"
+    @load="onLoad"
+  ></iframe>
   <Settings v-if="isSettingsView" :notebook="props.notebook"></Settings>
   <SendRequestModal
     v-if="requestDispatcher"

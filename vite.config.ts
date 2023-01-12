@@ -21,6 +21,11 @@ export default defineConfig({
       registerType: 'autoUpdate',
       injectRegister: null,
       srcDir: 'src',
+      workbox: {
+        // runtimeCaching: [
+          
+        // ]
+      },
     })
   ],
   server: {
