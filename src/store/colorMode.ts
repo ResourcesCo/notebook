@@ -33,7 +33,9 @@ const useStorage = (key: string, defaultValue: unknown) => {
 }
 
 const getUrlParamSchema = () => {
-  const params = new URLSearchParams(window.location.search)
+  // @ts-ignore
+  const wls: string = typeof window.parentLocationSearch === 'string' ? window.parentLocationSearch : window.location.search
+  const params = new URLSearchParams(wls)
   const result = params.get("color-scheme") || 'auto'
   return result
 }

@@ -7,17 +7,19 @@
         const prefersDark =
           window.matchMedia &&
           window.matchMedia("(prefers-color-scheme: dark)").matches
-        const params = new URLSearchParams(window.location.search)
-        const setting = params.get("color-scheme") || "auto"
-        const dark = setting === 'auto' ? prefersDark : (setting === 'dark')
-        document.documentElement.classList[dark ? 'add' : 'remove']("dark")
-
+        function setColorMode(colorMode) {
+          const dark = colorMode === 'auto' ? prefersDark : (colorMode === 'dark')
+          document.documentElement.classList[dark ? 'add' : 'remove']("dark")
+        }
+        window.parentLocationSearch = '__PARENT_LOCATION_SEARCH__'
+        const params = new URLSearchParams(window.parentLocationSearch)
+        setColorMode(params.get("color-scheme") || "auto")
         window.firstMessageEvent = {event: null}
         function listener(e) {
           if (window.firstMessageEvent && e.data.length > 0 && e.data[0] === 'md-doc') {
             window.firstMessageEvent.event = e
-          } else {
-            window.removeEventListener('message', listener)
+          } else if (Array.isArray(e.data) && e.data.length > 0 && e.data[0] === 'color-scheme') {
+            setColorMode(e.data[1])
           }
         }
         window.addEventListener('message', listener)
@@ -25,7 +27,6 @@
     </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval';" />
     <base target="_blank">
   </head>
   <body>
