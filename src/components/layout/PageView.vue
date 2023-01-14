@@ -87,15 +87,7 @@ useEventListener('message', (e: MessageEvent) => {
 })
 const isSettingsView = computed(() => props.page.isSettings && mode.value === 'view')
 const csp = computed(() => generateSecurityPolicy(props.container.content))
-const frameUrl = computed(() => {
-  const url = new URL('/api/frame', window.location.href)
-  url.searchParams.set('csp', btoa(csp.value))
-  url.searchParams.set('color-scheme', colorScheme.value)
-  if (props.page.isSettings) {
-    url.searchParams.set('role', 'settings')
-  }
-  return url.href
-})
+const frameUrl = ref<string | undefined>(undefined)
 // const src = computed(() => {
 //   const colorScheme = initialColorScheme.value
 //   const role = props.page.isSettings ? 'settings' : ''
@@ -143,6 +135,13 @@ const handleUpdate = (update: Uint8Array, origin: string | null) => {
 }
 onMounted(async () => {
   const data = await props.frameStore.buildPage(mode.value)
+  const url = new URL('/api/frame', window.location.href)
+  url.searchParams.set('csp', btoa(csp.value))
+  url.searchParams.set('color-scheme', colorScheme.value)
+  if (props.page.isSettings) {
+    url.searchParams.set('role', 'settings')
+  }
+  frameUrl.value = url.href
   srcdoc.value = data
   props.file.ydoc.on('update', handleUpdate)
   if (props.page.isSettings) {

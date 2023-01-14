@@ -36,10 +36,10 @@ export default defineConfig({
     <base target="_blank">
     <style type="text/css">
       html {
-        background-color: white;
+        background-color: #f5f5f4;
       }
       html.dark {
-        background-color: black;
+        background-color: #121212;
       }
       * {
         margin: 0;
@@ -58,6 +58,12 @@ export default defineConfig({
         const prefersDark =
           window.matchMedia &&
           window.matchMedia("(prefers-color-scheme: dark)").matches
+        function setColorMode(colorMode) {
+          const dark = colorMode === 'auto' ? prefersDark : (colorMode === 'dark')
+          document.documentElement.classList[dark ? 'add' : 'remove']("dark")
+        }
+        const params = new URLSearchParams(window.location.search)
+        setColorMode(params.get("color-scheme") || "auto")
         let frame = undefined
         window.addEventListener('message', (e) => {
           if (e.source === window.parent) {
@@ -71,9 +77,10 @@ export default defineConfig({
               })
               document.body.appendChild(frame)
             } else if (Array.isArray(e.data) && e.data[0] === 'color-scheme') {
-              const setting = e.data[1]
-              const dark = setting === 'auto' ? prefersDark : (setting === 'dark')
-              document.documentElement.classList[dark ? 'add' : 'remove']("dark")
+              setColorMode(e.data[1])
+              if (frame !== undefined) {
+                frame.contentWindow.postMessage(e.data, '*')                
+              }
             } else if (frame !== undefined) {
               frame.contentWindow.postMessage(e.data, '*')
             }
@@ -82,7 +89,7 @@ export default defineConfig({
           }
         })
       })()
-    </script>    
+    </script>
   </body>
 </html>
 `
