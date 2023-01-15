@@ -24,6 +24,7 @@ import { useEventListener } from "@vueuse/core"
 import * as Y from 'yjs'
 import Request from './data/Request'
 import Data from './data/Data'
+import Code from './data/Code'
 import RequestClient from "./data/Request/RequestClient"
 import { Containers, ContainerConfig } from "./data/Containers"
 import { Environment, EnvironmentConfig } from "./data/Environment"
@@ -65,7 +66,8 @@ const components = {
   LocalStorageTools,
   Sandbox,
   request: Request,
-  data: Data
+  data: Data,
+  code: Code,
 } as const
 
 type Block =
@@ -78,6 +80,7 @@ type Block =
   {tag: 'Sandbox', data: string, info?: string} |
   {tag: 'request', data: string, client: RequestClient} |
   {tag: 'data', data: string, info?: string, name: string} |
+  {tag: 'code', data: string, info?: string, name: string} |
   { error: string }
 
 const value = toRef(props, 'value')
@@ -122,7 +125,7 @@ watch(value, () => {
           return {tag, data: component.data, info: component.info}
         } else if (tag === 'request') {
           return {tag, data: component.data, client: props.client}
-        } else if (tag === 'data' && component.name !== undefined) {
+        } else if ((tag === 'data' || tag === 'code') && component.name !== undefined) {
           pageData.value[component.name] = {
             data: component.data,
             replace: s => {
@@ -194,6 +197,9 @@ useEventListener('change', (e) => {
         </template>
         <template v-else-if="block.tag === 'data'">
           <Data :data="block.data" :name="block.name" :info="block.info" />
+        </template>
+        <template v-else-if="block.tag === 'code'">
+          <Code :data="block.data" :name="block.name" :info="block.info" />
         </template>
       </template>
       <div class="prose my-2 text-red" v-else-if="'error' in block">{{block.error}}</div>
