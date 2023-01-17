@@ -2,7 +2,7 @@
 import { PropType, ref } from 'vue'
 import { useEventListener } from '@vueuse/core'
 import * as Y from 'yjs'
-import MarkdownView from '../../components/MarkdownView.vue'
+import MarkdownView from '@/components/markdown/MarkdownView'
 import SettingsClient from '@/store/SettingsClient'
 import RequestClient from '@/components/data/Request/RequestClient'
 

@@ -1,40 +1,25 @@
 <script lang="ts" setup>
 import { PropType, ref, toRef, watch } from "vue"
 import MarkdownIt from "markdown-it"
-import hljs from "highlight.js/lib/core"
-import markdown from "highlight.js/lib/languages/markdown"
-import xml from "highlight.js/lib/languages/xml"
-import css from "highlight.js/lib/languages/css"
-import javascript from "highlight.js/lib/languages/javascript"
-import typescript from "highlight.js/lib/languages/typescript"
-import json from "highlight.js/lib/languages/json"
-import ComponentManager from "./markdown/ComponentManager"
-import LiveCheckboxes from "./markdown/LiveCheckboxes"
-import LocalStorageTools from "./data/LocalStorageTools"
-import NotebookContent, { NotebookContentInfo, validate as validateNotebookContent } from './data/NotebookContent'
-import NotebookView, { NotebookViewType, validate as validateNotebookView } from './data/NotebookView'
-import Sandbox from "./data/Sandbox"
-import parseJson from '../utils/parseJson'
-import SettingsClient from '../store/SettingsClient'
-// @ts-ignore
-import highlight from "markdown-it-highlightjs/core"
+import { highlight, hljs } from './highlight'
+import ComponentManager from "../ComponentManager"
+import LiveCheckboxes from "../LiveCheckboxes"
+import LocalStorageTools from "@/components/data/LocalStorageTools"
+import NotebookContent, { NotebookContentInfo, validate as validateNotebookContent } from '@/components/data/NotebookContent'
+import NotebookView, { NotebookViewType, validate as validateNotebookView } from '@/components/data/NotebookView'
+import Sandbox from "@/components/data/Sandbox"
+import parseJson from '@/utils/parseJson'
+import SettingsClient from '@/store/SettingsClient'
 // @ts-ignore
 import taskLists from 'markdown-it-task-list-plus'
 import { useEventListener } from "@vueuse/core"
 import * as Y from 'yjs'
-import Request from './data/Request'
-import Data from './data/Data'
-import Code from './data/Code'
-import RequestClient from "./data/Request/RequestClient"
-import { Containers, ContainerConfig } from "./data/Containers"
-import { Environment, EnvironmentConfig } from "./data/Environment"
-
-hljs.registerLanguage("xml", xml)
-hljs.registerLanguage("css", css)
-hljs.registerLanguage("javascript", javascript)
-hljs.registerLanguage("typescript", typescript)
-hljs.registerLanguage("json", json)
-hljs.registerLanguage("markdown", markdown)
+import Request from '../../data/Request'
+import Data from '../../data/Data'
+import Code from '../../data/Code'
+import RequestClient from "../../data/Request/RequestClient"
+import { Containers, ContainerConfig } from "../../data/Containers"
+import { Environment, EnvironmentConfig } from "../../data/Environment"
 
 const props = defineProps({
   value: {
