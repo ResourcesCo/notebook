@@ -2,6 +2,7 @@
 import { useEventListener } from '@vueuse/core'
 import { PropType, ref, computed, watch, onMounted, onBeforeMount, onUnmounted } from 'vue'
 import * as Y from 'yjs'
+import {saveAs} from 'file-saver'
 import { FileData, Notebook } from '@/store/notebook'
 import { FrameStore } from '@/store/frame'
 import { colorScheme } from '../../store'
@@ -80,6 +81,10 @@ useEventListener('message', (e: MessageEvent) => {
       } else if (dispatcher.status === 'deny') {
         dispatcher.sendDenyMessage()
       }
+    } else if (e.data[0] === 'download') {
+      const data = JSON.parse(e.data[1])
+      const blob = new Blob([JSON.stringify(data, null, 2)], {type: "text/plain;charset=utf-8"})
+      saveAs(blob, 'data.json')
     } else if (props.page.isSettings) {
       handleSettingsMessage(e.data, props.notebook)
     }

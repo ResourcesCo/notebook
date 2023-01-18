@@ -1,25 +1,26 @@
 <script lang="ts" setup>
-import { PropType, ref, toRef, watch } from "vue"
-import MarkdownIt from "markdown-it"
+import { PropType, ref, toRef, watch } from 'vue'
+import MarkdownIt from 'markdown-it'
 import { highlight, hljs } from './highlight'
-import ComponentManager from "../ComponentManager"
-import LiveCheckboxes from "../LiveCheckboxes"
-import LocalStorageTools from "@/components/data/LocalStorageTools"
+import ComponentManager from '../ComponentManager'
+import LiveCheckboxes from '../LiveCheckboxes'
+import LocalStorageTools from '@/components/data/LocalStorageTools'
 import NotebookContent, { NotebookContentInfo, validate as validateNotebookContent } from '@/components/data/NotebookContent'
 import NotebookView, { NotebookViewType, validate as validateNotebookView } from '@/components/data/NotebookView'
-import Sandbox from "@/components/data/Sandbox"
+import Sandbox from '@/components/data/Sandbox'
 import parseJson from '@/utils/parseJson'
 import SettingsClient from '@/store/SettingsClient'
 // @ts-ignore
 import taskLists from 'markdown-it-task-list-plus'
-import { useEventListener } from "@vueuse/core"
+import { useEventListener } from '@vueuse/core'
 import * as Y from 'yjs'
-import Request from '../../data/Request'
-import Data from '../../data/Data'
-import Code from '../../data/Code'
-import RequestClient from "../../data/Request/RequestClient"
-import { Containers, ContainerConfig } from "../../data/Containers"
-import { Environment, EnvironmentConfig } from "../../data/Environment"
+import Request from '@/components/data/Request'
+import Data from '@/components/data/Data'
+import Code from '@/components/data/Code'
+import Download from '@/components/data/Download'
+import RequestClient from '@/components/data/Request/RequestClient'
+import { Containers, ContainerConfig } from '@/components/data/Containers'
+import { Environment, EnvironmentConfig } from '@/components/data/Environment'
 
 const props = defineProps({
   value: {
@@ -53,6 +54,7 @@ const components = {
   request: Request,
   data: Data,
   code: Code,
+  download: Download,
 } as const
 
 type Block =
@@ -66,6 +68,7 @@ type Block =
   {tag: 'request', data: string, client: RequestClient} |
   {tag: 'data', data: string, info?: string, name: string} |
   {tag: 'code', data: string, info?: string, name: string} |
+  {tag: 'download'} |
   { error: string }
 
 const value = toRef(props, 'value')
@@ -124,6 +127,8 @@ watch(value, () => {
             },
           }
           return {tag, data: component.data, name: component.name, info: component.info}
+        } else if (tag === 'download') {
+          return {tag}
         }
       }
       return { error: `Missing or invalid component: {tag: ${tag}, id: ${id}}` }
@@ -185,6 +190,9 @@ useEventListener('change', (e) => {
         </template>
         <template v-else-if="block.tag === 'code'">
           <Code :data="block.data" :name="block.name" :info="block.info" />
+        </template>
+        <template v-else-if="block.tag === 'download'">
+          <Download :pageData="pageData" />
         </template>
       </template>
       <div class="prose my-2 text-red" v-else-if="'error' in block">{{block.error}}</div>
