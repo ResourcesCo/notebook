@@ -13,6 +13,7 @@ import Settings from '../settings/Settings.vue'
 import { Container } from '../data/Containers/data'
 import { generateSecurityPolicy } from '../data/Containers/policy'
 import RequestDispatcher from '../data/Request/RequestDispatcher'
+import { compress } from '../data/Download/zip'
 
 const props = defineProps({
   notebook: {
@@ -83,8 +84,8 @@ useEventListener('message', (e: MessageEvent) => {
       }
     } else if (e.data[0] === 'download') {
       const data = JSON.parse(e.data[1])
-      const blob = new Blob([JSON.stringify(data, null, 2)], {type: "text/plain;charset=utf-8"})
-      saveAs(blob, 'data.json')
+      const blob = new Blob([compress(data)], {type: "application/zip"})
+      saveAs(blob, 'data.zip')
     } else if (props.page.isSettings) {
       handleSettingsMessage(e.data, props.notebook)
     }

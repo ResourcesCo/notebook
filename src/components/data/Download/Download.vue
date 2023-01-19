@@ -12,7 +12,8 @@ const props = defineProps({
 
 function download() {
   const client = new DownloadClient()
-  client.download(props.pageData)
+  const data = Object.fromEntries(Object.entries(props.pageData).map(([k, v]) => [k, v.data]))
+  client.download(data)
 }
 </script>
 
