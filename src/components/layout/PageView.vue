@@ -94,32 +94,6 @@ useEventListener('message', (e: MessageEvent) => {
 const isSettingsView = computed(() => props.page.isSettings && mode.value === 'view')
 const csp = computed(() => generateSecurityPolicy(props.container.content))
 const frameUrl = ref<string | undefined>(undefined)
-// const src = computed(() => {
-//   const colorScheme = initialColorScheme.value
-//   const role = props.page.isSettings ? 'settings' : ''
-//   const scriptUrl = (
-//     mode.value === 'edit' ?
-//     new URL("/src/app/edit/main.ts", import.meta.url) :
-//     new URL("/src/app/view/main.ts", import.meta.url)
-//   )
-//   if (role === 'settings') {
-//     scriptUrl.searchParams.set('role', 'settings')
-//   }
-//   const html = generateSrcDoc({colorScheme, scriptUrl: scriptUrl.toString(), csp: csp.value})
-//   const url = new URL('/api/frame', window.location.href)
-//   if (role === 'settings') {
-//     url.searchParams.set('role', 'settings')
-//   }
-//   url.searchParams.set('color-scheme', colorScheme)
-//   if (import.meta.env.PROD) {
-//     url.searchParams.set('mode', mode.value)
-//   } else {
-//     url.searchParams.set('html', btoa(html))
-//   }
-//   url.searchParams.set('csp', btoa(csp.value))
-//   const appUrl = new URL(mode.value === 'edit' ? '/app/edit/' : '/app/view/', window.location.href)
-//   return appUrl.href
-// })
 watch(colorScheme, () => {
   const contentWindow = frame.value?.contentWindow
   if (contentWindow) {
