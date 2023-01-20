@@ -23,7 +23,7 @@ const props = defineProps({
       class="overflow-x-auto p-1"
       scrollbar="~ track-slate-200 thumb-color-sky-300 dark:track-color-slate-900 dark:thumb-color-sky-900 rounded h-4px"
     >
-      <HighlightedCode :key="data" :data="data" />
+      <HighlightedCode :key="data" :data="data" :info="info" />
     </div>
   </div>
 </template>
