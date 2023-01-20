@@ -6,7 +6,9 @@ Send a request with the body and output in the specified `data` elements.
 
 ```json
 {
-  "hello": "page"
+  "title": "foo",
+  "body": "bar",
+  "userId": 1
 }
 ```
 
@@ -14,12 +16,12 @@ Send a request with the body and output in the specified `data` elements.
 
 ```json
 {
-  "method": "patch",
-  "url": "https://httpbin.org/post",
-  "input": {"data": "input"},
-  "output": {"data": "output"},
+  "method": "post",
+  "url": "https://jsonplaceholder.typicode.com/posts",
+  "input": {"$ref": "input"},
+  "output": {"$ref": "output"},
   "headers": {
-    "Authorization": "`Bearer ${api_key}`"
+    "Authorization": "Bearer ${API_KEY}"
   }
 }
 ```
@@ -28,6 +30,9 @@ Send a request with the body and output in the specified `data` elements.
 
 ```json
 {
-  "hello": "page"
+  "title": "foo",
+  "body": "bar",
+  "userId": 1,
+  "id": 101
 }
 ```

@@ -15,7 +15,6 @@ const props = defineProps({
 })
 
 const formatClass = computed(() => {
-  console.log(props.info)
   if (props.info === 'typescript' || props.info === 'ts') {
     return 'lang-typescript'
   } else if (props.info === 'javascript' || props.info === 'js') {

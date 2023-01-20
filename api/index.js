@@ -68,7 +68,11 @@ const html = `<!DOCTYPE html>
               frame.contentWindow.postMessage(e.data, '*')
             }
           } else if (e.source === frame.contentWindow) {
-            window.parent.postMessage(e.data, '*')
+            if (e.ports.length > 0) {
+              window.parent.postMessage(e.data, '*', [...e.ports])
+            } else {
+              window.parent.postMessage(e.data, '*')
+            }
           }
         })
       })()

@@ -82,20 +82,15 @@ GitLab proxies external content through `user-content.gitlab-static.net`. This a
     "request-example": {
       "pages": "request-example.md",
       "content": {
-        "httpbin.org": {
+        "jsonplaceholder.typicode.com": {
           "request": {
             "headers": {
               "Authorization": {
-                "env": {
-                  "API_KEY": "${env.HTTPBIN_API_KEY}"
-                }
+                "env": "API_KEY"
               }
             },
             "confirm": true
           }
-        },
-        "jsonplaceholder.typicode.com": {
-          "connect": true
         },
         "cdn.jsdelivr.net": {
           "script": true,
@@ -105,9 +100,6 @@ GitLab proxies external content through `user-content.gitlab-static.net`. This a
         },
         "placekitten.com": {
           "img": true
-        },
-        "jsonplaceholder.typicode.com": {
-          "connect": true
         }
       }
     }

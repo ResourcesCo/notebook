@@ -37,7 +37,7 @@ async function send() {
   const inputData = JSON.parse(props.data) as RequestModel
   const data: any = {...inputData}
   if (data.input !== undefined) {
-    data.input = props.pageData[data.input['$ref']]['data']
+    data.input = props.pageData[data.input['$ref']].data
   }
   if (data) {
     const result = await props.client.send(data)
