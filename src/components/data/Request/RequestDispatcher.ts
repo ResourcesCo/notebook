@@ -163,8 +163,6 @@ export default class RequestDispatcher {
             }
           }
         }
-        // for (const [k, v] of this.requestSource)
-        console.log(contentBody)
         const res = await fetch(this.data.url, {
           method: this.data.method,
           headers: {

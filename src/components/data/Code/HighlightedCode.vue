@@ -23,6 +23,8 @@ const formatClass = computed(() => {
     return 'lang-html'
   } else if (props.info === 'css') {
     return 'lang-css'
+  } else if (props.info === 'json') {
+    return 'lang-json'
   } else {
     return ''
   }
