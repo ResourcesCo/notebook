@@ -31,7 +31,7 @@ const data = computed(() => {
     <div
       class="overflow-x-auto p-1"
       scrollbar="~ track-slate-200 thumb-color-sky-300 dark:track-color-slate-900 dark:thumb-color-sky-900 rounded h-4px">
-      <HighlightedCode v-if="!data.err" :data="data.value" info="json" />
+      <HighlightedCode v-if="!data.err" :key="data.value" :data="data.value" info="json" />
       <div v-if="data.err" class="color-red">{{data.value}}</div>
     </div>
   </div>
