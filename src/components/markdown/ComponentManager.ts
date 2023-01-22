@@ -40,7 +40,7 @@ export default class ComponentManager {
             if (firstChild.type === 'link_open') {
               const url = firstChild.attrGet('href')
               if (typeof url === 'string') {
-                const match = url.match(/https:\/\/macchiato.dev\/(component|data|request)\/?([#?].*)?$/)
+                const match = url.match(/https:\/\/macchiato.dev\/(component|data|request|code|download)\/?([#?].*)?$/)
                 if (match) {
                   const item = match[1]
                   const tag = item === 'component' ? url.split('#', 2)[1] : item

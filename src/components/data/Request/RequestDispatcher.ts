@@ -76,7 +76,7 @@ export default class RequestDispatcher {
         let contentBody: {} | {body: string} = {}
         let contentHeaders: {[key: string]: string} = {}
         if (this.data.input !== undefined) {
-          contentBody = {body: JSON.stringify(this.data)}
+          contentBody = {body: typeof this.data.input === 'string' ? this.data.input : JSON.stringify(this.data.input)}
           contentHeaders = {'content-type': 'application/json'}
         }
         const headers: {[key: string]: string} = {}
@@ -163,7 +163,6 @@ export default class RequestDispatcher {
             }
           }
         }
-        // for (const [k, v] of this.requestSource)
         const res = await fetch(this.data.url, {
           method: this.data.method,
           headers: {

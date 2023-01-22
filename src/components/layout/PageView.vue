@@ -2,6 +2,7 @@
 import { useEventListener } from '@vueuse/core'
 import { PropType, ref, computed, watch, onMounted, onBeforeMount, onUnmounted } from 'vue'
 import * as Y from 'yjs'
+import {saveAs} from 'file-saver'
 import { FileData, Notebook } from '@/store/notebook'
 import { FrameStore } from '@/store/frame'
 import { colorScheme } from '../../store'
@@ -12,6 +13,7 @@ import Settings from '../settings/Settings.vue'
 import { Container } from '../data/Containers/data'
 import { generateSecurityPolicy } from '../data/Containers/policy'
 import RequestDispatcher from '../data/Request/RequestDispatcher'
+import { compress } from '../data/Download/zip'
 
 const props = defineProps({
   notebook: {
@@ -80,6 +82,10 @@ useEventListener('message', (e: MessageEvent) => {
       } else if (dispatcher.status === 'deny') {
         dispatcher.sendDenyMessage()
       }
+    } else if (e.data[0] === 'download') {
+      const data = JSON.parse(e.data[1])
+      const blob = new Blob([compress(data)], {type: "application/zip"})
+      saveAs(blob, 'data.zip')
     } else if (props.page.isSettings) {
       handleSettingsMessage(e.data, props.notebook)
     }
@@ -88,32 +94,6 @@ useEventListener('message', (e: MessageEvent) => {
 const isSettingsView = computed(() => props.page.isSettings && mode.value === 'view')
 const csp = computed(() => generateSecurityPolicy(props.container.content))
 const frameUrl = ref<string | undefined>(undefined)
-// const src = computed(() => {
-//   const colorScheme = initialColorScheme.value
-//   const role = props.page.isSettings ? 'settings' : ''
-//   const scriptUrl = (
-//     mode.value === 'edit' ?
-//     new URL("/src/app/edit/main.ts", import.meta.url) :
-//     new URL("/src/app/view/main.ts", import.meta.url)
-//   )
-//   if (role === 'settings') {
-//     scriptUrl.searchParams.set('role', 'settings')
-//   }
-//   const html = generateSrcDoc({colorScheme, scriptUrl: scriptUrl.toString(), csp: csp.value})
-//   const url = new URL('/api/frame', window.location.href)
-//   if (role === 'settings') {
-//     url.searchParams.set('role', 'settings')
-//   }
-//   url.searchParams.set('color-scheme', colorScheme)
-//   if (import.meta.env.PROD) {
-//     url.searchParams.set('mode', mode.value)
-//   } else {
-//     url.searchParams.set('html', btoa(html))
-//   }
-//   url.searchParams.set('csp', btoa(csp.value))
-//   const appUrl = new URL(mode.value === 'edit' ? '/app/edit/' : '/app/view/', window.location.href)
-//   return appUrl.href
-// })
 watch(colorScheme, () => {
   const contentWindow = frame.value?.contentWindow
   if (contentWindow) {

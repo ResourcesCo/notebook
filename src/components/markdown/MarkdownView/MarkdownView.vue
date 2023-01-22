@@ -1,39 +1,26 @@
 <script lang="ts" setup>
-import { PropType, ref, toRef, watch } from "vue"
-import MarkdownIt from "markdown-it"
-import hljs from "highlight.js/lib/core"
-import markdown from "highlight.js/lib/languages/markdown"
-import xml from "highlight.js/lib/languages/xml"
-import css from "highlight.js/lib/languages/css"
-import javascript from "highlight.js/lib/languages/javascript"
-import typescript from "highlight.js/lib/languages/typescript"
-import json from "highlight.js/lib/languages/json"
-import ComponentManager from "./markdown/ComponentManager"
-import LiveCheckboxes from "./markdown/LiveCheckboxes"
-import LocalStorageTools from "./data/LocalStorageTools"
-import NotebookContent, { NotebookContentInfo, validate as validateNotebookContent } from './data/NotebookContent'
-import NotebookView, { NotebookViewType, validate as validateNotebookView } from './data/NotebookView'
-import Sandbox from "./data/Sandbox"
-import parseJson from '../utils/parseJson'
-import SettingsClient from '../store/SettingsClient'
-// @ts-ignore
-import highlight from "markdown-it-highlightjs/core"
+import { PropType, ref, toRef, watch } from 'vue'
+import MarkdownIt from 'markdown-it'
+import { highlight, hljs } from './highlight'
+import ComponentManager from '../ComponentManager'
+import LiveCheckboxes from '../LiveCheckboxes'
+import LocalStorageTools from '@/components/data/LocalStorageTools'
+import NotebookContent, { NotebookContentInfo, validate as validateNotebookContent } from '@/components/data/NotebookContent'
+import NotebookView, { NotebookViewType, validate as validateNotebookView } from '@/components/data/NotebookView'
+import Sandbox from '@/components/data/Sandbox'
+import parseJson from '@/utils/parseJson'
+import SettingsClient from '@/store/SettingsClient'
 // @ts-ignore
 import taskLists from 'markdown-it-task-list-plus'
-import { useEventListener } from "@vueuse/core"
+import { useEventListener } from '@vueuse/core'
 import * as Y from 'yjs'
-import Request from './data/Request'
-import Data from './data/Data'
-import RequestClient from "./data/Request/RequestClient"
-import { Containers, ContainerConfig } from "./data/Containers"
-import { Environment, EnvironmentConfig } from "./data/Environment"
-
-hljs.registerLanguage("xml", xml)
-hljs.registerLanguage("css", css)
-hljs.registerLanguage("javascript", javascript)
-hljs.registerLanguage("typescript", typescript)
-hljs.registerLanguage("json", json)
-hljs.registerLanguage("markdown", markdown)
+import Request from '@/components/data/Request'
+import Data from '@/components/data/Data'
+import Code from '@/components/data/Code'
+import Download from '@/components/data/Download'
+import RequestClient from '@/components/data/Request/RequestClient'
+import { Containers, ContainerConfig } from '@/components/data/Containers'
+import { Environment, EnvironmentConfig } from '@/components/data/Environment'
 
 const props = defineProps({
   value: {
@@ -65,7 +52,9 @@ const components = {
   LocalStorageTools,
   Sandbox,
   request: Request,
-  data: Data
+  data: Data,
+  code: Code,
+  download: Download,
 } as const
 
 type Block =
@@ -78,6 +67,8 @@ type Block =
   {tag: 'Sandbox', data: string, info?: string} |
   {tag: 'request', data: string, client: RequestClient} |
   {tag: 'data', data: string, info?: string, name: string} |
+  {tag: 'code', data: string, info?: string, name: string} |
+  {tag: 'download'} |
   { error: string }
 
 const value = toRef(props, 'value')
@@ -122,7 +113,7 @@ watch(value, () => {
           return {tag, data: component.data, info: component.info}
         } else if (tag === 'request') {
           return {tag, data: component.data, client: props.client}
-        } else if (tag === 'data' && component.name !== undefined) {
+        } else if ((tag === 'data' || tag === 'code') && component.name !== undefined) {
           pageData.value[component.name] = {
             data: component.data,
             replace: s => {
@@ -136,6 +127,8 @@ watch(value, () => {
             },
           }
           return {tag, data: component.data, name: component.name, info: component.info}
+        } else if (tag === 'download') {
+          return {tag}
         }
       }
       return { error: `Missing or invalid component: {tag: ${tag}, id: ${id}}` }
@@ -194,6 +187,12 @@ useEventListener('change', (e) => {
         </template>
         <template v-else-if="block.tag === 'data'">
           <Data :data="block.data" :name="block.name" :info="block.info" />
+        </template>
+        <template v-else-if="block.tag === 'code'">
+          <Code :data="block.data" :name="block.name" :info="block.info" />
+        </template>
+        <template v-else-if="block.tag === 'download'">
+          <Download :pageData="pageData" />
         </template>
       </template>
       <div class="prose my-2 text-red" v-else-if="'error' in block">{{block.error}}</div>
