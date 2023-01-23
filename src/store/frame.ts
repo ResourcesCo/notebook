@@ -1,5 +1,3 @@
-import { onMounted, onUnmounted } from 'vue'
-
 // Adapted from https://github.com/richardtallent/vite-plugin-singlefile/
 
 // MIT License
@@ -98,15 +96,4 @@ export class FrameStore {
     // html = await this.replaceHtml(html, new URL(path, window.location.href).href)
     return html
   }
-}
-
-export function useFrameStore(): FrameStore {
-  const frameStore = new FrameStore()
-  onMounted(() => {
-    frameStore.loadModules()
-  })
-  onUnmounted(() => {
-    frameStore.unloadModules()
-  })
-  return frameStore
 }

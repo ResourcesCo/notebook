@@ -8,7 +8,6 @@ import ApplyContainerChangesModal from './ApplyContainerChangesModal.vue'
 import ApplyEnvironmentChangesModal from './ApplyEnvironmentChangesModal.vue'
 import { PropType } from 'vue'
 import { Notebook } from '@/store/notebook'
-import SecretsModal from './SecretsModal.vue'
 
 defineProps({
   notebook: {
@@ -19,11 +18,11 @@ defineProps({
 </script>
 
 <template>
-  <ExportLocalStorageModal></ExportLocalStorageModal>
-  <ImportLocalStorageModal></ImportLocalStorageModal>
-  <ClearLocalStorageModal></ClearLocalStorageModal>
-  <ApplyContentChangesModal></ApplyContentChangesModal>
-  <ApplyViewChangesModal></ApplyViewChangesModal>
-  <ApplyContainerChangesModal></ApplyContainerChangesModal>
-  <ApplyEnvironmentChangesModal></ApplyEnvironmentChangesModal>
+  <ExportLocalStorageModal :notebook="notebook"></ExportLocalStorageModal>
+  <ImportLocalStorageModal :notebook="notebook"></ImportLocalStorageModal>
+  <ClearLocalStorageModal :notebook="notebook"></ClearLocalStorageModal>
+  <ApplyContentChangesModal :notebook="notebook"></ApplyContentChangesModal>
+  <ApplyViewChangesModal :notebook="notebook"></ApplyViewChangesModal>
+  <ApplyContainerChangesModal :notebook="notebook"></ApplyContainerChangesModal>
+  <ApplyEnvironmentChangesModal :notebook="notebook"></ApplyEnvironmentChangesModal>
 </template>

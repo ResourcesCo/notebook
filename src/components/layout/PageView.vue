@@ -4,9 +4,7 @@ import { PropType, ref, computed, watch, onMounted, onBeforeMount, onUnmounted }
 import * as Y from 'yjs'
 import {saveAs} from 'file-saver'
 import { FileData, Notebook } from '@/store/notebook'
-import { FrameStore } from '@/store/frame'
 import { colorScheme } from '../../store'
-import { handleMessage as handleSettingsMessage } from '../../store/settings'
 import { RequestModel } from '../data/Request'
 import SendRequestModal from '../data/Request/SendRequestModal.vue'
 import Settings from '../settings/Settings.vue'
@@ -18,10 +16,6 @@ import { compress } from '../data/Download/zip'
 const props = defineProps({
   notebook: {
     type: Object as PropType<Notebook>,
-    required: true,
-  },
-  frameStore: {
-    type: Object as PropType<FrameStore>,
     required: true,
   },
   page: {
@@ -87,7 +81,7 @@ useEventListener('message', (e: MessageEvent) => {
       const blob = new Blob([compress(data)], {type: "application/zip"})
       saveAs(blob, 'data.zip')
     } else if (props.page.isSettings) {
-      handleSettingsMessage(e.data, props.notebook)
+      props.notebook.settingsStore.handleMessage(e.data)
     }
   }
 })
@@ -114,7 +108,7 @@ const handleUpdate = (update: Uint8Array, origin: string | null) => {
   }
 }
 onMounted(async () => {
-  const data = await props.frameStore.buildPage(mode.value)
+  const data = await props.notebook.frameStore.buildPage(mode.value)
   const url = new URL('/api/frame', window.location.href)
   url.searchParams.set('csp', btoa(csp.value))
   url.searchParams.set('color-scheme', colorScheme.value)

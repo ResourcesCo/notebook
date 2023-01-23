@@ -1,21 +1,31 @@
 <script lang="ts" setup>
-import {computed} from 'vue'
-import {notebook} from '../../store/notebook'
-import {action as settingsAction} from '../../store/settings'
+import {computed, PropType} from 'vue'
 import Modal from '../layout/Modal.vue'
 import Button from '../form/Button.vue'
+import { Notebook } from '@/store/notebook'
 
-const action = computed(() => settingsAction.value?.action === 'applyEnvironmentChanges' ? settingsAction.value : undefined)
+const props = defineProps({
+  notebook: {
+    type: Object as PropType<Notebook>,
+    required: true,
+  },
+})
+
+const action = computed(() => {
+  const settingsAction = props.notebook.settingsStore.action
+  return settingsAction.value?.action === 'applyEnvironmentChanges' ? settingsAction.value : undefined
+})
 
 function dismiss() {
+  const settingsAction = props.notebook.settingsStore.action
   settingsAction.value = undefined
 }
 
 function click() {
   const data = action.value?.data
   if (data) {
-    notebook.applyEnvironmentChanges(data)
-    notebook.resetSettings()
+    props.notebook.applyEnvironmentChanges(data)
+    props.notebook.resetSettings()
   }
   dismiss()
 }

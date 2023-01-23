@@ -1,4 +1,4 @@
-import { reactive, Ref } from 'vue'
+import { reactive, Ref, onMounted, onUnmounted } from 'vue'
 import { useStorage, toReactive, watchDebounced } from '@vueuse/core'
 import { sortBy, uniqBy } from 'lodash'
 import { wait } from 'lib0/promise'
@@ -15,6 +15,8 @@ import requestExample from './content/request-example.md?raw'
 import { NotebookContentInfo } from '@/components/data/NotebookContent'
 import { ContainerConfig } from '@/components/data/Containers'
 import { EnvironmentConfig } from '@/components/data/Environment'
+import { SettingsStore } from './settings'
+import { FrameStore } from './frame'
 
 function randomClientId() {
   const array = new Uint32Array(2)
@@ -92,6 +94,8 @@ export class Notebook {
   environment: Ref<EnvironmentConfig>
   channel: BroadcastChannel
   clientId: string
+  frameStore: FrameStore
+  settingsStore: SettingsStore
 
   constructor(config: Partial<NotebookConfig> = {}) {
     this.clientId = randomClientId()
@@ -161,6 +165,16 @@ export class Notebook {
     watchDebounced(this.view, () => this.savedView.value = this.view, {debounce: 200, maxWait: 500})
     this.channel = new BroadcastChannel(this.prefix)
     this.channel.onmessage = this.handleMessage.bind(this)
+    this.settingsStore = new SettingsStore(this)
+    this.frameStore = new FrameStore()
+  }
+
+  init() {
+    this.frameStore.loadModules()
+  }
+
+  cleanup() {
+    this.frameStore.unloadModules()
   }
 
   handleMessage(e: MessageEvent) {
@@ -415,4 +429,13 @@ export class Notebook {
   }
 }
 
-export const notebook = new Notebook()
+export function useNotebook(): Notebook {
+  const notebook = new Notebook()
+  onMounted(() => {
+    notebook.init()
+  })
+  onUnmounted(() => {
+    notebook.cleanup()
+  })
+  return notebook
+}

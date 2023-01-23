@@ -1,12 +1,10 @@
 <script lang="ts" setup>
 import {computed, ref, onMounted, PropType} from 'vue'
-import {action as settingsAction} from '../../store/settings'
 import Modal from '../layout/Modal.vue'
 import Button from '../form/Button.vue'
 import { Notebook } from '@/store/notebook'
 import { isPlainObject } from 'lodash'
 import SecretsModalForm from './SecretsModalForm.vue'
-
 
 const props = defineProps({
   notebook: {
@@ -16,10 +14,14 @@ const props = defineProps({
 })
 
 function dismiss() {
+  const settingsAction = props.notebook.settingsStore.action
   settingsAction.value = undefined
 }
 
-const action = computed(() => settingsAction.value?.action === 'openSecrets' ? settingsAction.value : undefined)
+const action = computed(() => {
+  const settingsAction = props.notebook.settingsStore.action
+  settingsAction.value?.action === 'openSecrets' ? settingsAction.value : undefined
+})
 </script>
 
 <template>
