@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { PropType, ref, toRef, watch } from 'vue'
+import { PropType, provide, ref, toRef, watch } from 'vue'
 import MarkdownIt from 'markdown-it'
 import { highlight, hljs } from './highlight'
 import ComponentManager from '../ComponentManager'
@@ -19,7 +19,7 @@ import Data from '@/components/data/Data'
 import Code from '@/components/data/Code'
 import Download from '@/components/data/Download'
 import RequestClient from '@/components/data/Request/RequestClient'
-import Diagram from '@/components/data/Diagram'
+import Diagram, { mermaidKey } from '@/components/data/Diagram'
 import { Containers, ContainerConfig } from '@/components/data/Containers'
 import { Environment, EnvironmentConfig } from '@/components/data/Environment'
 
@@ -45,7 +45,7 @@ const props = defineProps({
   },
 })
 
-
+provide(mermaidKey, {initialized: false})
 
 const components = {
   NotebookContent,
