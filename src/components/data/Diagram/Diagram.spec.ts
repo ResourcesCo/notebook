@@ -17,7 +17,7 @@ describe('mount component', () => {
       mount(Diagram, {
         props: {
           data: example,
-        }
+        },
       }).html()
     }).toThrowError(/provide/)
   })
