@@ -13,8 +13,6 @@ const yDoc = new Y.Doc()
 const yText = yDoc.getText('text')
 const undoManager = new Y.UndoManager(yText)
 
-const page = reactive({body: '', counter: 0})
-
 function handleMessage(e: MessageEvent) {
   if (
     e.isTrusted &&
@@ -64,7 +62,7 @@ const checkDoc = setInterval(() => {
 
 <template>
   <main class="p-1 flex flex-col flex-grow">
-    <MarkdownEdit v-if="haveDoc" :page="page" :yText="yText" :undoManager="undoManager" />
+    <MarkdownEdit v-if="haveDoc" :yText="yText" :undoManager="undoManager" />
   </main>
 </template>
 
