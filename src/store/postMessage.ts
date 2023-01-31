@@ -2,7 +2,10 @@ import * as Y from 'yjs'
 import { useEventListener } from '@vueuse/core'
 import { Ref } from 'vue'
 
-export default function postMessage({mode, haveDoc, yDoc, value}: {mode: 'view' | 'edit', haveDoc: Ref<boolean>, yDoc: Y.Doc, value?: Ref<string>}) {
+export default function postMessage(
+  {mode, haveDoc, yDoc, value = undefined}:
+  {mode: 'view' | 'edit', haveDoc: Ref<boolean>, yDoc: Y.Doc, value?: Ref<string>}
+) {
   function handleMessage(e: MessageEvent) {
     if (
       e.isTrusted &&
@@ -15,13 +18,13 @@ export default function postMessage({mode, haveDoc, yDoc, value}: {mode: 'view' 
       if (e.data[0] === 'md-doc') {
         haveDoc.value = true
         Y.applyUpdate(yDoc, update, 'local')
-        if (value) {
+        if (value !== undefined) {
           value.value = yDoc.getText('text').toString()
         }
       } else if (e.data[0] === 'md-update') {
         if (haveDoc.value === true) {
           Y.applyUpdate(yDoc, update, 'local')
-          if (value) {
+          if (value !== undefined) {
             value.value = yDoc.getText('text').toString()
           }
         } else {
@@ -36,7 +39,7 @@ export default function postMessage({mode, haveDoc, yDoc, value}: {mode: 'view' 
     if (mode === 'view') {
       if (origin === 'view') {
         parent.postMessage(['md-update', update], '*')
-      } else if (value) {
+      } else if (value !== undefined) {
         value.value = yDoc.getText('text').toString()
       }
     } else if (mode === 'edit') {

@@ -17,9 +17,13 @@ const div = ref<HTMLDivElement | null>(null)
 const src = ref<string | undefined>()
 
 function render() {
-  mermaid.render(id, props.data, (svg => {
-    src.value = svg
-  }))
+  try {
+    mermaid.render(id, props.data, (svg => {
+      src.value = svg
+    }))
+  } catch (e) {
+    console.error('Error rendering diagram', e)
+  }
 }
 
 watch([toRef(props, 'data')], render)
