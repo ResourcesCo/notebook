@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import Diagram from './Diagram.vue'
 import { mermaidKey } from './data'
@@ -23,38 +23,48 @@ describe('mount component', () => {
   })
 
   it('tries to render and fails on HappyDOM limitation with context provided', async () => {
-    expect(() => {
-      const diagram = mount(Diagram, {
-        props: {
-          data: example,
-        },
-        global: {
-          provide: {
-            // @ts-ignore
-            [mermaidKey]: {
-              initialized: false,
-            }
+    const spy = vi.spyOn(console, 'error')
+    const diagram = mount(Diagram, {
+      props: {
+        data: example,
+      },
+      global: {
+        provide: {
+          // @ts-ignore
+          [mermaidKey]: {
+            initialized: false,
           }
         }
-      })
-    }).toThrowError(/getBBox/)
+      }
+    })
+    const lastCall = spy.mock.lastCall
+    expect(spy).toHaveBeenCalledOnce()
+    expect(lastCall).not.toBeUndefined()
+    if (lastCall !== undefined) {
+      expect((lastCall[0] || '')).toMatch(/getBBox/)
+    }
   })
 
   it('gets different error with invalid mermaid source', async () => {
-    expect(() => {
-      const diagram = mount(Diagram, {
-        props: {
-          data: "asdf",
-        },
-        global: {
-          provide: {
-            // @ts-ignore
-            [mermaidKey]: {
-              initialized: false,
-            }
+    const spy = vi.spyOn(console, 'error')
+    const diagram = mount(Diagram, {
+      props: {
+        data: "asdf",
+      },
+      global: {
+        provide: {
+          // @ts-ignore
+          [mermaidKey]: {
+            initialized: false,
           }
         }
-      })
-    }).toThrowError(/^((?!provide|getBBox).)*$/)
+      }
+    })
+    const lastCall = spy.mock.lastCall
+    expect(spy).toHaveBeenCalledOnce()
+    expect(lastCall).not.toBeUndefined()
+    if (lastCall !== undefined) {
+      expect((lastCall[0] || '')).not.toMatch(/getBBox/)
+    }
   })
 })

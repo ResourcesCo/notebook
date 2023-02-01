@@ -22,7 +22,7 @@ function render() {
       src.value = svg
     }))
   } catch (e) {
-    console.error('Error rendering diagram', e)
+    console.error(`Error rendering diagram: ${e}`)
   }
 }
 
