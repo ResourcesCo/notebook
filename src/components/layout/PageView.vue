@@ -80,6 +80,9 @@ useEventListener('message', (e: MessageEvent) => {
       const data = JSON.parse(e.data[1])
       const blob = new Blob([compress(data)], {type: "application/zip"})
       saveAs(blob, 'data.zip')
+    } else if (e.data[0] === 'navigate') {
+      const url = e.data[1]
+      props.notebook.navigate(url)
     } else if (props.page.isSettings) {
       props.notebook.settingsStore.handleMessage(e.data)
     }

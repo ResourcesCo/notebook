@@ -427,6 +427,18 @@ export class Notebook {
     view.left.tabs = [...view.left.tabs, ...newKeys.slice(0, divide)]
     view.right.tabs = [...view.right.tabs, ...newKeys.slice(divide)]
   }
+
+  navigate(url: string) {
+    const urlObj = new URL(url, 'http://example.com/')
+    const {pathname, hash} = urlObj
+    const path = pathname.substring(1)
+    for (const side of [this.view.left, this.view.right]) {
+      if (side.tabs.includes(path)) {
+        side.selected = path
+        side.show = 'self'
+      }
+    }
+  }
 }
 
 export function useNotebook(): Notebook {
