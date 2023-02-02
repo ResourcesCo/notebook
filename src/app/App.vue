@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import Notebook from '../components/Notebook.vue'
-import { notebook } from '../store/notebook'
+import { useNotebook } from '../store/notebook'
+
+const notebook = useNotebook()
 </script>
 
 <template>

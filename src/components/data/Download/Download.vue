@@ -19,6 +19,6 @@ function download() {
 
 <template>
   <div class="m-3">
-    <Button @click="download">Download</Button>
+    <Button @click="download">Download Attachments</Button>
   </div>
 </template>

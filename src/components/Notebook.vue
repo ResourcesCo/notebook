@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { Notebook } from '@/store/notebook'
-import { useFrameStore } from '@/store/frame'
 import { PropType } from 'vue'
 import SplitView from './layout/SplitView.vue'
 
@@ -11,10 +10,8 @@ const {notebook} = defineProps({
   },
 })
 
-const frameStore = useFrameStore()
-
 </script>
 
 <template>
-  <SplitView :notebook="notebook" :frameStore="frameStore" />
+  <SplitView :notebook="notebook" />
 </template>

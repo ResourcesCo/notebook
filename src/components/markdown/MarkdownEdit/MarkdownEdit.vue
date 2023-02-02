@@ -47,10 +47,6 @@ import { jsonLanguage } from "@codemirror/lang-json"
 import { htmlLanguage } from "@codemirror/lang-html"
 
 const props = defineProps({
-  page: {
-    type: Object as PropType<{body: string}>,
-    required: true,
-  },
   yText: {
     type: Object as PropType<Y.Text>,
     required: true,

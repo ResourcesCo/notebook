@@ -20,54 +20,64 @@ export type Action =
   {action: 'sendRequest', data: RequestModel} |
   undefined
 
-export const action = ref<Action>(undefined)
+export class SettingsStore {
+  action = ref<Action>(undefined)
+  notebook: Notebook
 
-export function handleMessage(data: any[], notebook: Notebook) {
-  if (data[0] === 'exportLocalStorage') {
-    action.value = {
-      action: 'exportLocalStorage',
-      name: `local-storage.md`,
-      data: new Blob([writeMarkdown(getLocalStorage())])
-    }
-  } else if (data[0] === 'importLocalStorage') {
-    action.value = {
-      action: 'importLocalStorage',
-    }
-  } else if (data[0] === 'clearLocalStorage') {
-    action.value = {
-      action: 'clearLocalStorage',
-    }
-  } else if (data[0] === 'applyContentChanges') {
-    action.value = {
-      action: 'applyContentChanges',
-      data: JSON.parse(data[1]) as NotebookContentInfo,
-    }
-  } else if (data[0] === 'resetContentChanges') {
-    notebook.resetSettings({content: true})
-  } else if (data[0] === 'applyViewChanges') {
-    action.value = {
-      action: 'applyViewChanges',
-      data: JSON.parse(data[1]) as NotebookView,
-    }
-  } else if (data[0] === 'resetViewChanges') {
-    notebook.resetSettings({view: true})
-  } else if (data[0] === 'applyContainerChanges') {
-    action.value = {
-      action: 'applyContainerChanges',
-      data: JSON.parse(data[1]) as ContainerConfig,
-    }
-  } else if (data[0] === 'resetContainerChanges') {
-    notebook.resetSettings({containers: true})
-  } else if (data[0] === 'applyEnvironmentChanges') {
-    action.value = {
-      action: 'applyEnvironmentChanges',
-      data: JSON.parse(data[1]) as EnvironmentConfig,
-    }
-  } else if (data[0] === 'resetEnvironmentChanges') {
-    notebook.resetSettings({containers: true})
-  } else if (data[0] === 'openSecrets') {
-    action.value = {
-      action: 'openSecrets',
+  constructor(notebook: Notebook) {
+    this.notebook = notebook
+  }
+
+  handleMessage(data: any[]) {
+    const action = this.action
+    const notebook = this.notebook
+  
+    if (data[0] === 'exportLocalStorage') {
+      action.value = {
+        action: 'exportLocalStorage',
+        name: `local-storage.md`,
+        data: new Blob([writeMarkdown(getLocalStorage())])
+      }
+    } else if (data[0] === 'importLocalStorage') {
+      action.value = {
+        action: 'importLocalStorage',
+      }
+    } else if (data[0] === 'clearLocalStorage') {
+      action.value = {
+        action: 'clearLocalStorage',
+      }
+    } else if (data[0] === 'applyContentChanges') {
+      action.value = {
+        action: 'applyContentChanges',
+        data: JSON.parse(data[1]) as NotebookContentInfo,
+      }
+    } else if (data[0] === 'resetContentChanges') {
+      notebook.resetSettings({content: true})
+    } else if (data[0] === 'applyViewChanges') {
+      action.value = {
+        action: 'applyViewChanges',
+        data: JSON.parse(data[1]) as NotebookView,
+      }
+    } else if (data[0] === 'resetViewChanges') {
+      notebook.resetSettings({view: true})
+    } else if (data[0] === 'applyContainerChanges') {
+      action.value = {
+        action: 'applyContainerChanges',
+        data: JSON.parse(data[1]) as ContainerConfig,
+      }
+    } else if (data[0] === 'resetContainerChanges') {
+      notebook.resetSettings({containers: true})
+    } else if (data[0] === 'applyEnvironmentChanges') {
+      action.value = {
+        action: 'applyEnvironmentChanges',
+        data: JSON.parse(data[1]) as EnvironmentConfig,
+      }
+    } else if (data[0] === 'resetEnvironmentChanges') {
+      notebook.resetSettings({containers: true})
+    } else if (data[0] === 'openSecrets') {
+      action.value = {
+        action: 'openSecrets',
+      }
     }
   }
 }

@@ -1,10 +1,8 @@
 <script lang="ts" setup>
 import {computed, ref, onMounted, PropType} from 'vue'
-import {action as settingsAction} from '../../store/settings'
 import Button from '../form/Button.vue'
 import { Notebook } from '@/store/notebook'
 import { isPlainObject } from 'lodash'
-
 
 const props = defineProps({
   notebook: {
@@ -13,9 +11,8 @@ const props = defineProps({
   },
 })
 
-const action = computed(() => settingsAction.value?.action === 'openSecrets' ? settingsAction.value : undefined)
-
 function dismiss() {
+  const settingsAction = props.notebook.settingsStore.action
   settingsAction.value = undefined
 }
 

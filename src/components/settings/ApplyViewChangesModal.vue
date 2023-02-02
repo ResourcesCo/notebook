@@ -1,12 +1,21 @@
 <script lang="ts" setup>
-import {computed} from 'vue'
-import {notebook} from '../../store/notebook'
-import {action as settingsAction} from '../../store/settings'
+import {computed, PropType} from 'vue'
 import Modal from '../layout/Modal.vue'
 import Button from '../form/Button.vue'
 import { uniq } from 'lodash'
+import { Notebook } from '@/store/notebook'
 
-const action = computed(() => settingsAction.value?.action === 'applyViewChanges' ? settingsAction.value : undefined)
+const props = defineProps({
+  notebook: {
+    type: Object as PropType<Notebook>,
+    required: true,
+  },
+})
+
+const action = computed(() => {
+  const settingsAction = props.notebook.settingsStore.action
+  return settingsAction.value?.action === 'applyViewChanges' ? settingsAction.value : undefined
+})
 
 const status = computed<{messages: string[]}>(() => {
   if (action.value) {
@@ -16,7 +25,7 @@ const status = computed<{messages: string[]}>(() => {
         messages.push(`There must be at least one tab on each side. The ${side} side has none.`)
       }
       for (const tab of tabState.tabs) {
-        if (!notebook.content.files[tab]) {
+        if (!props.notebook.content.files[tab]) {
           messages.push(`The file ${tab} in the ${side} side is not found.`)
         }
       }
@@ -33,14 +42,15 @@ const status = computed<{messages: string[]}>(() => {
 })
 
 function dismiss() {
+  const settingsAction = props.notebook.settingsStore.action
   settingsAction.value = undefined
 }
 
 function click() {
   const data = action.value?.data
   if (data) {
-    notebook.applyViewChanges(data)
-    notebook.resetSettings()
+    props.notebook.applyViewChanges(data)
+    props.notebook.resetSettings()
   }
   dismiss()
 }

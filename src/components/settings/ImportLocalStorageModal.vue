@@ -1,22 +1,34 @@
 <script lang="ts" setup>
-import {ref, computed} from 'vue'
-import {action as settingsAction} from '../../store/settings'
+import {ref, computed, PropType} from 'vue'
 import readMarkdown from '../data/LocalStorageTools/readMarkdown'
 import setStorage from '../data/LocalStorageTools/setStorage'
 import Modal from '../layout/Modal.vue'
 import Button from '../form/Button.vue'
 import { StoragesExport } from '../data/LocalStorageTools/getStorage'
+import { Notebook } from '@/store/notebook'
+
+const props = defineProps({
+  notebook: {
+    type: Object as PropType<Notebook>,
+    required: true,
+  },
+})
+
+const action = computed(() => {
+  const settingsAction = props.notebook.settingsStore.action
+  return settingsAction.value?.action === 'importLocalStorage' ? settingsAction.value : undefined
+})
 
 const hasError = ref<Boolean>(false)
 const data = ref<StoragesExport>()
 
-const action = computed(() => settingsAction.value?.action === 'importLocalStorage' ? settingsAction.value : undefined)
-
 function dismiss() {
+  const settingsAction = props.notebook.settingsStore.action
   settingsAction.value = undefined
 }
 
 function click() {
+  const settingsAction = props.notebook.settingsStore.action
   if (data.value !== undefined) {
     setStorage(data.value)
     data.value = undefined

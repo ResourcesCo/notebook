@@ -6,14 +6,14 @@ It appears in a sandboxed iFrame, so it can't access the content of other pages 
 
 With a postMessage, it can update its own text, but is limited to 50K characters so unless localStorage is crowded, won't cause localStorage data to get deleted by the browser by exceeding its 5MB limit!
 
-[`Sandbox`](https://macchiato.dev/component/#Sandbox)
+[`Sandbox`](https://macchiato.dev/sandbox)
 
 ```html
 <p class="hello">Hello, World.</p>
 <p><button id="toggle-hello">Toggle</button></p>
 ```
 
-[`Sandbox`](https://macchiato.dev/component/#Sandbox)
+[`Sandbox`](https://macchiato.dev/sandbox)
 
 ```css
 .hello {
@@ -33,7 +33,7 @@ button#toggle-hello {
 }
 ```
 
-[`Sandbox`](https://macchiato.dev/component/#Sandbox)
+[`Sandbox`](https://macchiato.dev/sandbox)
 
 ```js
 document.querySelector('.hello').innerText = 'Hello, World!!!'

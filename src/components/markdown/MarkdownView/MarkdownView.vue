@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { PropType, ref, toRef, watch } from 'vue'
+import { PropType, provide, ref, toRef, watch } from 'vue'
 import MarkdownIt from 'markdown-it'
 import { highlight, hljs } from './highlight'
 import ComponentManager from '../ComponentManager'
@@ -19,6 +19,7 @@ import Data from '@/components/data/Data'
 import Code from '@/components/data/Code'
 import Download from '@/components/data/Download'
 import RequestClient from '@/components/data/Request/RequestClient'
+import Diagram, { mermaidKey } from '@/components/data/Diagram'
 import { Containers, ContainerConfig } from '@/components/data/Containers'
 import { Environment, EnvironmentConfig } from '@/components/data/Environment'
 
@@ -44,17 +45,20 @@ const props = defineProps({
   },
 })
 
+provide(mermaidKey, {initialized: false})
+
 const components = {
   NotebookContent,
   NotebookView,
   Containers,
   Environment,
   LocalStorageTools,
-  Sandbox,
+  sandbox: Sandbox,
   request: Request,
   data: Data,
   code: Code,
   download: Download,
+  diagram: Diagram,
 } as const
 
 type Block =
@@ -64,10 +68,11 @@ type Block =
   {tag: 'Containers', data: ContainerConfig, settings: SettingsClient } |
   {tag: 'Environment', data: EnvironmentConfig, settings: SettingsClient } |
   {tag: 'LocalStorageTools', settings: SettingsClient} |
-  {tag: 'Sandbox', data: string, info?: string} |
+  {tag: 'sandbox', data: string, info?: string} |
   {tag: 'request', data: string, client: RequestClient} |
   {tag: 'data', data: string, info?: string, name: string} |
   {tag: 'code', data: string, info?: string, name: string} |
+  {tag: 'diagram', data: string, info?: string} |
   {tag: 'download'} |
   { error: string }
 
@@ -109,7 +114,7 @@ watch(value, () => {
           return { error: 'Schema mismatch' }
         } else if (settings && tag === 'LocalStorageTools') {
           return {tag, settings}
-        } else if (!settings && tag === 'Sandbox') {
+        } else if (!settings && tag === 'sandbox') {
           return {tag, data: component.data, info: component.info}
         } else if (tag === 'request') {
           return {tag, data: component.data, client: props.client}
@@ -129,6 +134,8 @@ watch(value, () => {
           return {tag, data: component.data, name: component.name, info: component.info}
         } else if (tag === 'download') {
           return {tag}
+        } else if (tag === 'diagram') {
+          return {tag, data: component.data, info: component.info}
         }
       }
       return { error: `Missing or invalid component: {tag: ${tag}, id: ${id}}` }
@@ -179,7 +186,7 @@ useEventListener('change', (e) => {
         <template v-else-if="block.tag === 'LocalStorageTools'">
           <LocalStorageTools :settings="block.settings" />
         </template>
-        <template v-else-if="block.tag === 'Sandbox'">
+        <template v-else-if="block.tag === 'sandbox'">
           <Sandbox :data="block.data" :info="block.info" />
         </template>
         <template v-else-if="block.tag === 'request'">
@@ -193,6 +200,9 @@ useEventListener('change', (e) => {
         </template>
         <template v-else-if="block.tag === 'download'">
           <Download :pageData="pageData" />
+        </template>
+        <template v-else-if="block.tag === 'diagram'">
+          <Diagram :data="block.data" :info="block.info" />
         </template>
       </template>
       <div class="prose my-2 text-red" v-else-if="'error' in block">{{block.error}}</div>

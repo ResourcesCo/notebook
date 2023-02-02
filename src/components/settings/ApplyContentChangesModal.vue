@@ -1,12 +1,21 @@
 <script lang="ts" setup>
-import {computed} from 'vue'
-import {notebook} from '../../store/notebook'
-import {action as settingsAction} from '../../store/settings'
+import {computed, PropType} from 'vue'
 import Modal from '../layout/Modal.vue'
 import Button from '../form/Button.vue'
 import { uniq } from 'lodash'
+import { Notebook } from '@/store/notebook'
 
-const action = computed(() => settingsAction.value?.action === 'applyContentChanges' ? settingsAction.value : undefined)
+const props = defineProps({
+  notebook: {
+    type: Object as PropType<Notebook>,
+    required: true,
+  },
+})
+
+const action = computed(() => {
+  const settingsAction = props.notebook.settingsStore.action
+  return settingsAction.value?.action === 'applyContentChanges' ? settingsAction.value : undefined
+})
 
 const status = computed<{messages: string[], deletes: string[]}>(() => {
   if (action.value) {
@@ -16,7 +25,7 @@ const status = computed<{messages: string[], deletes: string[]}>(() => {
       if (file.rename && file.rename === file.name) {
         messages.push(`Cannot rename ${JSON.stringify(file.name)} to the same name.`)
       }
-      if ((file.delete || file.rename) && !(file.name in notebook.content.files)) {
+      if ((file.delete || file.rename) && !(file.name in props.notebook.content.files)) {
         messages.push(
           `The file ${JSON.stringify(file.name)} does not exist and can't be ${file.delete ? 'deleted' : 'renamed'}.`
         )
@@ -43,7 +52,7 @@ const status = computed<{messages: string[], deletes: string[]}>(() => {
         )
       }
     }
-    for (const name of Object.keys(notebook.content.files)) {
+    for (const name of Object.keys(props.notebook.content.files)) {
       if (!(name in action.value.data.files)) {
         messages.push(
           `The file ${JSON.stringify(name)} is not included in the list of files. ` +
@@ -57,10 +66,12 @@ const status = computed<{messages: string[], deletes: string[]}>(() => {
 })
 
 function close() {
+  const settingsAction = props.notebook.settingsStore.action
   settingsAction.value = undefined
 }
 
 async function apply() {
+  const notebook = props.notebook
   const data = action.value?.data
   if (data) {
     await notebook.applyContentChanges({data, deletes: status.value.deletes})

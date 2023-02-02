@@ -1,0 +1,24 @@
+default:
+  image: node:current
+  before_script:
+  - echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+  - apt-get update && apt-get install curl -y
+  - curl -L https://pnpm.js.org/pnpm.js | node - add --global pnpm@7
+  - pnpm config set store-dir .pnpm-store
+  - pnpm install
+  cache:
+    key:
+      files:
+        - pnpm-lock.yaml
+    paths:
+      - .pnpm-store
+    policy: pull
+
+test:
+  stage: test
+  script:
+    - pnpm test -- --no-watch
+  only:
+    refs:
+      - main
+      - merge_requests

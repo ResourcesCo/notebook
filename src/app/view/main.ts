@@ -13,3 +13,13 @@ const params = new URLSearchParams(window.parentLocationSearch)
 delete window.parentLocationSearch
 const app = createApp(App, {params})
 app.mount("#app")
+
+declare global {
+  interface Window { notebookClient: any; }
+}
+
+window.notebookClient = {
+  navigate(url: string) {
+    parent.postMessage(['navigate', url], '*')
+  }
+}

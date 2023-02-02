@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, ref, computed } from 'vue'
-import hljs from "highlight.js/lib/core"
+import { hljs } from "@/components/markdown/MarkdownView/highlight"
 
 const pre = ref()
 

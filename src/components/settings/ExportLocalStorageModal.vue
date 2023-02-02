@@ -1,13 +1,23 @@
 <script lang="ts" setup>
-import {ref, computed, watch} from 'vue'
+import {ref, computed, watch, PropType} from 'vue'
 import {saveAs} from 'file-saver'
-import {action as settingsAction} from '../../store/settings'
 import Modal from '../layout/Modal.vue'
 import Button from '../form/Button.vue'
+import { Notebook } from '@/store/notebook'
+
+const props = defineProps({
+  notebook: {
+    type: Object as PropType<Notebook>,
+    required: true,
+  },
+})
 
 const name = ref('')
 
-const action = computed(() => settingsAction.value?.action === 'exportLocalStorage' ? settingsAction.value : undefined)
+const action = computed(() => {
+  const settingsAction = props.notebook.settingsStore.action
+  return settingsAction.value?.action === 'exportLocalStorage' ? settingsAction.value : undefined
+})
 
 watch([action], () => {
   if (action.value) {
@@ -16,6 +26,7 @@ watch([action], () => {
 })
 
 function dismiss() {
+  const settingsAction = props.notebook.settingsStore.action
   settingsAction.value = undefined
 }
 
