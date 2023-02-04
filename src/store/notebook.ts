@@ -17,6 +17,7 @@ import { ContainerConfig } from '@/components/data/Containers'
 import { EnvironmentConfig } from '@/components/data/Environment'
 import { SettingsStore } from './settings'
 import { FrameStore } from './frame'
+import { defaultContent, defaultView } from './content/data'
 
 function randomClientId() {
   const array = new Uint32Array(2)
@@ -104,59 +105,8 @@ export class Notebook {
     this.docDiscoverWait = fullConfig.docDiscoverWait
     this.docTransferWait = fullConfig.docTransferWait
     this.docDeleteWait = fullConfig.docDeleteWait
-    const defaultContent: NotebookContent = {
-      files: {
-        "_newtab.md": {
-          "emoji": "🗂",
-          "title": "New Tab",
-        },
-        "_welcome.md": {
-          "emoji": "👋",
-          "title": "Welcome",
-        },
-        "_settings.md": {
-          "emoji": "⚙️",
-          "title": "Settings",
-        },
-        "notes-example.md": {
-          "emoji": "🗒",
-          "title": "Notes Example",
-          "primaryComponent": "edit",
-        },
-        "sandbox-example.md": {
-          "emoji": "🏝",
-          "title": "Sandbox Example",
-          "primaryComponent": "edit",
-        },
-        "request-example.md": {
-          "emoji": "🌐",
-          "title": "Request Example",
-          "primaryComponent": "edit",
-        },
-      }
-    }
-    const defaultView: NotebookView = {
-      "left": {
-        "tabs": ["notes-example.md", "sandbox-example.md", "request-example.md"],
-        "selected": "notes-example.md",
-        "lastSelected": null,
-        "show": "self",
-      },
-      "right": {
-        "tabs": ["_welcome.md"],
-        "selected": "_welcome.md",
-        "lastSelected": null,
-        "show": "self",
-      },
-    }
     const defaultContainerConfig = {containers: {}}
     const defaultEnvironmentConfig = {}
-    if (this.prefix === notebookDefaults.prefix && (localStorage.getItem(`.notebook/_content.json`) || '').trim() === '') {
-      const haveOldData = [1, 2, 3, 4, 5].some(i => (localStorage.getItem(`doc-${i}`) || '').trim().length > 0)
-      if (haveOldData) {
-        this.migrateOldData(defaultContent, defaultView)
-      }
-    }
     this.content = toReactive(useStorage(`${this.prefix}/_content.json`, defaultContent))
     this.savedView = useStorage(`${this.prefix}/_view.json`, defaultView)
     this.view = toReactive(useStorage(`${this.prefix}/_view.json`, this.savedView.value, sessionStorage))
@@ -394,38 +344,6 @@ export class Notebook {
 
   applyEnvironmentChanges(environment: EnvironmentConfig) {
     this.environment.value = environment
-  }
-
-  migrateOldData(content: NotebookContent, view: NotebookView) {
-    let number = 1;
-    const newKeys: string[] = []
-    for (const i of [1, 2, 3, 4, 5]) {
-      const oldKey = `doc-${i}`
-      const savedData = (localStorage.getItem(oldKey) || '').trim()
-      if (savedData.length > 0) {
-        const newKey = `untitled-${number}.md`
-        const data = (
-          (
-            oldKey === 'doc-5' ?
-            'NOTE: This was previously called the Settings page.\n' +
-            'It has been moved to this page to make room for the new settings page.\n\n---\n' : ''
-          ) + (localStorage.getItem(oldKey) || '')
-        )
-        this.getFile(
-          `${this.prefix}/${newKey}`, data
-        )
-        localStorage.removeItem(oldKey)
-        content.files[newKey] = {
-          emoji: '📝',
-          title: `Untitled ${number}`
-        }
-        newKeys.push(newKey)
-        number++;
-      }
-    }
-    const divide = Math.ceil(newKeys.length / 2)
-    view.left.tabs = [...view.left.tabs, ...newKeys.slice(0, divide)]
-    view.right.tabs = [...view.right.tabs, ...newKeys.slice(divide)]
   }
 
   navigate(url: string) {
