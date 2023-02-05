@@ -5,7 +5,6 @@ import { wait } from 'lib0/promise'
 import * as Y from 'yjs'
 
 import updateComponentData from './updateComponentData'
-import fixSpelling from './fixSpelling'
 import defaultNewTab from './content/_newtab.md?raw'
 import defaultWelcome from './content/_welcome.md?raw'
 import defaultSettings from './content/_settings.md?raw'
@@ -287,7 +286,6 @@ export class Notebook {
     if (environment) {
       updateComponentData(settingsText, 'Environment', this.environment.value)
     }
-    fixSpelling(settingsText)
   }
 
   async applyContentChanges({data, deletes}: {data: NotebookContentInfo, deletes: string[]}) {
