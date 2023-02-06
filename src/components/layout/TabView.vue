@@ -103,7 +103,7 @@ const container = computed<Container>(() => {
   }
   return result
 })
-const pageKey = computed(() => `${filename.value}---${mode.value}---${file.value?.ydocCreated}--${JSON.stringify(container.value)}`)
+const pageKey = computed(() => `${filename.value}---${mode.value}---${JSON.stringify(container.value)}`)
 </script>
 
 <template>
@@ -125,8 +125,9 @@ const pageKey = computed(() => `${filename.value}---${mode.value}---${file.value
     <DisplayButton class="flex-shrink-0" v-if="side === 'right'" />
     <div class="spacer <sm:hidden" v-if="side === 'left'"></div>
   </div>
-  <div :class="['overflow-auto', 'content', 'relative', side]" v-if="page && file?.ydocCreated">
+  <div :class="['overflow-auto', 'content', 'relative', side]" v-if="page">
     <PageView
+      v-if="file !== undefined"
       :key="pageKey"
       :notebook="notebook"
       :page="page"

@@ -1,7 +1,6 @@
 import { reactive, Ref, onMounted, onUnmounted } from 'vue'
 import { useStorage, toReactive, watchDebounced } from '@vueuse/core'
 import { sortBy, uniqBy } from 'lodash'
-import { wait } from 'lib0/promise'
 import * as Y from 'yjs'
 
 import updateComponentData from './updateComponentData'
@@ -49,12 +48,6 @@ export interface NotebookFileInfo {
 export interface FileData {
   body: string
   ydoc: Y.Doc
-  ydocCreated?: number
-  clients: {
-    [key: string]: {
-      ydocCreated?: number
-    }
-  }
 }
 
 export interface NotebookContent {
@@ -122,7 +115,7 @@ export class Notebook {
       const ydoc = new Y.Doc()
       const ytext = ydoc.getText('text')
       ytext.insert(0, body.value)
-      this.fileData[name] = reactive({body, ydoc, clients: {[this.clientId]: {}}})
+      this.fileData[name] = reactive({body, ydoc})
     }
     return this.fileData[name]
   }
