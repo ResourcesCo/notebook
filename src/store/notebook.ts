@@ -68,23 +68,14 @@ export interface NotebookView {
 
 interface NotebookConfig {
   prefix: string
-  docDiscoverWait: number
-  docTransferWait: number
-  docDeleteWait: number
 }
 
 const notebookDefaults: NotebookConfig = {
   prefix: '.notebook',
-  docDiscoverWait: 50,
-  docTransferWait: 500,
-  docDeleteWait: 25
 }
 
 export class Notebook {
   prefix: string
-  docDiscoverWait: number
-  docTransferWait: number
-  docDeleteWait: number
 
   fileData: {[key: string]: FileData} = {}
   content: NotebookContent
@@ -92,7 +83,6 @@ export class Notebook {
   view: NotebookView
   containers: Ref<ContainerConfig>
   environment: Ref<EnvironmentConfig>
-  channel: BroadcastChannel
   clientId: string
   frameStore: FrameStore
   settingsStore: SettingsStore
@@ -101,9 +91,6 @@ export class Notebook {
     this.clientId = randomClientId()
     const fullConfig = {...notebookDefaults, config}
     this.prefix = fullConfig.prefix
-    this.docDiscoverWait = fullConfig.docDiscoverWait
-    this.docTransferWait = fullConfig.docTransferWait
-    this.docDeleteWait = fullConfig.docDeleteWait
     const defaultContainerConfig = {containers: {}}
     const defaultEnvironmentConfig = {}
     this.content = toReactive(useStorage(`${this.prefix}/_content.json`, defaultContent))
@@ -112,8 +99,6 @@ export class Notebook {
     this.containers = useStorage(`${this.prefix}/_containers.json`, defaultContainerConfig)
     this.environment = useStorage(`${this.prefix}/_environment.json`, defaultEnvironmentConfig)
     watchDebounced(this.view, () => this.savedView.value = this.view, {debounce: 200, maxWait: 500})
-    this.channel = new BroadcastChannel(this.prefix)
-    this.channel.onmessage = this.handleMessage.bind(this)
     this.settingsStore = new SettingsStore(this)
     this.frameStore = new FrameStore()
   }
@@ -124,59 +109,6 @@ export class Notebook {
 
   cleanup() {
     this.frameStore.unloadModules()
-  }
-
-  handleMessage(e: MessageEvent) {
-    const [messageType, message] = e.data
-    if (messageType === 'opened-file') {
-      const {name, clientId} = message
-      if (clientId !== this.clientId) {
-        const file = this.getFile(name)
-        if (file.ydocCreated !== undefined) {
-          const info = {name, created: file.ydocCreated, clientId: this.clientId}
-          this.channel.postMessage(['have-ydoc', info])
-          this.channel.postMessage(['ydoc', {...info, update: Y.encodeStateAsUpdate(file.ydoc)}])
-        }
-      }
-    } else if (messageType === 'have-ydoc') {
-      const {name, created, clientId} = message
-      if (clientId !== this.clientId) {
-        const file = this.getFile(name)
-        file.clients[clientId] = {ydocCreated: created}
-      }
-    } else if (messageType === 'ydoc') {
-      const {name, created, clientId, update} = message
-      const file = this.getFile(name)
-      if (file !== undefined && clientId !== this.clientId && (file.ydocCreated === undefined || created > file.ydocCreated)) {
-        const ydoc = new Y.Doc()
-        Y.applyUpdate(ydoc, update, `client:${clientId}`)
-        file.ydoc.destroy()
-        file.ydoc = ydoc
-        file.ydocCreated = created
-        file.clients[this.clientId].ydocCreated = created
-        file.ydoc.on('update', (update: Uint8Array, origin: string | null) => {
-          if (!origin?.startsWith('client:')) {
-            this.channel.postMessage(['update', {name, update, clientId: this.clientId, created: file.ydocCreated}])
-          }
-        })
-      }
-    } else if (messageType === 'update') {
-      const {name, created, clientId, update} = message
-      const file = this.getFile(name)
-      if (file !== undefined && clientId !== this.clientId && created === file.ydocCreated) {
-        Y.applyUpdate(file.ydoc, update, `client:${clientId}`)
-      }
-    } else if (messageType === 'file-deleted') {
-      const {name, clientId} = message
-      if (clientId !== this.clientId) {
-        this.closeFile(name)
-      }
-    } else if (messageType === 'file-renamed') {
-      const {name, rename, clientId} = message
-      if (clientId !== this.clientId) {
-        this.renameFileInView(name, rename)
-      }
-    }
   }
 
   getFile(name: string, defaultContent?: string) {
@@ -191,7 +123,6 @@ export class Notebook {
       const ytext = ydoc.getText('text')
       ytext.insert(0, body.value)
       this.fileData[name] = reactive({body, ydoc, clients: {[this.clientId]: {}}})
-      this.loadYdoc(name)
     }
     return this.fileData[name]
   }
@@ -214,39 +145,16 @@ export class Notebook {
     }
   }
 
-  async loadYdoc(name: string) {
-    const file = this.fileData[name]
-    if (file !== undefined) {
-      this.channel.postMessage(['opened-file', {name, clientId: this.clientId}])
-      await wait(this.docDiscoverWait)
-      const clients = sortBy(
-        Object.entries(file.clients).filter(([clientId, client]) => clientId !== this.clientId && client.ydocCreated !== undefined),
-        ([clientId, client]) => client.ydocCreated
-      )
-      if (clients.length > 1) {
-        if (uniqBy(clients, ([clientId, client]) => client.ydocCreated).length > 1) {
-          console.warn('Some clients are not on the same document version')
-        }
-        await wait(this.docDiscoverWait)
-      }
-    }
-    if (file.ydocCreated === undefined) {
-      file.ydocCreated = Date.now()
-    }
-  }
-
   deleteFile(name: string) {
     if (name in this.fileData) {
       const file = this.fileData[name]
       file.ydoc.destroy()
       delete this.fileData[name]
       localStorage.removeItem(`${this.prefix}/${name}`)
-      this.channel.postMessage(['file-deleted', {clientId: this.clientId, name}])
     }
   }
 
   renameFile(name: string, rename: string) {
-    this.channel.postMessage(['file-renamed', {clientId: this.clientId, name, rename}])
     this.renameFileInView(name, rename)
   }
 
@@ -293,9 +201,6 @@ export class Notebook {
       this.closeFile(del)
       delete this.content.files[del]
       this.deleteFile(del)
-    }
-    if (deletes.length > 0) {
-      await wait(this.docDeleteWait)
     }
     for (const [name, file] of Object.entries(data.files)) {
       if (typeof file.rename === 'string') {
