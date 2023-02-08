@@ -1,5 +1,5 @@
 import { reactive, Ref, onMounted, onUnmounted } from 'vue'
-import { useStorage, toReactive, watchDebounced } from '@vueuse/core'
+import { useStorage, toReactive, watchDebounced, useEventListener } from '@vueuse/core'
 import { sortBy, uniqBy } from 'lodash'
 import * as Y from 'yjs'
 
@@ -253,10 +253,22 @@ export class Notebook {
       }
     }
   }
+
+  onWindowFocus() {
+    for (const file of Object.values(this.fileData)) {
+      // TODO: save the last saved time in memory and in localStorage, and if the one in
+      // localStorage is newer, replace the one in memory with the one in localStorage
+      // versioning is needed and so is saving Yjs updates
+      // const ytext = ydoc.getText('text')
+      // ytext.insert(0, body.value)
+      // this.fileData[name] = reactive({body, ydoc})
+    }
+  }
 }
 
 export function useNotebook(): Notebook {
   const notebook = new Notebook()
+  useEventListener(window, 'focus', () => notebook.onWindowFocus())
   onMounted(() => {
     notebook.init()
   })

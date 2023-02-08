@@ -117,9 +117,7 @@ const pageKey = computed(() => `${filename.value}---${mode.value}---${JSON.strin
     <Tab class="right flex-shrink-0 utility" :selected="tabState.show === 'other' || otherTabState.show === 'other'"
       @click="() => toggleMode()"><span class="<sm:hidden" v-if="tabState.show === 'other'">{{ primaryComponent ===
           'view' ? 'Edit ' : 'Preview '
-      }} </span>{{
-    primaryComponent === 'view' ? '📝' : '👁'
-}}
+      }} </span>{{ primaryComponent === 'view' ? '📝' : '👁' }}
     </Tab>
     <TabViewButton class="flex-shrink-0" v-if="side === 'right'" @click="() => toggleSettings()">⚙️</TabViewButton>
     <DisplayButton class="flex-shrink-0" v-if="side === 'right'" />
