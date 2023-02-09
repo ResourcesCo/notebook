@@ -92,6 +92,7 @@ watch(value, () => {
     .use(liveCheckboxes.plugin)
     .use(componentManager.plugin)
   )
+  pageData.value = {}
   const html = md.render(source)
   blocks.value = html.split(/(\{\{[^}]+\}\})/).map(token => {
     if (token.startsWith('{{') && token.endsWith('}}')) {
