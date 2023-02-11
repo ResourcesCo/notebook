@@ -125,10 +125,11 @@ const pageKey = computed(() => `${filename.value}---${mode.value}---${JSON.strin
   </div>
   <div :class="['overflow-auto', 'content', 'relative', side]" v-if="page">
     <PageView
-      v-if="file !== undefined"
+      v-if="filename !== null && file !== undefined"
       :key="pageKey"
       :notebook="notebook"
       :page="page"
+      :filename="filename"
       :file="file"
       :mode="mode"
       :container="container"

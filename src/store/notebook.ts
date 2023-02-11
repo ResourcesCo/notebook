@@ -120,6 +120,10 @@ export class Notebook {
     return this.fileData[name]
   }
 
+  applyFileUpdate(filename: string, file: FileData, update: Uint8Array, transactionOrigin: any) {
+    Y.applyUpdate(file.ydoc, update, transactionOrigin)
+  }
+
   closeFile(name: string) {
     for (const tabState of [this.view.left, this.view.right]) {
       if (tabState.tabs.includes(name)) {
