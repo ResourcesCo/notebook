@@ -122,6 +122,8 @@ export class Notebook {
 
   applyFileUpdate(filename: string, file: FileData, update: Uint8Array, transactionOrigin: any) {
     Y.applyUpdate(file.ydoc, update, transactionOrigin)
+    const text = file.ydoc.getText('text').toString()
+    file.body = text.length >= 50000 ? text.substring(0, 50000) : text
   }
 
   closeFile(name: string) {

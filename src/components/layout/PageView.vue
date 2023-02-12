@@ -67,8 +67,6 @@ useEventListener('message', (e: MessageEvent) => {
     } else if (e.data[0] === "md-update" && e.data.length === 2) {
       const update = e.data[1] as Uint8Array
       props.notebook.applyFileUpdate(props.filename, props.file, update, mode.value)
-      const text = props.file.ydoc.getText('text').toString()
-      props.file.body = text.length >= 50000 ? text.substring(0, 50000) : text
     } else if (e.data[0] === 'request' && e.data.length === 2) {
       const data = JSON.parse(e.data[1]) as RequestModel
       const port = e.ports[0]
