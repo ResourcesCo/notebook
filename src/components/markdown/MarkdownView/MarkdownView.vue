@@ -175,7 +175,7 @@ useEventListener('change', (e) => {
 <template>
   <div class="mb-2">
     <template v-for="block in blocks">
-      <div class="prose px-2" v-if="'html' in block" v-html="block.html"></div>
+      <div class="prose prose-stone dark:prose-invert px-2" v-if="'html' in block" v-html="block.html"></div>
       <template v-else-if="'tag' in block">
         <template v-if="isSettingsTag(block.tag) && 'data' in block && 'settings' in block">
           <component :is="components[block.tag]" :data="block.data" :settings="block.settings" />
