@@ -48,6 +48,7 @@ export interface NotebookFileInfo {
 export interface FileData {
   body: string
   ydoc: Y.Doc
+  ydocStore: Uint8Array
 }
 
 export interface NotebookContent {
@@ -112,10 +113,19 @@ export class Notebook {
         undefined,
         {writeDefaults: false}
       )
+      const ydocStore = useStorage(
+        `${this.prefix}/.doc/${name}`,
+        Uint8Array.of(),
+        undefined,
+        {writeDefaults: false}
+      )
       const ydoc = new Y.Doc()
+      if (ydocStore.value.byteLength > 0) {
+        Y.applyUpdate(ydoc, ydocStore.value)
+      }
       const ytext = ydoc.getText('text')
       ytext.insert(0, body.value)
-      this.fileData[name] = reactive({body, ydoc})
+      this.fileData[name] = reactive({body, ydoc, ydocStore})
     }
     return this.fileData[name]
   }
