@@ -1,7 +1,8 @@
-import { reactive, Ref, onMounted, onUnmounted } from 'vue'
+import { reactive, Ref, onMounted, onUnmounted, watch, toRef } from 'vue'
 import { useStorage, toReactive, watchDebounced, useEventListener } from '@vueuse/core'
 import { sortBy, uniqBy } from 'lodash'
 import * as Y from 'yjs'
+import { toBase64, fromBase64 } from 'lib0/buffer'
 
 import updateComponentData from './updateComponentData'
 import defaultNewTab from './content/_newtab.md?raw'
@@ -47,8 +48,9 @@ export interface NotebookFileInfo {
 
 export interface FileData {
   body: string
+  lastUpdated: number | undefined
   ydoc: Y.Doc
-  ydocStore: Uint8Array
+  ydocStore: string
 }
 
 export interface NotebookContent {
@@ -115,17 +117,22 @@ export class Notebook {
       )
       const ydocStore = useStorage(
         `${this.prefix}/.doc/${name}`,
-        Uint8Array.of(),
+        '',
         undefined,
         {writeDefaults: false}
       )
       const ydoc = new Y.Doc()
-      if (ydocStore.value.byteLength > 0) {
-        Y.applyUpdate(ydoc, ydocStore.value)
+      if (ydocStore.value.length > 0) {
+        Y.applyUpdate(ydoc, fromBase64(ydocStore.value))
+      } else {
+        const ytext = ydoc.getText('text')
+        ytext.insert(0, body.value)
       }
-      const ytext = ydoc.getText('text')
-      ytext.insert(0, body.value)
-      this.fileData[name] = reactive({body, ydoc, ydocStore})
+      const fileData = reactive({body, ydoc, ydocStore, lastUpdated: undefined})
+      watchDebounced(toRef(fileData, 'lastUpdated'), () => {
+        fileData.ydocStore = toBase64(Y.encodeStateAsUpdate(fileData.ydoc))
+      }, {debounce: 500, maxWait: 2000})
+      this.fileData[name] = fileData
     }
     return this.fileData[name]
   }
@@ -133,7 +140,8 @@ export class Notebook {
   applyFileUpdate(filename: string, file: FileData, update: Uint8Array, transactionOrigin: any) {
     Y.applyUpdate(file.ydoc, update, transactionOrigin)
     const text = file.ydoc.getText('text').toString()
-    file.body = text.length >= 50000 ? text.substring(0, 50000) : text
+    file.body = text.length >= 50_000 ? text.substring(0, 50_000) : text
+    file.lastUpdated = Date.now()
   }
 
   closeFile(name: string) {
