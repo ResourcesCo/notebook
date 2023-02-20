@@ -50,7 +50,7 @@ export interface FileData {
   body: string
   lastUpdated: number | undefined
   ydoc: Y.Doc
-  ydocStore: string
+  ydocStore: string[]
 }
 
 export interface NotebookContent {
@@ -115,23 +115,22 @@ export class Notebook {
         undefined,
         {writeDefaults: false}
       )
-      const ydocStore = useStorage(
+      const ydocStore = useStorage<string[]>(
         `${this.prefix}/.doc/${name}`,
-        '',
+        [],
         undefined,
         {writeDefaults: false}
       )
       const ydoc = new Y.Doc()
       if (ydocStore.value.length > 0) {
-        Y.applyUpdate(ydoc, fromBase64(ydocStore.value))
+        for (const update of ydocStore.value) {
+          Y.applyUpdate(ydoc, fromBase64(update))
+        }
       } else {
         const ytext = ydoc.getText('text')
         ytext.insert(0, body.value)
       }
       const fileData = reactive({body, ydoc, ydocStore, lastUpdated: undefined})
-      watchDebounced(toRef(fileData, 'lastUpdated'), () => {
-        fileData.ydocStore = toBase64(Y.encodeStateAsUpdate(fileData.ydoc))
-      }, {debounce: 500, maxWait: 2000})
       this.fileData[name] = fileData
     }
     return this.fileData[name]
@@ -142,6 +141,7 @@ export class Notebook {
     const text = file.ydoc.getText('text').toString()
     file.body = text.length >= 50_000 ? text.substring(0, 50_000) : text
     file.lastUpdated = Date.now()
+    file.ydocStore.push(toBase64(update))
   }
 
   closeFile(name: string) {
