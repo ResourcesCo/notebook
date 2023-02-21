@@ -122,10 +122,17 @@ export class Notebook {
         {writeDefaults: false}
       )
       const ydoc = new Y.Doc()
-      if (ydocStore.value.length > 0) {
-        for (const update of ydocStore.value) {
-          Y.applyUpdate(ydoc, fromBase64(update))
+      ydoc.on('update', (update, origin) => {
+        if (origin !== this) {
+          ydocStore.value.push(toBase64(update))
         }
+      })
+      if (ydocStore.value.length > 0) {
+        Y.transact(ydoc, () => {
+          for (const update of ydocStore.value) {
+            Y.applyUpdate(ydoc, fromBase64(update))
+          }
+        }, this, false)
       } else {
         const ytext = ydoc.getText('text')
         ytext.insert(0, body.value)
@@ -141,7 +148,6 @@ export class Notebook {
     const text = file.ydoc.getText('text').toString()
     file.body = text.length >= 50_000 ? text.substring(0, 50_000) : text
     file.lastUpdated = Date.now()
-    file.ydocStore.push(toBase64(update))
   }
 
   closeFile(name: string) {
