@@ -96,7 +96,9 @@ GitLab proxies external content through `user-content.gitlab-static.net`. This a
           "script": true,
           "style": true,
           "media": true,
-          "font": true
+          "font": true,
+          "img": true,
+          "object": true
         },
         "placekitten.com": {
           "img": true

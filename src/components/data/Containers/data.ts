@@ -32,6 +32,7 @@ export const sources = [
   'script',
   'style',
   'img',
+  'object',
   'media',
   'font',
   'connect',
@@ -43,6 +44,7 @@ export type ContentArea = {
   script?: ContentSource | true
   style?: ContentSource | true
   img?: ContentSource | true
+  object?: ContentSource | true
   media?: ContentSource | true
   font?: ContentSource | true
   connect?: ContentSource | true
