@@ -13,7 +13,7 @@ const props = defineProps({
 })
 
 watchEffect(() => {
-  if (props.info === 'js') {
+  if (props.info === 'js' || props.info === 'javascript') {
     const g = document.createElement('script')
     const s = document.getElementsByTagName('script')[0]
     g.text = `(() => { ${props.data} })()`

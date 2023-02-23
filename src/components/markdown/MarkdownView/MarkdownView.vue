@@ -12,7 +12,7 @@ import parseJson from '@/utils/parseJson'
 import SettingsClient from '@/store/SettingsClient'
 // @ts-ignore
 import taskLists from 'markdown-it-task-list-plus'
-import { useEventListener } from '@vueuse/core'
+import { useEventListener, watchDebounced } from '@vueuse/core'
 import * as Y from 'yjs'
 import Request from '@/components/data/Request'
 import Data from '@/components/data/Data'
@@ -89,7 +89,7 @@ const blocks = ref<Block[]>([])
 
 const pageData = ref<{[key: string]: {data: string, replace(s: string): void}}>({})
 
-watch(value, () => {
+watchDebounced(value, () => {
   const source = value.value
   const componentManager = new ComponentManager({source})
   const liveCheckboxes = new LiveCheckboxes({source})
@@ -150,7 +150,7 @@ watch(value, () => {
       html: token
     }
   })
-})
+}, {debounce: 500, maxWait: 10_000})
 
 useEventListener('change', (e) => {
   const target = e.target
