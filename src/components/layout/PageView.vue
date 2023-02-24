@@ -66,7 +66,7 @@ useEventListener('message', (e: MessageEvent) => {
       }
     } else if (e.data[0] === "md-update" && e.data.length === 2) {
       const update = e.data[1] as Uint8Array
-      props.notebook.applyFileUpdate(props.filename, props.file, update, mode.value)
+      props.notebook.applyFileUpdate(props.filename, update, mode.value)
     } else if (e.data[0] === 'request' && e.data.length === 2) {
       const data = JSON.parse(e.data[1]) as RequestModel
       const port = e.ports[0]

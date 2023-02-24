@@ -1,6 +1,6 @@
-import { reactive, Ref, onMounted, onUnmounted, watch, toRef } from 'vue'
-import { useStorage, toReactive, watchDebounced, useEventListener } from '@vueuse/core'
-import { sortBy, uniqBy } from 'lodash'
+import { reactive, Ref, onMounted, onUnmounted, watch, WatchStopHandle } from 'vue'
+import { useStorage, toReactive, watchDebounced, useEventListener, useBroadcastChannel, UseBroadcastChannelReturn } from '@vueuse/core'
+import { sortBy } from 'lodash'
 import * as Y from 'yjs'
 import { toBase64, fromBase64 } from 'lib0/buffer'
 
@@ -62,6 +62,12 @@ export interface NotebookView {
   right: TabState
 }
 
+interface UpdateMessage {
+  filename: string,
+  update: Uint8Array,
+  transactionOrigin: any,
+}
+
 interface NotebookConfig {
   prefix: string
 }
@@ -82,6 +88,9 @@ export class Notebook {
   clientId: string
   frameStore: FrameStore
   settingsStore: SettingsStore
+  viewWatchStop?: WatchStopHandle
+  broadcastChannel?: UseBroadcastChannelReturn<UpdateMessage, UpdateMessage>
+  broadcastChannelWatchStop?: WatchStopHandle
 
   constructor(config: Partial<NotebookConfig> = {}) {
     this.clientId = randomClientId()
@@ -94,17 +103,26 @@ export class Notebook {
     this.view = toReactive(useStorage(`${this.prefix}/_view.json`, this.savedView.value, sessionStorage))
     this.containers = useStorage(`${this.prefix}/_containers.json`, defaultContainerConfig)
     this.environment = useStorage(`${this.prefix}/_environment.json`, defaultEnvironmentConfig)
-    watchDebounced(this.view, () => this.savedView.value = this.view, {debounce: 200, maxWait: 500})
     this.settingsStore = new SettingsStore(this)
     this.frameStore = new FrameStore()
+    this.broadcastChannel = useBroadcastChannel<UpdateMessage, UpdateMessage>({name: this.prefix})
+    this.broadcastChannelWatchStop = watch(this.broadcastChannel.data, (update) => {
+      this.applyFileUpdate(update.filename, update.update, update.transactionOrigin, false)
+    })
   }
 
   init() {
     this.frameStore.loadModules()
+    this.viewWatchStop = watchDebounced(this.view, () => this.savedView.value = this.view, {debounce: 200, maxWait: 500})
   }
 
   cleanup() {
     this.frameStore.unloadModules()
+    for (const watchStop of [this.viewWatchStop, this.broadcastChannelWatchStop]) {
+      if (watchStop !== undefined) {
+        watchStop()
+      }  
+    }
   }
 
   getFile(name: string, defaultContent?: string) {
@@ -143,11 +161,17 @@ export class Notebook {
     return this.fileData[name]
   }
 
-  applyFileUpdate(filename: string, file: FileData, update: Uint8Array, transactionOrigin: any) {
-    Y.applyUpdate(file.ydoc, update, transactionOrigin)
-    const text = file.ydoc.getText('text').toString()
-    file.body = text.length >= 50_000 ? text.substring(0, 50_000) : text
-    file.lastUpdated = Date.now()
+  applyFileUpdate(filename: string, update: Uint8Array, transactionOrigin: any, broadcast = true) {
+    const file = this.fileData[filename]
+    if (file !== undefined) {
+      Y.applyUpdate(file.ydoc, update, transactionOrigin)
+      const text = file.ydoc.getText('text').toString()
+      file.body = text.length >= 50_000 ? text.substring(0, 50_000) : text
+      file.lastUpdated = Date.now()
+      if (broadcast && this.broadcastChannel) {
+        this.broadcastChannel.post({filename, update, transactionOrigin: `b-${this.clientId}`})
+      }
+    }
   }
 
   closeFile(name: string) {
