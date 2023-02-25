@@ -48,7 +48,6 @@ export interface NotebookFileInfo {
 
 export interface FileData {
   body: string
-  lastUpdated: number | undefined
   ydoc: Y.Doc
   ydocStore: string[]
 }
@@ -155,7 +154,7 @@ export class Notebook {
         const ytext = ydoc.getText('text')
         ytext.insert(0, body.value)
       }
-      const fileData = reactive({body, ydoc, ydocStore, lastUpdated: undefined})
+      const fileData = reactive({body, ydoc, ydocStore})
       this.fileData[name] = fileData
     }
     return this.fileData[name]
@@ -165,9 +164,7 @@ export class Notebook {
     const file = this.fileData[filename]
     if (file !== undefined) {
       Y.applyUpdate(file.ydoc, update, transactionOrigin)
-      const text = file.ydoc.getText('text').toString()
-      file.body = text.length >= 50_000 ? text.substring(0, 50_000) : text
-      file.lastUpdated = Date.now()
+      file.body = file.ydoc.getText('text').toString()
       if (broadcast && this.broadcastChannel) {
         this.broadcastChannel.post({filename, update, transactionOrigin: `b-${this.clientId}`})
       }
