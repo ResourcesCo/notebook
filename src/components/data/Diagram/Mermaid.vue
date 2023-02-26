@@ -16,11 +16,9 @@ const id = 'diagram-' + nanoid(8)
 const div = ref<HTMLDivElement | null>(null)
 const src = ref<string | undefined>()
 
-function render() {
+async function render() {
   try {
-    mermaid.render(id, props.data, (svg => {
-      src.value = svg
-    }))
+    src.value = (await mermaid.render(id, props.data)).svg
   } catch (e) {
     console.error(`Error rendering diagram: ${e}`)
   }
