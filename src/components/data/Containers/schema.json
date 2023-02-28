@@ -102,6 +102,12 @@
                     {"$ref": "#/definitions/contentSource"}
                   ]
                 },
+                "object": {
+                  "anyOf": [
+                    {"const": true},
+                    {"$ref": "#/definitions/contentSource"}
+                  ]
+                },
                 "media": {
                   "anyOf": [
                     {"const": true},

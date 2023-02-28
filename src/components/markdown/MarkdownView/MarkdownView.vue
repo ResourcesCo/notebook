@@ -12,7 +12,7 @@ import parseJson from '@/utils/parseJson'
 import SettingsClient from '@/store/SettingsClient'
 // @ts-ignore
 import taskLists from 'markdown-it-task-list-plus'
-import { useEventListener } from '@vueuse/core'
+import { useEventListener, watchDebounced } from '@vueuse/core'
 import * as Y from 'yjs'
 import Request from '@/components/data/Request'
 import Data from '@/components/data/Data'
@@ -44,6 +44,14 @@ const props = defineProps({
     required: true,
   },
 })
+
+const settingsTags = ['NotebookContent', 'NotebookView', 'Containers', 'Environment'] as const
+
+type SettingsTag = typeof settingsTags[number]
+
+function isSettingsTag(tag: string): tag is SettingsTag {
+  return (settingsTags as readonly string[]).includes(tag)
+}
 
 provide(mermaidKey, {initialized: false})
 
@@ -81,7 +89,7 @@ const blocks = ref<Block[]>([])
 
 const pageData = ref<{[key: string]: {data: string, replace(s: string): void}}>({})
 
-watch(value, () => {
+watchDebounced(value, () => {
   const source = value.value
   const componentManager = new ComponentManager({source})
   const liveCheckboxes = new LiveCheckboxes({source})
@@ -92,6 +100,7 @@ watch(value, () => {
     .use(liveCheckboxes.plugin)
     .use(componentManager.plugin)
   )
+  pageData.value = {}
   const html = md.render(source)
   blocks.value = html.split(/(\{\{[^}]+\}\})/).map(token => {
     if (token.startsWith('{{') && token.endsWith('}}')) {
@@ -100,18 +109,15 @@ watch(value, () => {
       const component = componentManager.components.find(({id: _id}) => id === String(_id))
       const settings = props.settings
       if (component && Object.keys(components).includes(tag)) {
-        if (settings && (tag === 'NotebookContent' || tag === 'NotebookView' || tag === 'Containers' || tag === 'Environment')) {
+        if (settings && isSettingsTag(tag)) {
           const data = parseJson(component.data)
-          if (tag === 'NotebookContent' && validateNotebookContent(data)) {
-            return {tag, data, settings}
-          } else if (tag === 'NotebookView' && validateNotebookView(data)) {
-            return {tag, data, settings}
-          } else if (tag === 'Containers') {
-            return {tag, data, settings}
-          } else if (tag === 'Environment') {
-            return {tag, data, settings}
+          if (
+            (tag === 'NotebookContent' && !validateNotebookContent(data)) ||
+            (tag === 'NotebookView' && !validateNotebookView(data))
+          ) {
+            return {error: 'Schema mismatch'}
           }
-          return { error: 'Schema mismatch' }
+          return {tag: tag as typeof settingsTags[number], data, settings}
         } else if (settings && tag === 'LocalStorageTools') {
           return {tag, settings}
         } else if (!settings && tag === 'sandbox') {
@@ -144,7 +150,7 @@ watch(value, () => {
       html: token
     }
   })
-})
+}, {debounce: 500, maxWait: 10_000})
 
 useEventListener('change', (e) => {
   const target = e.target
@@ -169,19 +175,10 @@ useEventListener('change', (e) => {
 <template>
   <div class="mb-2">
     <template v-for="block in blocks">
-      <div class="prose px-2" v-if="'html' in block" v-html="block.html"></div>
+      <div class="prose prose-stone dark:prose-invert px-2" v-if="'html' in block" v-html="block.html"></div>
       <template v-else-if="'tag' in block">
-        <template v-if="block.tag === 'NotebookContent'">
-          <NotebookContent :data="block.data" :settings="block.settings" />
-        </template>
-        <template v-else-if="block.tag === 'NotebookView'">
-          <NotebookView :data="block.data" :settings="block.settings" />
-        </template>
-        <template v-else-if="block.tag === 'Containers'">
-          <Containers :data="block.data" :settings="block.settings" />
-        </template>
-        <template v-else-if="block.tag === 'Environment'">
-          <Environment :data="block.data" :settings="block.settings" />
+        <template v-if="isSettingsTag(block.tag) && 'data' in block && 'settings' in block">
+          <component :is="components[block.tag]" :data="block.data" :settings="block.settings" />
         </template>
         <template v-else-if="block.tag === 'LocalStorageTools'">
           <LocalStorageTools :settings="block.settings" />
@@ -205,7 +202,7 @@ useEventListener('change', (e) => {
           <Diagram :data="block.data" :info="block.info" />
         </template>
       </template>
-      <div class="prose my-2 text-red" v-else-if="'error' in block">{{block.error}}</div>
+      <div class="px-2 my-2 text-red" v-else-if="'error' in block">{{block.error}}</div>
     </template>
   </div>
 </template>

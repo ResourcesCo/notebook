@@ -15,14 +15,15 @@ const props = defineProps({
 const id = 'diagram-' + nanoid(8)
 const div = ref<HTMLDivElement | null>(null)
 const src = ref<string | undefined>()
+const error = ref<boolean>(false)
 
-function render() {
+async function render() {
+  error.value = false
   try {
-    mermaid.render(id, props.data, (svg => {
-      src.value = svg
-    }))
+    src.value = (await mermaid.render(id, props.data)).svg
   } catch (e) {
     console.error(`Error rendering diagram: ${e}`)
+    error.value = true
   }
 }
 
@@ -43,4 +44,5 @@ onMounted(() => {
 
 <template>
   <div ref="div" class="mermaid w-full" v-if="src !== undefined" v-html="src"></div>
+  <div v-if="error" class="color-red px-2">Error rendering diagram.</div>
 </template>

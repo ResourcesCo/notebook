@@ -103,7 +103,7 @@ const container = computed<Container>(() => {
   }
   return result
 })
-const pageKey = computed(() => `${filename.value}---${mode.value}---${file.value?.ydocCreated}--${JSON.stringify(container.value)}`)
+const pageKey = computed(() => `${filename.value}---${mode.value}---${JSON.stringify(container.value)}`)
 </script>
 
 <template>
@@ -117,19 +117,19 @@ const pageKey = computed(() => `${filename.value}---${mode.value}---${file.value
     <Tab class="right flex-shrink-0 utility" :selected="tabState.show === 'other' || otherTabState.show === 'other'"
       @click="() => toggleMode()"><span class="<sm:hidden" v-if="tabState.show === 'other'">{{ primaryComponent ===
           'view' ? 'Edit ' : 'Preview '
-      }} </span>{{
-    primaryComponent === 'view' ? '📝' : '👁'
-}}
+      }} </span>{{ primaryComponent === 'view' ? '📝' : '👁' }}
     </Tab>
     <TabViewButton class="flex-shrink-0" v-if="side === 'right'" @click="() => toggleSettings()">⚙️</TabViewButton>
     <DisplayButton class="flex-shrink-0" v-if="side === 'right'" />
     <div class="spacer <sm:hidden" v-if="side === 'left'"></div>
   </div>
-  <div :class="['overflow-auto', 'content', 'relative', side]" v-if="page && file?.ydocCreated">
+  <div :class="['overflow-auto', 'content', 'relative', side]" v-if="page">
     <PageView
+      v-if="filename !== null && file !== undefined"
       :key="pageKey"
       :notebook="notebook"
       :page="page"
+      :filename="filename"
       :file="file"
       :mode="mode"
       :container="container"

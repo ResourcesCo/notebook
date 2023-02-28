@@ -1,11 +1,10 @@
-import { reactive, Ref, onMounted, onUnmounted } from 'vue'
-import { useStorage, toReactive, watchDebounced } from '@vueuse/core'
-import { sortBy, uniqBy } from 'lodash'
-import { wait } from 'lib0/promise'
+import { reactive, Ref, onMounted, onUnmounted, watch, WatchStopHandle } from 'vue'
+import { useStorage, toReactive, watchDebounced, useEventListener, useBroadcastChannel, UseBroadcastChannelReturn } from '@vueuse/core'
+import { sortBy } from 'lodash'
 import * as Y from 'yjs'
+import { toBase64, fromBase64 } from 'lib0/buffer'
 
 import updateComponentData from './updateComponentData'
-import fixSpelling from './fixSpelling'
 import defaultNewTab from './content/_newtab.md?raw'
 import defaultWelcome from './content/_welcome.md?raw'
 import defaultSettings from './content/_settings.md?raw'
@@ -17,6 +16,7 @@ import { ContainerConfig } from '@/components/data/Containers'
 import { EnvironmentConfig } from '@/components/data/Environment'
 import { SettingsStore } from './settings'
 import { FrameStore } from './frame'
+import { defaultContent, defaultView } from './content/data'
 
 function randomClientId() {
   const array = new Uint32Array(2)
@@ -49,12 +49,7 @@ export interface NotebookFileInfo {
 export interface FileData {
   body: string
   ydoc: Y.Doc
-  ydocCreated?: number
-  clients: {
-    [key: string]: {
-      ydocCreated?: number
-    }
-  }
+  ydocStore: string[]
 }
 
 export interface NotebookContent {
@@ -66,25 +61,22 @@ export interface NotebookView {
   right: TabState
 }
 
+interface UpdateMessage {
+  filename: string,
+  update: Uint8Array,
+  transactionOrigin: any,
+}
+
 interface NotebookConfig {
   prefix: string
-  docDiscoverWait: number
-  docTransferWait: number
-  docDeleteWait: number
 }
 
 const notebookDefaults: NotebookConfig = {
   prefix: '.notebook',
-  docDiscoverWait: 50,
-  docTransferWait: 500,
-  docDeleteWait: 25
 }
 
 export class Notebook {
   prefix: string
-  docDiscoverWait: number
-  docTransferWait: number
-  docDeleteWait: number
 
   fileData: {[key: string]: FileData} = {}
   content: NotebookContent
@@ -92,141 +84,43 @@ export class Notebook {
   view: NotebookView
   containers: Ref<ContainerConfig>
   environment: Ref<EnvironmentConfig>
-  channel: BroadcastChannel
   clientId: string
   frameStore: FrameStore
   settingsStore: SettingsStore
+  viewWatchStop?: WatchStopHandle
+  broadcastChannel?: UseBroadcastChannelReturn<UpdateMessage, UpdateMessage>
+  broadcastChannelWatchStop?: WatchStopHandle
 
   constructor(config: Partial<NotebookConfig> = {}) {
     this.clientId = randomClientId()
     const fullConfig = {...notebookDefaults, config}
     this.prefix = fullConfig.prefix
-    this.docDiscoverWait = fullConfig.docDiscoverWait
-    this.docTransferWait = fullConfig.docTransferWait
-    this.docDeleteWait = fullConfig.docDeleteWait
-    const defaultContent: NotebookContent = {
-      files: {
-        "_newtab.md": {
-          "emoji": "🗂",
-          "title": "New Tab",
-        },
-        "_welcome.md": {
-          "emoji": "👋",
-          "title": "Welcome",
-        },
-        "_settings.md": {
-          "emoji": "⚙️",
-          "title": "Settings",
-        },
-        "notes-example.md": {
-          "emoji": "🗒",
-          "title": "Notes Example",
-          "primaryComponent": "edit",
-        },
-        "sandbox-example.md": {
-          "emoji": "🏝",
-          "title": "Sandbox Example",
-          "primaryComponent": "edit",
-        },
-        "request-example.md": {
-          "emoji": "🌐",
-          "title": "Request Example",
-          "primaryComponent": "edit",
-        },
-      }
-    }
-    const defaultView: NotebookView = {
-      "left": {
-        "tabs": ["notes-example.md", "sandbox-example.md", "request-example.md"],
-        "selected": "notes-example.md",
-        "lastSelected": null,
-        "show": "self",
-      },
-      "right": {
-        "tabs": ["_welcome.md"],
-        "selected": "_welcome.md",
-        "lastSelected": null,
-        "show": "self",
-      },
-    }
     const defaultContainerConfig = {containers: {}}
     const defaultEnvironmentConfig = {}
-    if (this.prefix === notebookDefaults.prefix && (localStorage.getItem(`.notebook/_content.json`) || '').trim() === '') {
-      const haveOldData = [1, 2, 3, 4, 5].some(i => (localStorage.getItem(`doc-${i}`) || '').trim().length > 0)
-      if (haveOldData) {
-        this.migrateOldData(defaultContent, defaultView)
-      }
-    }
     this.content = toReactive(useStorage(`${this.prefix}/_content.json`, defaultContent))
     this.savedView = useStorage(`${this.prefix}/_view.json`, defaultView)
     this.view = toReactive(useStorage(`${this.prefix}/_view.json`, this.savedView.value, sessionStorage))
     this.containers = useStorage(`${this.prefix}/_containers.json`, defaultContainerConfig)
     this.environment = useStorage(`${this.prefix}/_environment.json`, defaultEnvironmentConfig)
-    watchDebounced(this.view, () => this.savedView.value = this.view, {debounce: 200, maxWait: 500})
-    this.channel = new BroadcastChannel(this.prefix)
-    this.channel.onmessage = this.handleMessage.bind(this)
     this.settingsStore = new SettingsStore(this)
     this.frameStore = new FrameStore()
+    this.broadcastChannel = useBroadcastChannel<UpdateMessage, UpdateMessage>({name: this.prefix})
+    this.broadcastChannelWatchStop = watch(this.broadcastChannel.data, (update) => {
+      this.applyFileUpdate(update.filename, update.update, update.transactionOrigin, false)
+    })
   }
 
   init() {
     this.frameStore.loadModules()
+    this.viewWatchStop = watchDebounced(this.view, () => this.savedView.value = this.view, {debounce: 200, maxWait: 500})
   }
 
   cleanup() {
     this.frameStore.unloadModules()
-  }
-
-  handleMessage(e: MessageEvent) {
-    const [messageType, message] = e.data
-    if (messageType === 'opened-file') {
-      const {name, clientId} = message
-      if (clientId !== this.clientId) {
-        const file = this.getFile(name)
-        if (file.ydocCreated !== undefined) {
-          const info = {name, created: file.ydocCreated, clientId: this.clientId}
-          this.channel.postMessage(['have-ydoc', info])
-          this.channel.postMessage(['ydoc', {...info, update: Y.encodeStateAsUpdate(file.ydoc)}])
-        }
-      }
-    } else if (messageType === 'have-ydoc') {
-      const {name, created, clientId} = message
-      if (clientId !== this.clientId) {
-        const file = this.getFile(name)
-        file.clients[clientId] = {ydocCreated: created}
-      }
-    } else if (messageType === 'ydoc') {
-      const {name, created, clientId, update} = message
-      const file = this.getFile(name)
-      if (file !== undefined && clientId !== this.clientId && (file.ydocCreated === undefined || created > file.ydocCreated)) {
-        const ydoc = new Y.Doc()
-        Y.applyUpdate(ydoc, update, `client:${clientId}`)
-        file.ydoc.destroy()
-        file.ydoc = ydoc
-        file.ydocCreated = created
-        file.clients[this.clientId].ydocCreated = created
-        file.ydoc.on('update', (update: Uint8Array, origin: string | null) => {
-          if (!origin?.startsWith('client:')) {
-            this.channel.postMessage(['update', {name, update, clientId: this.clientId, created: file.ydocCreated}])
-          }
-        })
-      }
-    } else if (messageType === 'update') {
-      const {name, created, clientId, update} = message
-      const file = this.getFile(name)
-      if (file !== undefined && clientId !== this.clientId && created === file.ydocCreated) {
-        Y.applyUpdate(file.ydoc, update, `client:${clientId}`)
-      }
-    } else if (messageType === 'file-deleted') {
-      const {name, clientId} = message
-      if (clientId !== this.clientId) {
-        this.closeFile(name)
-      }
-    } else if (messageType === 'file-renamed') {
-      const {name, rename, clientId} = message
-      if (clientId !== this.clientId) {
-        this.renameFileInView(name, rename)
-      }
+    for (const watchStop of [this.viewWatchStop, this.broadcastChannelWatchStop]) {
+      if (watchStop !== undefined) {
+        watchStop()
+      }  
     }
   }
 
@@ -238,13 +132,43 @@ export class Notebook {
         undefined,
         {writeDefaults: false}
       )
+      const ydocStore = useStorage<string[]>(
+        `${this.prefix}/.doc/${name}`,
+        [],
+        undefined,
+        {writeDefaults: false}
+      )
       const ydoc = new Y.Doc()
-      const ytext = ydoc.getText('text')
-      ytext.insert(0, body.value)
-      this.fileData[name] = reactive({body, ydoc, clients: {[this.clientId]: {}}})
-      this.loadYdoc(name)
+      ydoc.on('update', (update, origin) => {
+        if (origin !== this) {
+          ydocStore.value.push(toBase64(update))
+        }
+      })
+      if (ydocStore.value.length > 0) {
+        Y.transact(ydoc, () => {
+          for (const update of ydocStore.value) {
+            Y.applyUpdate(ydoc, fromBase64(update))
+          }
+        }, this, false)
+      } else {
+        const ytext = ydoc.getText('text')
+        ytext.insert(0, body.value)
+      }
+      const fileData = reactive({body, ydoc, ydocStore})
+      this.fileData[name] = fileData
     }
     return this.fileData[name]
+  }
+
+  applyFileUpdate(filename: string, update: Uint8Array, transactionOrigin: any, broadcast = true) {
+    const file = this.fileData[filename]
+    if (file !== undefined) {
+      Y.applyUpdate(file.ydoc, update, transactionOrigin)
+      file.body = file.ydoc.getText('text').toString()
+      if (broadcast && this.broadcastChannel) {
+        this.broadcastChannel.post({filename, update, transactionOrigin: `b-${this.clientId}`})
+      }
+    }
   }
 
   closeFile(name: string) {
@@ -265,39 +189,16 @@ export class Notebook {
     }
   }
 
-  async loadYdoc(name: string) {
-    const file = this.fileData[name]
-    if (file !== undefined) {
-      this.channel.postMessage(['opened-file', {name, clientId: this.clientId}])
-      await wait(this.docDiscoverWait)
-      const clients = sortBy(
-        Object.entries(file.clients).filter(([clientId, client]) => clientId !== this.clientId && client.ydocCreated !== undefined),
-        ([clientId, client]) => client.ydocCreated
-      )
-      if (clients.length > 1) {
-        if (uniqBy(clients, ([clientId, client]) => client.ydocCreated).length > 1) {
-          console.warn('Some clients are not on the same document version')
-        }
-        await wait(this.docDiscoverWait)
-      }
-    }
-    if (file.ydocCreated === undefined) {
-      file.ydocCreated = Date.now()
-    }
-  }
-
   deleteFile(name: string) {
     if (name in this.fileData) {
       const file = this.fileData[name]
       file.ydoc.destroy()
       delete this.fileData[name]
       localStorage.removeItem(`${this.prefix}/${name}`)
-      this.channel.postMessage(['file-deleted', {clientId: this.clientId, name}])
     }
   }
 
   renameFile(name: string, rename: string) {
-    this.channel.postMessage(['file-renamed', {clientId: this.clientId, name, rename}])
     this.renameFileInView(name, rename)
   }
 
@@ -337,7 +238,6 @@ export class Notebook {
     if (environment) {
       updateComponentData(settingsText, 'Environment', this.environment.value)
     }
-    fixSpelling(settingsText)
   }
 
   async applyContentChanges({data, deletes}: {data: NotebookContentInfo, deletes: string[]}) {
@@ -345,9 +245,6 @@ export class Notebook {
       this.closeFile(del)
       delete this.content.files[del]
       this.deleteFile(del)
-    }
-    if (deletes.length > 0) {
-      await wait(this.docDeleteWait)
     }
     for (const [name, file] of Object.entries(data.files)) {
       if (typeof file.rename === 'string') {
@@ -396,38 +293,6 @@ export class Notebook {
     this.environment.value = environment
   }
 
-  migrateOldData(content: NotebookContent, view: NotebookView) {
-    let number = 1;
-    const newKeys: string[] = []
-    for (const i of [1, 2, 3, 4, 5]) {
-      const oldKey = `doc-${i}`
-      const savedData = (localStorage.getItem(oldKey) || '').trim()
-      if (savedData.length > 0) {
-        const newKey = `untitled-${number}.md`
-        const data = (
-          (
-            oldKey === 'doc-5' ?
-            'NOTE: This was previously called the Settings page.\n' +
-            'It has been moved to this page to make room for the new settings page.\n\n---\n' : ''
-          ) + (localStorage.getItem(oldKey) || '')
-        )
-        this.getFile(
-          `${this.prefix}/${newKey}`, data
-        )
-        localStorage.removeItem(oldKey)
-        content.files[newKey] = {
-          emoji: '📝',
-          title: `Untitled ${number}`
-        }
-        newKeys.push(newKey)
-        number++;
-      }
-    }
-    const divide = Math.ceil(newKeys.length / 2)
-    view.left.tabs = [...view.left.tabs, ...newKeys.slice(0, divide)]
-    view.right.tabs = [...view.right.tabs, ...newKeys.slice(divide)]
-  }
-
   navigate(url: string) {
     const urlObj = new URL(url, 'http://example.com/')
     const {pathname, hash} = urlObj
@@ -439,10 +304,22 @@ export class Notebook {
       }
     }
   }
+
+  onWindowFocus() {
+    for (const file of Object.values(this.fileData)) {
+      // TODO: save the last saved time in memory and in localStorage, and if the one in
+      // localStorage is newer, replace the one in memory with the one in localStorage
+      // versioning is needed and so is saving Yjs updates
+      // const ytext = ydoc.getText('text')
+      // ytext.insert(0, body.value)
+      // this.fileData[name] = reactive({body, ydoc})
+    }
+  }
 }
 
 export function useNotebook(): Notebook {
   const notebook = new Notebook()
+  useEventListener(window, 'focus', () => notebook.onWindowFocus())
   onMounted(() => {
     notebook.init()
   })
