@@ -18,7 +18,7 @@ describe('mount component', () => {
         props: {
           data: example,
         },
-      }).html()
+      })
     }).toThrowError(/provide/)
   })
 })
